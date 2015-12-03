@@ -1,0 +1,48 @@
+
+digraph G {
+	rankdir=TD
+	{	node [style=filled shape=box]
+		build test publish customize install upgrade rollback administer
+	}
+	subgraph cluster_0 {
+		edge [penwidth=3.0]
+		build -> test -> publish -> customize -> install
+		administer -> install -> administer
+		administer -> upgrade -> administer
+		administer -> rollback -> administer
+	}
+	{
+		edge [style=dashed]
+		node [penwidth=0]
+
+		applianceKs [label="o-n-appliance.ks"]
+		lmc [label="livemedia-creator"]
+		applianceKs -> build
+		lmc -> build
+
+		cloud_init [label="cloud-init"]
+		squashfs [label="o-n-appliance.squashfs.img"]
+		installKs [label="o-n-appliance-auto-install.ks"]
+		build -> squashfs
+		cloud_init -> test
+		squashfs -> test
+		guestfish -> test
+		anaconda -> test
+		installKs -> test
+
+		jenkins -> publish
+		yaml -> publish
+
+		guestfish -> customize
+		lmc -> customize
+
+		lvm -> install
+		anaconda -> install
+
+		cockpitPlugin [label="cockpit-plugin-ovirt"]
+		cockpit -> administer
+		cockpitPlugin -> administer
+
+		imgbased -> { administer upgrade rollback }
+	}
+}

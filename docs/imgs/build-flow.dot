@@ -1,0 +1,11 @@
+
+digraph G {
+	label="build"
+	rankdir=LR
+
+	ks [label="ovirt-node-appliance.ks"]
+	lmc [label="livemedia-creator" shape=box style=filled]
+	squashfs [label="ovirt-node-appliance.squashfs.img"]
+
+	ks -> lmc -> squashfs
+}
