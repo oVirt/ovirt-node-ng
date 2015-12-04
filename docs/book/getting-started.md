@@ -6,13 +6,17 @@ a VM for testing.
 ## Prerequisities
 
 Node is mainly developed on rpm based distributions like Fedora and CentOS 7.
-The main requirements are
+The main requirements are:
 
 - git
 - qemu
-- libguestfs
 - python
-
+- python-pep8
+- pyflakes
+- python-nose
+- python-sh
+- libguestfs
+- libguestfs-tools
 
 ## Bootstrap
 
