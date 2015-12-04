@@ -1,30 +1,83 @@
 # Installation
 
-To install the Node squashfs image you need a kickstart file which points
+To install the Node squashfs image you need a kickstart file.
 
 ## Overview
 
-**FIXME**
+`Anaconda` is the installation program used by Fedora, Red Hat Enterprise Linux,
+CentOS and some other distributions. It allows the user to install the operating
+system software on the target computer. Additionally, it can also upgrade existing
+installations of earlier versions of the same distribution.
 
-- Anaconda for installation
-- Important to use Thin LVM
+### Highlight features that ovirt-node-appliace take advance of Anaconda:
 
+* Automatically create partitions
 
-## Anaconda
+* `LVM Thin Provisioning` support helps users to make snapshot and
+rollbacks in the system.
 
-Anaconda is the installer of Fedora, CentOS, and RHEL.
-As stated above, anaconda can use the liveimg as an installation source. And
-thin provisioned LVM Logical Volumes can be used as an installation
-destination.
+* Install disk image instead of packages.
 
 Anaconda does not need any modifications to provide the required functional of
-this design. All other functionality of anaconda works without limitations.
+this design. All other functionality of Anaconda works without limitations.
+
+## Anaconda Kickstart
+
+The Anaconda kickstart is an automated installation method to install operating system.
+
+System administrator and/or developers can create a single file (.ks) containing the answers
+to all the questions that would normally be asked during a typical installation.
+
+The minimal requirement kickstart options are `liveimg` and `autopart`. Anaconda then
+will use that kickstart to proceed with the installation.
+
+In the `liveimg` option it can be the `squashfs.img` from a Live iso,
+or any filesystem mountable by the install media (eg. ext4).
+
+`autopart` automatically create partitions -- a root (/) partition, a swap partition,
+and an appropriate boot partition for the architecture. On large enough drives,
+this will also create a /home partition.
+
+**NOTE**: Using only minimal kickstart requirement options (`liveimg` and `autopart`)
+will trigger the manual installation. For more detailed information about kickstart
+options or automatic installations, please see official kickstart documentation.
 
 ## Anaconda Boot Options
 
-**FIXME**
-Like in "Build Process", important to create a kickstart which points
-to the liveimg. Anaconda then needs to use that kickstart
+To start a Kickstart installation, a special boot option `inst.ks=` must be specified
+when booting the system.
+
+# Example: Manual installation of Node from a webserver
+
+## Install httpd
+
+`httpd` must be installed on a separate host
+
+    $ sudo yum -y install httpd
+    $ sudo systemctl start httpd
+    $ sudo systemctl enable httpd
+
+## Publish the `squashfs` image
+
+Build locally the ovirt-node-appliance squashfs image or download
+the last successfully image from ovirt jekins job and make it available
+in the httpd server.
+
+    $ cd /var/www/html
+    $ wget http://jenkins.ovirt.org/job/ovirt-appliance-node_master_create-squashfs-el7_merged/lastSuccessfulBuild/artifact/exported-artifacts/ovirt-node-appliance.squashfs.img
+
+## Create the kickstart
+
+Create the minimal-ngn.ks in the httpd public dir
+
+    $ cat minimal-ngn.ks
+    autopart --type=thinp --fstype=ext4
+    liveimg --url=http://server/ovirt-node-appliance.squashfs.img
+
+## Start the installation
+
+At this stage, you should be able to proceed with the manual installation adding
+into the boot kargs the kickstart flag inst.ks=http://server/minimal-ngn.ks
 
 # PXE Installation
 
@@ -42,3 +95,7 @@ to the liveimg. Anaconda then needs to use that kickstart
 3. Run `livecd-iso-to-disk --ks liveimg-install.ks $CENTOS_ISO $DISK`
 4. Mount the created disk, and copy the squashfs image to the same directory as the `liveimg-install.ks` file.
 
+# Additional reference
+
+Kickstart Documentation
+https://github.com/rhinstaller/pykickstart/blob/master/docs/kickstart-docs.rst
