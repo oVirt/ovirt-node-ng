@@ -13,6 +13,12 @@ image-install: ovirt-node-appliance-auto-installation.ks.in ovirt-node-appliance
 	$(MAKE) -f image-tools/build.mk DISTRO=$(DISTRO) RELEASEVER=$(RELEASEVER) DISK_SIZE=$$(( 10 * 1024 )) SPARSE= ovirt-node-appliance-auto-installation.qcow2
 	cp -v anaconda.log anaconda-$@.log
 
+ovirt-node-appliance-auto-installation.ks.in:
+	ln -sv data/$@ .
+
+ovirt-node-appliance.ks:
+	ln -sv data/$@ .
+
 verrel:
 	@bash image-tools/image-verrel rootfs org.ovirt.Node x86_64
 
