@@ -21,12 +21,10 @@ The main requirements are:
 ## Bootstrap
 
 The starting point is the `ovirt-node-appliance` which is currently living in
-the `ovirt-appliance` repository:
+the `ovirt-node-ng` repository:
 
-    git clone git://gerrit.ovirt.org/ovirt-appliance.git
+    git clone git://gerrit.ovirt.org/ovirt-node-ng.git
     git submodule update --init --recursive
-
-    cd node-appliance
 
 
 ## Building the image
