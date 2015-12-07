@@ -2,8 +2,8 @@
 DISTRO=centos
 RELEASEVER=7
 
-#all: ovirt-node-ng.squashfs
-#	echo Done
+all: ovirt-node-ng.squashfs
+	echo Done
 
 # Builds the rootfs
 image-build: ovirt-node-ng.qcow2
@@ -40,19 +40,11 @@ verrel:
 %-manifest-rpm: %.qcow2
 	 guestfish --ro -i -a $< sh 'rpm -qa | sort -u' > $@
 
-# Direct for virt-sparsify: http://libguestfs.org/guestfs.3.html#backend
-export LIBGUESTFS_BACKEND=direct
-# Workaround nest problem: https://bugzilla.redhat.com/show_bug.cgi?id=1195278
-export LIBGUESTFS_BACKEND_SETTINGS=force_tcg
-export TEST_NODE_ROOTFS_IMG=$(PWD)/ovirt-node-ng.qcow2
-export TEST_NODE_SQUASHFS_IMG=$(PWD)/ovirt-node-ng.squashfs.img
-export PYTHONPATH=$(PWD)/../tests/
-# We explicitly set now targets (i.e. qcow2 images) as dependencies
-# building them is up to the user
-check:
-	pyflakes tests/*.py
-	pep8 tests/*.py
-	cd tests && nosetests --with-xunit -v -w .
-
 clean:
 	-rm -vf ovirt-node-ng.qcow2 ovirt-node-ng.squashfs.img ovirt-node-ng-manifest-rpm
+
+clean-build-and-check: | clean image-build check
+	echo Done
+
+check:
+	$(MAKE) -C tests check
