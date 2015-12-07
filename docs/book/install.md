@@ -59,12 +59,12 @@ when booting the system.
 
 ## Publish the `squashfs` image
 
-Build locally the ovirt-node-appliance squashfs image or download
+Build locally the ovirt-node-ng squashfs image or download
 the last successfully image from ovirt jekins job and make it available
 in the httpd server.
 
     $ cd /var/www/html
-    $ wget http://jenkins.ovirt.org/job/ovirt-appliance-node_master_create-squashfs-el7_merged/lastSuccessfulBuild/artifact/exported-artifacts/ovirt-node-appliance.squashfs.img
+    $ wget http://jenkins.ovirt.org/job/ovirt-appliance-node_master_create-squashfs-el7_merged/lastSuccessfulBuild/artifact/exported-artifacts/ovirt-node-ng.squashfs.img
 
 ## Create the kickstart
 
@@ -72,7 +72,7 @@ Create the minimal-ngn.ks in the httpd public dir
 
     $ cat minimal-ngn.ks
     autopart --type=thinp --fstype=ext4
-    liveimg --url=http://server/ovirt-node-appliance.squashfs.img
+    liveimg --url=http://server/ovirt-node-ng.squashfs.img
 
 ## Start the installation
 
@@ -91,7 +91,7 @@ into the boot kargs the kickstart flag inst.ks=http://server/minimal-ngn.ks
 **FIXME**
 
 1. Fetch a CentOS 7 installation ISO
-2. Create a kickstart file using: `echo "liveimg --url=file://ovirt-node-appliance.squashfs.img" > liveimg-install.ks`
+2. Create a kickstart file using: `echo "liveimg --url=file://ovirt-node-ng.squashfs.img" > liveimg-install.ks`
 3. Run `livecd-iso-to-disk --ks liveimg-install.ks $CENTOS_ISO $DISK`
 4. Mount the created disk, and copy the squashfs image to the same directory as the `liveimg-install.ks` file.
 

@@ -2,29 +2,32 @@
 DISTRO=centos
 RELEASEVER=7
 
+#all: ovirt-node-ng.squashfs
+#	echo Done
+
 # Builds the rootfs
-image-build: ovirt-node-appliance.qcow2
+image-build: ovirt-node-ng.qcow2
 	cp -v virt-install.log virt-install-$@.log
 
 # Simulates an auto-installation
-image-install: SQUASHFS_URL="@HOST_HTTP@/ovirt-node-appliance.squashfs.img"
-image-install: ovirt-node-appliance-auto-installation.ks.in ovirt-node-appliance.squashfs.img
-	sed -e "s#@SQUASHFS_URL@#$(SQUASHFS_URL)#" ovirt-node-appliance-auto-installation.ks.in > ovirt-node-appliance-auto-installation.ks
-	$(MAKE) -f image-tools/build.mk DISTRO=$(DISTRO) RELEASEVER=$(RELEASEVER) DISK_SIZE=$$(( 10 * 1024 )) SPARSE= ovirt-node-appliance-auto-installation.qcow2
+image-install: SQUASHFS_URL="@HOST_HTTP@/ovirt-node-ng.squashfs.img"
+image-install: ovirt-node-ng-auto-installation.ks.in ovirt-node-ng.squashfs.img
+	sed -e "s#@SQUASHFS_URL@#$(SQUASHFS_URL)#" ovirt-node-ng-auto-installation.ks.in > ovirt-node-ng-auto-installation.ks
+	$(MAKE) -f image-tools/build.mk DISTRO=$(DISTRO) RELEASEVER=$(RELEASEVER) DISK_SIZE=$$(( 10 * 1024 )) SPARSE= ovirt-node-ng-auto-installation.qcow2
 	cp -v anaconda.log anaconda-$@.log
 
-ovirt-node-appliance-auto-installation.ks.in:
+ovirt-node-ng-auto-installation.ks.in:
 	ln -sv data/$@ .
 
-ovirt-node-appliance.ks:
+ovirt-node-ng.ks:
 	ln -sv data/$@ .
 
 verrel:
 	@bash image-tools/image-verrel rootfs org.ovirt.Node x86_64
 
 %.qcow2: %.ks
-# Ensure that the url line contains the distro
-	sudo python scripts/ovirt-node-ng-build-tool.py --qcow-debug --base $(DISTRO)$(RELEASEVER) --kickstart $< $@
+	# Ensure that the url line contains the distro
+	python scripts/ovirt-node-ng-build-tool.py --qcow-debug --base $(DISTRO)$(RELEASEVER) --kickstart $< $@
 
 %.squashfs.img: %.ks
 	python scripts/ovirt-node-ng-build-tool.py --base $(DISTRO)$(RELEASEVER) --kickstart $< $@
@@ -36,8 +39,8 @@ verrel:
 export LIBGUESTFS_BACKEND=direct
 # Workaround nest problem: https://bugzilla.redhat.com/show_bug.cgi?id=1195278
 export LIBGUESTFS_BACKEND_SETTINGS=force_tcg
-export TEST_NODE_ROOTFS_IMG=$(PWD)/ovirt-node-appliance.qcow2
-export TEST_NODE_SQUASHFS_IMG=$(PWD)/ovirt-node-appliance.squashfs.img
+export TEST_NODE_ROOTFS_IMG=$(PWD)/ovirt-node-ng.qcow2
+export TEST_NODE_SQUASHFS_IMG=$(PWD)/ovirt-node-ng.squashfs.img
 export PYTHONPATH=$(PWD)/../tests/
 # We explicitly set now targets (i.e. qcow2 images) as dependencies
 # building them is up to the user
@@ -47,4 +50,4 @@ check:
 	cd tests && nosetests --with-xunit -v -w .
 
 clean:
-	-rm -vf ovirt-node-appliance.qcow2 ovirt-node-appliance.squashfs.img ovirt-node-appliance-manifest-rpm
+	-rm -vf ovirt-node-ng.qcow2 ovirt-node-ng.squashfs.img ovirt-node-ng-manifest-rpm

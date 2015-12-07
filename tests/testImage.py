@@ -35,9 +35,9 @@ sh.ErrorReturnCode.truncate_cap = 999999
 
 
 squashfsimg = os.environ.get("TEST_NODE_SQUASHFS_IMG",
-                             "ovirt-node-appliance.squashfs.img")
+                             "ovirt-node-ng.squashfs.img")
 qcowimg = os.environ.get("TEST_NODE_ROOTFS_IMG",
-                         "ovirt-node-appliance.qcow2")
+                         "ovirt-node-ng.qcow2")
 
 
 @unittest.skipUnless(os.path.exists(qcowimg), "qcow2 is missing")

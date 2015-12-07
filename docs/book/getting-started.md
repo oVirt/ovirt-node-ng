@@ -20,7 +20,7 @@ The main requirements are:
 
 ## Bootstrap
 
-The starting point is the `ovirt-node-appliance` which is currently living in
+The starting point is the `ovirt-node-ng` which is currently living in
 the `ovirt-node-ng` repository:
 
     git clone git://gerrit.ovirt.org/ovirt-node-ng.git
@@ -29,8 +29,8 @@ the `ovirt-node-ng` repository:
 
 ## Building the image
 
-To build the `ovirt-node-appliance.squashfs.img` image from the
-`ovirt-node-appliance.ks` you now just need to run the following command and
+To build the `ovirt-node-ng.squashfs.img` image from the
+`ovirt-node-ng.ks` you now just need to run the following command and
 be patient:
 
     # To build the squashfs image (liveimg):
@@ -50,24 +50,24 @@ This can be done by running:
     make image-install
 
 This will install the previously generated squashfs image to the
-`ovirt-node-appliance-auto-install.qocw2` disk image.
+`ovirt-node-ng-auto-install.qocw2` disk image.
 The auto-installation ensures that LVM Thin is used, otherwise the upgrade and
 rollbacks would not work.
 
 This disk image can be booted in KVM and used for debugging and testing.
 
 **NOTE:** A root password can be set in the
-`ovirt-node-appliance-auto-install.ks.in` kickstart _before_ the install.
+`ovirt-node-ng-auto-install.ks.in` kickstart _before_ the install.
 
 
 ## Making Changes
 
-The appliance image itself is defined by the `ovirt-node-appliance.ks` file.
+The appliance image itself is defined by the `ovirt-node-ng.ks` file.
 Any change to that file will lead to a change in the appliance.
 
 Note that some changes (i.e. root password) might be overriden or deactivated
 at installation time by directives in the
-`ovirt-node-appliance-auto-installation.ks`.
+`ovirt-node-ng-auto-installation.ks`.
 
 Once you did a change you can commit the change and post it to
 [oVirt Gerrit](http://gerrit.ovirt.org) for review.

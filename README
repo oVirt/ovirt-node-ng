@@ -21,9 +21,9 @@ To get started with Node, you first need to clone the appliance and build it:
     # To build the squashfs image (liveimg):
     make image-build
 
-**Note:** The `ovirt-node-appliance.ks` is used to build the `ovirt-node-appliance-squashfs-img`
+**Note:** The `ovirt-node-ng.ks` is used to build the `ovirt-node-ng-squashfs-img`
 
-The created `ovirt-node-appliance.squashfs.img` contains the root-file-system and will be used for installation.
+The created `ovirt-node-ng.squashfs.img` contains the root-file-system and will be used for installation.
 
 ## Install
 
@@ -40,14 +40,14 @@ This command will download the correct CentOS 7 images and pass them to `qemu` t
 
 After the installation you can import the container into libvirt to use it.
 
-**Hint:** The `ovirt-node-appliance-auto-installation.ks` file is used for the auto-installation of the squashfs image.
+**Hint:** The `ovirt-node-ng-auto-installation.ks` file is used for the auto-installation of the squashfs image.
 
 ### [WIP] Create USB media
 
 The squashfs image, a kickstart, and  `livecd-iso-to-disk` can be used to create a bootable USB media using the following steps:
 
 1. Fetch a CentOS 7 installation ISO
-2. Create a kickstart file using: `echo "liveimg --url=file://ovirt-node-appliance.squashfs.img" > liveimg-install.ks`
+2. Create a kickstart file using: `echo "liveimg --url=file://ovirt-node-ng.squashfs.img" > liveimg-install.ks`
 3. Run `livecd-iso-to-disk --ks liveimg-install.ks $CENTOS_ISO $DISK` 
 4. Mount the created disk, and copy the squashfs image to the same directory as the `liveimg-install.ks` file.
 

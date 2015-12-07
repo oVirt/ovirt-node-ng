@@ -89,7 +89,7 @@ kickstart='appname.ks', qcow_debug=True)
 def validate_cmdline(args):
     '''validates the arguments passed to the utility
 
-    >>> test = {"kickstart": "ovirt-node-appliance.ks",\
+    >>> test = {"kickstart": "ovirt-node-ng.ks",\
                 "disk_file": "test.out"}
     >>> validate_cmdline(test)
     '''
@@ -162,7 +162,7 @@ def main():
     try:
         # TODO: do something with the output?
         output = subprocess.check_call(['livemedia-creator',
-                                        '--ks', 'ovirt-node-appliance.ks',
+                                        '--ks', 'ovirt-node-ng.ks',
                                         '--iso', 'boot.iso',
                                         '--resultdir', results]
                                        + output_format, shell=False)

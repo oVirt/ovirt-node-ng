@@ -29,7 +29,7 @@ See the [official kickstart documentation](https://github.com/rhinstaller/pykick
 for more informations.
 
 The specific kickstart which defines the oVirt Node appliance is defined in the
-`ovirt-node-appliance.ks` file, which hosted in the
+`ovirt-node-ng.ks` file, which hosted in the
 `ovirt-node-ng` repository.
 See the [getting started section](getting-started.md) for how to clone that
 repository.
