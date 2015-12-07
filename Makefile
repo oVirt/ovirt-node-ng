@@ -4,7 +4,7 @@ RELEASEVER=7
 
 # Builds the rootfs
 image-build: ovirt-node-appliance.qcow2
-	cp -v anaconda.log anaconda-$@.log
+	cp -v virt-install.log virt-install-$@.log
 
 # Simulates an auto-installation
 image-install: SQUASHFS_URL="@HOST_HTTP@/ovirt-node-appliance.squashfs.img"
@@ -24,15 +24,13 @@ verrel:
 
 %.qcow2: %.ks
 # Ensure that the url line contains the distro
-	egrep -q "^url .*$(DISTRO)" $<
-	make -f image-tools/build.mk DISTRO=$(DISTRO) RELEASEVER=$(RELEASEVER) $@
+	sudo python scripts/ovirt-node-ng-build-tool.py --qcow-debug --base $(DISTRO)$(RELEASEVER) --kickstart $< $@
 
-%.squashfs.img: %.qcow2
-	make -f image-tools/build.mk $@
-	unsquashfs -ll $@
+%.squashfs.img: %.ks
+	python scripts/ovirt-node-ng-build-tool.py --base $(DISTRO)$(RELEASEVER) --kickstart $< $@
 
 %-manifest-rpm: %.qcow2
-	 make -f image-tools/build.mk $@
+	 guestfish --ro -i -a $< sh 'rpm -qa | sort -u' > $@
 
 # Direct for virt-sparsify: http://libguestfs.org/guestfs.3.html#backend
 export LIBGUESTFS_BACKEND=direct
