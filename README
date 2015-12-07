@@ -21,7 +21,7 @@ To get started with Node, you first need to clone the appliance and build it:
     # To build the squashfs image (liveimg):
     make image-build
 
-**Note:** The `ovirt-node-ng.ks` is used to build the `ovirt-node-ng-squashfs-img`
+**Note:** The `ovirt-node-ng.ks` is used to build `ovirt-node-ng-squashfs-img`
 
 The created `ovirt-node-ng.squashfs.img` contains the root-file-system and will be used for installation.
 
@@ -30,17 +30,17 @@ The created `ovirt-node-ng.squashfs.img` contains the root-file-system and will 
 You need
 
 1. a CentOS 7 boot ISO and
-2. a kickstart to tell anaconda where to get the squashfs image from
+2. a kickstart which tells anaconda where to get the squashfs image from
  
-There is a `makefile` target to simulate this locally using `qemu`:
+There is a `Makefile` target to simulate this locally using `qemu`:
 
     make image-install
 
-This command will download the correct CentOS 7 images and pass them to `qemu` to launch an installation which will in turn install the previously created squashfs image into a VM.
+This command will download the correct CentOS 7 images and pass them to `qemu` to launch an installation which will, in turn, install the previously created squashfs image into a VM.
 
-After the installation you can import the container into libvirt to use it.
+After the installation you can import the image into libvirt to use it. You can also use it directly with qemu, import it into glance, examine/modify it with libguestfs, or otherwise treat it like a normal disk image.
 
-**Hint:** The `ovirt-node-ng-auto-installation.ks` file is used for the auto-installation of the squashfs image.
+**Hint:** The `ovirt-node-ng-auto-installation.ks` file is used for the auto-installation of the squashfs image. Modify `ovirt-node-ng-auto-installation.ks.in` in order to make changes which are reflected in `ovirt-node-ng-auto-installation.ks`
 
 ### [WIP] Create USB media
 
