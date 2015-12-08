@@ -11,6 +11,7 @@ The main requirements are:
 - git
 - qemu
 - python
+- python-requests
 - python-pep8
 - pyflakes
 - python-nose
