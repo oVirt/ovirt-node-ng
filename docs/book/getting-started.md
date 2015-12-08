@@ -52,14 +52,14 @@ This can be done by running:
     make image-install
 
 This will install the previously generated squashfs image to the
-`ovirt-node-ng-auto-install.qocw2` disk image.
+`ovirt-node-ng-auto-install.qcow2` disk image.
 The auto-installation ensures that LVM Thin is used, otherwise the upgrade and
 rollbacks would not work.
 
 This disk image can be booted in KVM and used for debugging and testing.
 
 **NOTE:** A root password can be set in the
-`ovirt-node-ng-auto-install.ks.in` kickstart _before_ the install.
+`ci-image-install.ks` kickstart _before_ the install.
 
 
 ## Making Changes
@@ -69,7 +69,7 @@ Any change to that file will lead to a change in the appliance.
 
 Note that some changes (i.e. root password) might be overriden or deactivated
 at installation time by directives in the
-`ovirt-node-ng-auto-installation.ks`.
+`ci-image-install.ks`
 
 Once you did a change you can commit the change and post it to
 [oVirt Gerrit](http://gerrit.ovirt.org) for review.

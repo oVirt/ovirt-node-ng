@@ -9,15 +9,20 @@ RELEASEVER=7
 image-build: ovirt-node-ng.qcow2
 	cp -v virt-install.log virt-install-$@.log
 
-# Simulates an auto-installation
-image-install: SQUASHFS_URL="@HOST_HTTP@/ovirt-node-ng.squashfs.img"
-image-install: ovirt-node-ng-auto-installation.ks.in ovirt-node-ng.squashfs.img
-	sed -e "s#@SQUASHFS_URL@#$(SQUASHFS_URL)#" ovirt-node-ng-auto-installation.ks.in > ovirt-node-ng-auto-installation.ks
-	$(MAKE) -f image-tools/build.mk DISTRO=$(DISTRO) RELEASEVER=$(RELEASEVER) DISK_SIZE=$$(( 10 * 1024 )) SPARSE= ovirt-node-ng-auto-installation.qcow2
-	cp -v anaconda.log anaconda-$@.log
+boot.iso:
+	curl -O http://mirror.centos.org/centos-7/7/os/x86_64/images/boot.iso
 
-ovirt-node-ng-auto-installation.ks.in:
-	ln -sv data/$@ .
+image-install: data/ci-image-install.ks ovirt-node-ng.squashfs.img boot.iso
+	virt-install \
+		--name ngn-install \
+		--memory 4096 \
+		--vcpus 4 --cpu host \
+		--os-variant rhel7 \
+		--location boot.iso \
+		--extra-args "inst.ks=file:///ci-image-install.ks" \
+		--initrd-inject data/ci-image-install.ks \
+		--disk path=ovirt-node-ng.squashfs.img,readonly=on,device=disk,bus=virtio,serial=livesrc \
+		--disk path=ovirt-node-ng-auto-installation.raw,size=20,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=raw
 
 ovirt-node-ng.ks:
 	ln -sv data/$@ .

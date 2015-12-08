@@ -1,4 +1,0 @@
-[submodule "image-tools"]
-    path = image-tools
-    url = https://github.com/fabiand/image-tools.git
-
