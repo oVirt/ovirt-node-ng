@@ -169,7 +169,7 @@ def main():
 
     livemedia_creator_cmd = ['livemedia-creator',
                              '--ks', args.kickstart,
-                             '--iso', 'boot.iso',
+                             '--iso', iso,
                              '--resultdir', results]
 
     if args.qcow_debug:
