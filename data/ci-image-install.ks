@@ -1,3 +1,7 @@
+#
+# CentOS 7.2 compatible kickstart for CI auto-installation
+#
+
 lang en_US.UTF-8
 keyboard us
 timezone --utc Etc/UTC
@@ -6,12 +10,12 @@ selinux --permissive
 network --bootproto=dhcp
 firstboot --reconfig
 
-rootpw --lock
-user --name=node --lock
+rootpw --plaintext ovirt
+user --name=ovirt --plaintext --password=ovirt
 
 poweroff
 
-clearpart --all --initlabel # --disklabel=gpt
+clearpart --all --initlabel --disklabel=gpt
 bootloader --timeout=1
 autopart --type=thinp --fstype=ext4
 

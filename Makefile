@@ -13,16 +13,19 @@ boot.iso:
 	curl -O http://mirror.centos.org/centos-7/7/os/x86_64/images/boot.iso
 
 image-install: data/ci-image-install.ks ovirt-node-ng.squashfs.img boot.iso
+	#curl "http://mirror.centos.org/centos/7/os/x86_64/Packages/" | grep centos-release-7-2 || ( echo "ERROR: CentOS 7.2 is required" ; exit 1  ; )
 	virt-install \
-		--name ngn-install \
+		--name $@-$(shell date +%F-%H%M) \
 		--memory 4096 \
 		--vcpus 4 --cpu host \
 		--os-variant rhel7 \
+		--rng random \
+		--noreboot \
 		--location boot.iso \
 		--extra-args "inst.ks=file:///ci-image-install.ks" \
 		--initrd-inject data/ci-image-install.ks \
-		--disk path=ovirt-node-ng.squashfs.img,readonly=on,device=disk,bus=virtio,serial=livesrc \
-		--disk path=ovirt-node-ng-auto-installation.raw,size=20,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=raw
+		--disk path=ovirt-node-ng-auto-installation.raw,size=20,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=raw \
+		--disk path=ovirt-node-ng.squashfs.img,readonly=on,device=disk,bus=virtio,serial=livesrc
 
 ovirt-node-ng.ks:
 	ln -sv data/$@ .
