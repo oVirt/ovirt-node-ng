@@ -4,10 +4,15 @@ set -x
 
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
+export PATH=$PATH:/sbin:/usr/sbin
+export TMPDIR=/var/tmp/
+
+prepare() {
+  git submodule update --init --recursive
+}
+
 build() {
-  bash -xe ci/pre.sh
-  bash -xe ci/build.sh
-  bash -xe ci/test.sh
+  make image-build ovirt-node-ng-manifest-rpm
 
   mkdir "$ARTIFACTSDIR"
 
@@ -30,8 +35,7 @@ prepare_boot() {
   sed "s#@SQUASHFS_URL@#$SQUASHFS_URL#" ovirt-node-ng-auto-installation.ks.in > ovirt-node-ng-auto-installation.ks
   sed -i -e "/http_proxy=/ d" -e "s/^poweroff/reboot/" *-installation.ks
 
-  # Fetch the installer image of Fedora 21, can get removed once CentOS 7.1 is released
-  bash image-tools/bootstrap_anaconda fedora 21
+  bash image-tools/bootstrap_anaconda centos 7
 
   mv -v \
     *.ks .treeinfo \
@@ -47,5 +51,6 @@ prepare_boot() {
   ls -shal "$ARTIFACTSDIR/" "$ARTIFACTSDIR/images" || :
 }
 
+prepare
 build
 prepare_boot
