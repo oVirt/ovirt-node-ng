@@ -18,6 +18,7 @@ The main requirements are:
 - python-sh
 - libguestfs
 - libguestfs-tools
+- lorax
 
 ## Bootstrap
 
