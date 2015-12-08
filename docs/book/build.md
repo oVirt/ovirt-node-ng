@@ -140,38 +140,46 @@ install the required packages onto disk.
 
 Let's see how this step looks in-depth.
 
-## Anaconda arguments
-
-The key is to get anaconda to do an unattended install based on the kickstart.
-To achieve this you need to pass the following arguments to anaconda:
-
-    inst.cmdline inst.ks=<url-to-ks> inst.stage2=live:CDLABEL=CentOS\x207\x20x86_64
-
-This assumes that a CentOS 7 installation ISO is attached to the VM.
-
-See the [anaconda boot options documentation](https://github.com/rhinstaller/anaconda/blob/master/docs/boot-options.rst)
-for the details of those arguments.
-
-
 Before we continue: both of the methods described below are using the same
 basic mechanism to perform the installation. They only differ in additional
 logic around pre- and post-processing of the kickstart and the final image.
 
-## Current build process: `image-tools`
+## Current build process: `livemedia-creator`
 
-**FIXME** Aren't we using livemedia-creator now?
-The `image-tools` script collection is mimicing the behavior of
-`livemedia-creator`, the main difference is that `image-tools` are using
-qemu directly, to be able to use these scripts in Jenkins.
+The image is built using `livemedia-creator`. `livemedia-creator` uses
+[Anaconda](https://github.com/rhinstaller/anaconda),
+[kickstart](https://github.com/rhinstaller/pykickstart),
+and [Lorax](https://github.com/rhinstaller/lorax) to create a wide range of
+outputs, with a focus on flexibility. `livemedia-creator` is used extensively
+by many other projects, and it is used here to provide a stable, maintained
+way to perform the necessary build and install steps rather than using the
+installer tools directly.
 
-To get started, you can clone the `image-tools`
+The `ovirt-node-ng` repository includes a wrapper around `livemedia-creator`
+to simplify usage, and only two arguments need to be provided, with an
+optional flag which may be used for development.
 
-    git clone https://github.com/fabiand/image-tools
+`scripts/ovirt-node-ng-build-tool.py` is used to build, and takes the
+following arguments:
 
-The main build logic is in the `anaconda_install` script.
-This script will then perform the installation as described previously.
+    --kickstart KICKSTART
+                          the kickstart describing the image to create
+    --base BASE           The path to a netinstall ISO, or one of
+                          [fedora23|centos7] and the image will be retrieved
+                          automatically
+    --qcow-debug          creates a qcow2 image instead of fs for debugging
+                          purposes
 
-**FIXME** this tool should be obsoleted by koji and livemdia-creator
+To use it, simply pass `--kickstart data/ovirt-node-ng.ks` (for a manual,
+step-by-step install), and your choice of `--base fedora23` or
+`--base centos7`, depending on what you'd like your Node image based upon.
+
+Recent versions of Fedora should work, as should other distros (as long as
+they're RPM-based, and derived from EL7/F21 or later. Please don't try this
+with CentOS 6!), but they probably won't be supported. We'd love to know if
+you get it working with another distro, though.
+
+**FIXME** koji support should be added
 
 
 ### Image Format: Liveimg
