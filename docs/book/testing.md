@@ -1,11 +1,11 @@
 # Testing
 
 Continous Integration is an integral part of Node.
-The fact that there is also an Engine appliance is very benefitial.
+The fact that there is also an Engine appliance is very beneficial.
 
 ## Overview
 
-- Engine and Node appliance are spawned in distinct but connected
+- Engine and Node appliances are spawned in distinct, but connected,
   (user-session) VMs
 - virt-install is used to setup the VMs
 - cloud-init is used to do the basic OS configuration (passwords, ssh, and IP

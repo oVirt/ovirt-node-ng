@@ -10,6 +10,7 @@ Several aspects of this integration are discussed in this section.
 **FIXME**
 
 - No updates through Engine
-- Host discovers updates itself, signal available upgrade to Engine needs RFE
+- Host discovers updates itself, then signals that an upgrade is available
+  to Engine. Needs RFE
 - RFE needed to let Engine rollback host if needed
   (chain: engine->vdsm->imgbase)

@@ -1,32 +1,32 @@
 # Filesystem layout and concepts
 
 
-To especially let upgrades work correctly imgbase is making a few assumptions
-about file locations and how the filesystem is organized.
-These concepts are well defined by OSTree and the Stateless project from
-systemd.
+`imgbased` makes a few assumptions about file locations and how the filesystem
+is organized in order to make upgrades work correctly
+These concepts have been clearly defined by OSTree, and the Stateless project
+from systemd.
 
 ## Overview
 
-A few relevant main points are:
+A few relevant points are:
 
 - Only /etc and /var are writable and persisted.
 - Vendor presets/configuration goes to /usr/etc
 - User configuration goes to /etc
-- The user configuration overrides the vendor presets
+- User configuration overrides the vendor presets
 - Partial configuration snippets can be placed in <conf>.d
 
-The assumption is that these mechanisms above provide enough structure to build
+The assumption is that these mechanisms provide enough structure to build
 robust upgrades.
 
 **NOTE:** Following these guidelines is one critical point to allow stable
-upgrade an rollback.
+upgrade and rollback.
 
 ## Open Items
 
 **FIXME**
 
 - Identify packages which modify config outside of /etc - use imgbase diff
-- Patches for other packages to support scheme above,
+- Patches for other packages to support the above schema,
   like https://gerrit.ovirt.org/#/c/48317/
 - Node identifier /etc/os.release.d/50-ovirt-node with VARIANT field

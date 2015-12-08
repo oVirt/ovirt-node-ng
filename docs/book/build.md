@@ -19,30 +19,35 @@ Let's start with the specifics about the kickstart file.
 
 ## Kickstart
 The _kickstart_ file defines what packages go into the appliance image. In
-addition a few additional configurations can be performed as part of the
+addition, a few additional configuration steps can be performed as part of the
 installation.
 
-A kickstart file is used, because anaconda is used for installation. And
-kickstarts are files which control unattended installations.
+A kickstart file is used because anaconda is used for installation, and
+kickstart can be used for deep, repeatable customization with anaconda, or
+for simple automated installs.
 
 See the [official kickstart documentation](https://github.com/rhinstaller/pykickstart/blob/master/docs/kickstart-docs.rst)
 for more informations.
 
 The specific kickstart which defines the oVirt Node appliance is defined in the
-`ovirt-node-ng.ks` file, which hosted in the
-`ovirt-node-ng` repository.
+`ovirt-node-ng.ks` file, which hosted in the `ovirt-node-ng` repository.
 See the [getting started section](getting-started.md) for how to clone that
 repository.
 
 ### Unattended installation
-The first important note about the Node kickstart is, that it needs to contain
-enough informations to perform an [unattended installation](https://github.com/rhinstaller/pykickstart/blob/master/docs/kickstart-docs.rst#creating-the-kickstart-file).
+The first important note about the Node kickstart is that it needs to contain
+enough directives to perform an [unattended installation](https://github.com/rhinstaller/pykickstart/blob/master/docs/kickstart-docs.rst#creating-the-kickstart-file).
 
-There are "enough informations" if the kickstart provides answers to all
-required spokes.
+There are "enough directives" if the kickstart provides answers to all spokes
+(anaconda's terminology for a configuration section). You will know whether
+there is enough information by watching the installer. If there are spokes
+which are not completed, directives which fill those spokes will need to be
+added. If the `text` directive is used in the kickstart, spokes which are
+complete will helpfully have `[x]` next to them. Those which do not will show
+`[ ]`.
 
 ### Security
-To have a decent level of security, the image comes with:
+To provide a baseline level of security, the image comes with:
 
 + SELinux in permissive mode (during development)
 + A locked _root_ account
@@ -55,13 +60,13 @@ The following directives are used to achieve this:
     user --name=node --lock
 
 ### Filesystem
-It is important that the kickstart will only create a disk with a single
-partition, because this single partition will get extracted and be wrapped
-into the squashfs.
+It is important to note that the kickstart will only create a disk with a
+single partition, because this partition will be extracted and be wrapped
+in the squashfs.
 
-Another important point is to choose a filesystem which supports _discard_ or
-_trim_. This feature enables alter - after deployment - an efficient use of
-the available space, and is a curcial point in the upgrade and rollback
+Another important point is the choide of a filesystem which supports _discard_
+or _trim_. This feature enables alter - after deployment - an efficient use of
+the available space, and is a crucial point in the upgrade and rollback
 implementation. See the [upgrade section](upgrade.md) for more details on
 the storage requirements.
 
@@ -74,17 +79,19 @@ with _discard_ support is used:
 ### Packages
 The `%packages` section defines what packages get installed inside the
 appliance image.
-The main goal should be to keep this list small.
+The primary goal should be to keep this list small.
 
-If you see yourself adding packages to this kickstart section, then you should
-ask yourself, why this package you are adding, isn't a dependency of an already
-included package.
+If you find yourself adding packages to this kickstart section, you should ask
+yourself why the package you are adding isn't a already a dependency of an
+included package. If it isn't, is it necessary for inclusion? If you believe
+that it is, submit a patch which includes it as a dependency of
+`ovirt-node-node-host` or some upstream package which is already included.
 
 Let's take a look at the important packages:
     
     %packages
-    # config generic == not-hostonly, this is needed
-    # to support make a generic image (do not keep lvm informations in the image)
+    # config -generic == not -hostonly, this is needed
+    # to support make a generic initrd (which does not keep lvm information)
     dracut-config-generic
     
     # EFI support
@@ -102,24 +109,27 @@ The packages are used to achieve the following:
 + Add generic initramfs support
 + Add lvm2 and imgbased support
 
-On normal installs of Fedora or CentOS these packages don't need to be added
-explicitly, because anaconda will install them autoamitcally if they are
+On normal installs of Fedora or CentOS, these packages don't need to be added
+explicitly, because anaconda will install them automatically if they are
 needed.
 `lvm2` will be installed if LVM is used for storage, `grub2-efi` will be
 installed if the OS is installed on EFI hardware, etc.
 
 We need to install these packages explicitly, because it is expected that the
-applianc eimage contains everything that is needed for every use-case.
+appliance image contains everything that is needed for every use-case, and we
+want to include support for configurations which differ from the install
+environment, which, as noted above, only has one partition, and
+livemedia-creator does not install in EFI mode.
 
 **FIXME** The package requirements should go to some package dependencies,
 i.e. `ovirt-release-node-host`, see [this bug](https://bugzilla.redhat.com/show_bug.cgi?id=1285024).
 
 ### `%post` scriptlets for additional software
 
-You might have noticed that i.e. `vdsm` is missing in the package list above.
+You might have noticed that `vdsm` is missing in the package list above.
 
-`vdsm` can not be installed directly, because it needs the ovirt`-release`
-package to be installed, to get access to the necessary repositories.
+`vdsm` can not be installed directly, because it needs the `ovirt-release`
+package to be installed to add to the necessary repositories.
 
 That is why `vdsm` is getting installed in a `%post` scriptlet.
 
@@ -143,16 +153,16 @@ See the [anaconda boot options documentation](https://github.com/rhinstaller/ana
 for the details of those arguments.
 
 
-Before we continue: Both of the methods described below are using the same
-basic mechanism to perform the installation.
-They only differ in additional logic around pre- and post-processing of the
-kickstart and the final image.
+Before we continue: both of the methods described below are using the same
+basic mechanism to perform the installation. They only differ in additional
+logic around pre- and post-processing of the kickstart and the final image.
 
 ## Current build process: `image-tools`
 
+**FIXME** Aren't we using livemedia-creator now?
 The `image-tools` script collection is mimicing the behavior of
 `livemedia-creator`, the main difference is that `image-tools` are using
-qemu directly, to be able to use this scripts in Jenkins.
+qemu directly, to be able to use these scripts in Jenkins.
 
 To get started, you can clone the `image-tools`
 
@@ -167,23 +177,28 @@ This script will then perform the installation as described previously.
 ### Image Format: Liveimg
 
 Node is installed (and updated) using a single operating system image.
-Contrary to many other distributions packages are not used to install the operating system. Packages are primarily used to [build the image](build.md), and eventually to [customize the image](impl.md).
+Contrary to many other distributions, packages are not used to install the
+operating system. Packages are primarily used to [build the image](build.md),
+and eventually to [customize the image](impl.md).
 
-The liveimg image format is a Fedora- and CentOS-ish format used to deliver LiveCDs.
-A liveimg is a file-system image wrapped into a squashfs image.
-The reasoning behind this matroska mechanism is that the file-system image can be mounted easily, and the squashfs image - as it can compress - is helping to reduce the size of the image.
-Because it has been around for a long time, this format has mature support in dracut and anaconda.
-This effectively enables two use-cases with one image:
+The liveimg image format is a Fedora-andCentOS-ish format used to deliver
+LiveCDs. A liveimg is a file-system image wrapped into a squashfs image.
+The reasoning behind this matroska mechanism is that the file-system image
+can be mounted easily, and the squashfs image -- as it can compress --
+helps reduce the size of the image. Because it has been around for a long time,
+this format has mature support in both dracut and anaconda.
+This effectively enables two use-cases with a single image:
 
 * anaconda can use this image as a source instead of individual rpms
 * dracut can boot into a liveimg
 
 
-## Deliveryformat
+## Delivery Format
 
 The appliance image is delivered in the squashfs liveimg format.
 
-This format is understood by anaconda (for installation) and dracut (for state- and diskless boots).
+This format is understood by anaconda (for installation) and dracut (for
+stateful and diskless boots).
 
 The format is described in `man dracut.cmdline`:
 
@@ -201,6 +216,8 @@ The format is described in `man dracut.cmdline`:
 
 > Note: the `ext3fs.img` is a file-system image, not a disk image.
 
-The `ext3fs.img` can be created using a range of tools, the primary one being `livemedia-creator` (part of `lorax`).
+The `ext3fs.img` can be created using a variety of tools, the primary one used
+by Node is `livemedia-creator` (part of `lorax`).
 
-[Eventually](https://bugzilla.redhat.com/show_bug.cgi?id=1282496) `livemedia-creator` will be capable of creating squashfs images directly.
+[Eventually](https://bugzilla.redhat.com/show_bug.cgi?id=1282496)
+`livemedia-creator` will be capable of creating squashfs images directly.

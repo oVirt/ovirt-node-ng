@@ -6,7 +6,7 @@
 
 **FIXME**
 
-- imgbase for management
+- imgbased for management of versioned filesystem layers
 - Layout
   - liveimg is rsynced into Thin LV, then made RO and active=n (BASE)
   - Thin snapshot of LV is created, this is RW (LAYER)
@@ -31,17 +31,17 @@
 
 ### Open Items
 
-- How do driver disks survive an upgrade
+- How do driver disks survive an upgrade?
 - uid drift is solved enough?
 - daemon for imgbased
-- currentl kernel+initrd in subdir in /boot, idea: keep kernel+initrd in /boot
-  this will allow dracut and others to work correct
+- currently kernel+initrd are in subdir in /boot, idea: keep kernel+initrd in
+  /boot. This will allow dracut and others to work correctly
 
 ## Package persistence
 
 **FIXME**
 
-- how - if - should rpms be persisted?
+- should rpms be persisted? if so, how?
   - separate volume with magic name, put rpm there, will be reinstalled on
     every new layer
   - only through puppet/chef/ansible?
