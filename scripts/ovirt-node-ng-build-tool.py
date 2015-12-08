@@ -157,12 +157,12 @@ def main():
     if args.qcow_debug:
         output_format = ['--make-disk', '--qcow2']
     else:
-        output_format = ['--make-fsimage']
+        output_format = ['--make-pxe-live']
 
     try:
         # TODO: do something with the output?
         output = subprocess.check_call(['livemedia-creator',
-                                        '--ks', 'ovirt-node-ng.ks',
+                                        '--ks', args.kickstart ,
                                         '--iso', 'boot.iso',
                                         '--resultdir', results]
                                        + output_format, shell=False)
@@ -175,7 +175,7 @@ def main():
 
     finally:
         os.remove(iso)
-        os.removedirs(results)
+        shutil.rmtree(results)
 
 
 if __name__ == "__main__":
