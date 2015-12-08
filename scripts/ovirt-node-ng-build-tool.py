@@ -23,6 +23,7 @@ import os.path
 import requests
 import shutil
 import subprocess
+import sys
 import tempfile
 
 ''' Definitions of sizes
@@ -120,6 +121,9 @@ def download_image(base):
     True
     '''
 
+    # Buffer size for downloading distro
+    BUFFER_SIZE = int(1024)
+
     # lest create tmp file
     boot_filename = tempfile.mkstemp(prefix='ngnode')[1]
 
@@ -127,13 +131,22 @@ def download_image(base):
         with open(boot_filename, 'wb') as f:
             try:
                 r = requests.get(distributions[base], stream=True)
-
+                total_length = int(r.headers.get('content-length'))
+                print("Distro ISO: %s\nTotal size ISO: %s" % (
+                      distributions[base], total_length))
                 if not r.ok:
                     raise Exception("There was a problem downloading the "
                                     "file", exc_info=True)
 
-                for block in r.iter_content(1024):
+                downloaded = 0
+                for block in r.iter_content(BUFFER_SIZE):
+                    downloaded += int(BUFFER_SIZE)
                     f.write(block)
+                    percent_downloaded = int(
+                        100.0 * (float(downloaded) / float(total_length))
+                    )
+                    sys.stdout.write("\rDownload status: [%s%%]"
+                                     % percent_downloaded)
 
             except:
                 print("There was a problem downloading the file!")
