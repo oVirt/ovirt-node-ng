@@ -167,18 +167,23 @@ def main():
     results = tempfile.mkdtemp(prefix='ngnode')
     os.removedirs(results)
 
+    livemedia_creator_cmd = ['livemedia-creator',
+                             '--ks', args.kickstart,
+                             '--iso', 'boot.iso',
+                             '--resultdir', results]
+
     if args.qcow_debug:
         output_format = ['--make-disk', '--qcow2']
     else:
         output_format = ['--make-pxe-live']
 
+    livemedia_creator_cmd.extend(output_format)
+
+    print("\nExecuting: %s" % livemedia_creator_cmd)
+
     try:
         # TODO: do something with the output?
-        output = subprocess.check_call(['livemedia-creator',
-                                        '--ks', args.kickstart ,
-                                        '--iso', 'boot.iso',
-                                        '--resultdir', results]
-                                       + output_format, shell=False)
+        output = subprocess.check_call(livemedia_creator_cmd)
 
         img = glob.glob('{}/*.img'.format(results))[0]
         shutil.move(img, args.disk_file)
