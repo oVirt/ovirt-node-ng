@@ -18,7 +18,9 @@ The main requirements are:
 - python-sh
 - libguestfs
 - libguestfs-tools
+- libvirt-python
 - lorax
+- virt-install
 
 ## Bootstrap
 
