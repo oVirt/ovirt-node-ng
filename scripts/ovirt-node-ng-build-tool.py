@@ -124,7 +124,7 @@ def download_image(base):
     # Buffer size for downloading distro
     BUFFER_SIZE = int(1024)
 
-    # lest create tmp file
+    # let's create tmp file
     boot_filename = tempfile.mkstemp(prefix='ngnode')[1]
 
     if base in distributions.keys():
