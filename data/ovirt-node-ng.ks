@@ -95,15 +95,6 @@ yum install --nogpgcheck -y glusterfs-server
 #
 %post
 set -x
-mkdir -p /etc/imgbased.conf.d
-cat > /etc/imgbased.conf.d/50-ovirt.conf <<EOF
-[remote node-stable]
-url = http://jenkins.ovirt.org/job/ovirt-appliance-node_master_create-imgbased-index/lastSuccessfulBuild/artifact/stable/
-
-[remote node-unstable]
-url = http://jenkins.ovirt.org/job/ovirt-appliance-node_master_create-imgbased-index/lastSuccessfulBuild/artifact/unstable/
-EOF
-
 yum install -y git automake autoconf
 git clone https://gerrit.ovirt.org/imgbased.git
 pushd imgbased
@@ -113,5 +104,4 @@ pushd imgbased
 popd
 
 imgbase --debug --experimental image-build --postprocess
-# imgbase --debug update --set-upstream node-unstable:org.ovirt.node.Node
 %end
