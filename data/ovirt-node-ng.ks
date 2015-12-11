@@ -33,24 +33,19 @@ poweroff
 %packages --excludedocs --ignoremissing
 @core
 
-# lvm - for sure
-lvm2
-
-# config generic == hostonly, this is needed
-# to support make a generic image (do not keep lvm informations in the image)
+#
+# Additional packages for EFI support
+# https://www.brianlane.com/creating-live-isos-with-livemedia-creator.html
+# http://lorax.readthedocs.org/en/latest/livemedia-creator.html#kickstarts
 dracut-config-generic
-
-# EFI support
+-dracut-config-rescue
 grub2-efi
-shim
-efibootmgr
+memtest86+
+syslinux
 
-# Some tools
-vim-minimal
-augeas
-tmux
-
-# For image based updates
+#
+# Needed at install time for layer mgmt
+lvm2
 imgbased
 %end
 
@@ -75,7 +70,6 @@ yum clean all
 #
 %post
 set -x
-grep -i fedora /etc/system-release && yum-config-manager --add-repo="https://copr.fedoraproject.org/coprs/sgallagh/cockpit-preview/repo/fedora-21/sgallagh-cockpit-preview-fedora-21.repo"
 grep -i centos /etc/system-release && yum-config-manager --add-repo="https://copr.fedoraproject.org/coprs/sgallagh/cockpit-preview/repo/epel-7/sgallagh-cockpit-preview-epel-7.repo"
 #grep -i centos /etc/system-release && yum-config-manager --add-repo="http://cbs.centos.org/repos/virt7-testing/x86_64/os/"
 grep -i centos /etc/system-release && yum install -y https://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
@@ -119,5 +113,5 @@ pushd imgbased
 popd
 
 imgbase --debug --experimental image-build --postprocess
-imgbase --debug update --set-upstream node-unstable:org.ovirt.node.Node
+# imgbase --debug update --set-upstream node-unstable:org.ovirt.node.Node
 %end
