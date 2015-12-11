@@ -15,7 +15,7 @@ export TEST_NODE_SQUASHFS_IMG=$(PWD)/../ovirt-node-ng.squashfs.img
 export PYTHONPATH=$(PWD)
 
 ovirt-engine-appliance.qcow2:
-	echo curl -O FIXME_ADD_URL
+	curl -O http://jenkins.ovirt.org/job/ovirt-appliance_master_build-artifacts-el7-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-engine-appliance.qcow2
 
 check-code:
 	@pyflakes *.py
