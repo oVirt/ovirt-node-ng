@@ -72,7 +72,8 @@ class MachineTestCase(unittest.TestCase):
         SELINUX_ENFORCEMENT_FILE = "/sys/fs/selinux/enforce"
         if os.path.exists(SELINUX_ENFORCEMENT_FILE):
             with open(SELINUX_ENFORCEMENT_FILE, "rt") as src:
-                assert "0" == src.read().strip()
+                assert "0" == src.read().strip(), \
+                       "SELinux is enforcing, but needs to be permissive"
 
         debug("Strating new VM %s" % name)
 
@@ -87,7 +88,7 @@ class MachineTestCase(unittest.TestCase):
         cc.instanceid = name + "-ci"
         cc.password = str(magicnumber)
 
-        # Brin gup the second NIC for inter-VM networking
+        # Bring up the second NIC for inter-VM networking
         # cc.runcmd = "ip link set dev eth1 up ; ip addr add {ipaddr}/24 dev
         # eth1".format(ipaddr=ipaddr)
         cc.runcmd = ("nmcli con add con-name bus0 ifname eth1 " +
