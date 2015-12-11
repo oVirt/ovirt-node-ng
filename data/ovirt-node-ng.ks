@@ -105,7 +105,7 @@ url = http://jenkins.ovirt.org/job/ovirt-appliance-node_master_create-imgbased-i
 EOF
 
 yum install -y git automake autoconf
-git clone https://github.com/fabiand/imgbased.git
+git clone https://gerrit.ovirt.org/imgbased.git
 pushd imgbased
  ./autogen.sh && ./configure
  yum install -y $(make --silent rpm-build-deps)
