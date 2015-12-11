@@ -19,8 +19,8 @@ Results for <xsl:value-of select="@name"/>
 * Skipped: <xsl:value-of select="@skip"/>
 * Errors: <xsl:value-of select="@errors"/>
 
-        <xsl:for-each select="testcase">
-----
+        <!--xsl:for-each select="testcase">
+-
 Class: <xsl:value-of select="@classname"/>
 Name: <xsl:value-of select="@name"/>
 Runtime: <xsl:value-of select="@time"/>
@@ -43,7 +43,8 @@ FAILED
 <xsl:for-each select="system-out">
 	<xsl:value-of select="."/>
 </xsl:for-each>
-</xsl:for-each>
+</xsl:for-each-->
+<xsl:text>&#10;</xsl:text><!-- newline -->
 	</xsl:template>
 </xsl:stylesheet>
 
