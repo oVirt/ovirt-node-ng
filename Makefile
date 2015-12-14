@@ -33,12 +33,12 @@ ovirt-node-ng.ks:
 verrel:
 	@bash image-tools/image-verrel rootfs org.ovirt.Node x86_64
 
-%.qcow2: %.ks
+%.qcow2: data/%.ks boot.iso
 	# Ensure that the url line contains the distro
-	python scripts/ovirt-node-ng-build-tool.py --qcow-debug --base $(DISTRO)$(RELEASEVER) --kickstart $< $@
+	python scripts/ovirt-node-ng-build-tool.py --qcow-debug --base boot.iso --kickstart $< $@
 
-%.squashfs.img: %.ks
-	python scripts/ovirt-node-ng-build-tool.py --base $(DISTRO)$(RELEASEVER) --kickstart $< $@
+%.squashfs.img: %.ks boot.iso
+	python scripts/ovirt-node-ng-build-tool.py --base boot.iso --kickstart $< $@
 
 %-manifest-rpm: %.qcow2
 	 guestfish --ro -i -a $< sh 'rpm -qa | sort -u' > $@

@@ -116,7 +116,7 @@ def download_image(base):
     >>> bootiso = download_image( 'centos7')
     >>> import os
     >>> result = os.path.exists(bootiso)
-    >>> os.remove( bootiso )
+    >>> os.remove(bootiso)
     >>> print(result)
     True
     '''
@@ -192,9 +192,12 @@ def main():
         print("Fs creation failed : {}".format(e))
 
     finally:
-        os.remove(iso)
+        if os.path.exists(iso):
+            os.remove(iso)
         shutil.rmtree(results)
 
 
 if __name__ == "__main__":
     main()
+
+# vim: sts=4 et:
