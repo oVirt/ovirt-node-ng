@@ -1,10 +1,17 @@
 libguestfs-tools
 qemu-system-x86
+python-requests
 python-sh
+git
 glusterfs
 gluster
 squashfs-tools
+sudo
 libvirt-daemon-qemu
 libvirt-daemon-kvm
 libvirt
 libvirt-client
+libvirt-python
+libvirt-python3
+lorax
+virt-install
