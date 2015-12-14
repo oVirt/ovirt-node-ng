@@ -27,9 +27,6 @@ image-install: data/ci-image-install.ks ovirt-node-ng.squashfs.img boot.iso
 		--disk path=ovirt-node-ng-auto-installation.raw,size=20,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=raw \
 		--disk path=ovirt-node-ng.squashfs.img,readonly=on,device=disk,bus=virtio,serial=livesrc
 
-ovirt-node-ng.ks:
-	ln -sv data/$@ .
-
 verrel:
 	@bash image-tools/image-verrel rootfs org.ovirt.Node x86_64
 
@@ -37,7 +34,7 @@ verrel:
 	# Ensure that the url line contains the distro
 	python scripts/ovirt-node-ng-build-tool.py --qcow-debug --base boot.iso --kickstart $< $@
 
-%.squashfs.img: %.ks boot.iso
+%.squashfs.img: data/%.ks boot.iso
 	python scripts/ovirt-node-ng-build-tool.py --base boot.iso --kickstart $< $@
 
 %-manifest-rpm: %.qcow2

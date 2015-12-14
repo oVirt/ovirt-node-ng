@@ -1,5 +1,3 @@
-ovirt-node-ng-auto-installation.ks.in
-ovirt-node-ng.ks
 livemedia.log
 program.log
 virt-install.log
