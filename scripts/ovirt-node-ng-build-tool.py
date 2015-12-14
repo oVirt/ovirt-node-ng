@@ -84,6 +84,13 @@ kickstart='appname.ks', qcow_debug=True)
 
     parser.add_argument('disk_file', help="the image to create",
                         metavar="DISK_FILE")
+
+    parser.add_argument('--tmp-dir',
+                        help="The temporary directory root",
+                        required=False,
+                        default=None,
+                        type=str)
+
     return parser
 
 
@@ -109,7 +116,7 @@ def validate_cmdline(args):
     return
 
 
-def download_image(base):
+def download_image(base, tmpdir):
     ''' Downloads the image for the distro or put the provided
     iso into temporary dir for future use
 
@@ -125,7 +132,7 @@ def download_image(base):
     BUFFER_SIZE = int(1024)
 
     # let's create tmp file
-    boot_filename = tempfile.mkstemp(prefix='ngnode')[1]
+    boot_filename = tempfile.mkstemp(prefix='ngnode',dir=tmpdir)[1]
 
     if base in distributions.keys():
         with open(boot_filename, 'wb') as f:
@@ -163,8 +170,8 @@ def main():
     args = parser.parse_args()
     validate_cmdline(vars(args))
 
-    iso = download_image(args.base)
-    results = tempfile.mkdtemp(prefix='ngnode')
+    iso = download_image(args.base, args.tmp_dir)
+    results = tempfile.mkdtemp(prefix='ngnode', dir=args.tmp_dir)
     os.removedirs(results)
 
     livemedia_creator_cmd = ['livemedia-creator',
@@ -178,6 +185,9 @@ def main():
         output_format = ['--make-pxe-live']
 
     livemedia_creator_cmd.extend(output_format)
+
+    if args.tmp_dir is not None:
+        livemedia_creator_cmd.extend(["--tmp", args.tmp_dir])
 
     print("\nExecuting: %s" % livemedia_creator_cmd)
 
