@@ -2,6 +2,14 @@
 DISTRO=centos
 RELEASEVER=7
 
+ifdef TMPDIR
+BUILD_ARGS = --tmp-dir $(TMPDIR)
+endif
+
+ifdef LIBGUESTFS_BACKEND
+GUESTFISH_ARGS = LIBGUESTFS_BACKEND=$(LIBGUESTFS_BACKEND)
+endif
+
 all: ovirt-node-ng.squashfs
 	echo Done
 
@@ -32,13 +40,13 @@ verrel:
 
 %.qcow2: data/%.ks boot.iso
 	# Ensure that the url line contains the distro
-	python scripts/ovirt-node-ng-build-tool.py --qcow-debug --base boot.iso --kickstart $< $@
+	python scripts/ovirt-node-ng-build-tool.py $(BUILD_ARGS) --qcow-debug --base boot.iso --kickstart $< $@
 
 %.squashfs.img: data/%.ks boot.iso
-	python scripts/ovirt-node-ng-build-tool.py --base boot.iso --kickstart $< $@
+	python scripts/ovirt-node-ng-build-tool.py $(BUILD_ARGS) --base boot.iso --kickstart $< $@
 
 %-manifest-rpm: %.qcow2
-	 guestfish --ro -i -a $< sh 'rpm -qa | sort -u' > $@
+	 $(GUESTFISH_ARGS) guestfish --ro -i -a $< sh 'rpm -qa | sort -u' > $@
 
 clean:
 	-rm -vf ovirt-node-ng.qcow2 ovirt-node-ng.squashfs.img ovirt-node-ng-manifest-rpm

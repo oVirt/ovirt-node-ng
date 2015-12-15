@@ -5,14 +5,18 @@ set -x
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
 export PATH=$PATH:/sbin:/usr/sbin
-export TMPDIR=/var/tmp/
+export TMPDIR=$PWD/tmp
+export LIBGUESTFS_BACKEND=direct
 
 prepare() {
   git submodule update --init --recursive
+  mkdir $TMPDIR
 }
 
 build() {
-  make image-build ovirt-node-ng-manifest-rpm
+  sudo -E make image-build
+  sudo -E make ovirt-node-ng-manifest-rpm
+  sudo -E make image-install
 
   mkdir "$ARTIFACTSDIR"
 

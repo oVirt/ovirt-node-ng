@@ -5,6 +5,8 @@ python-sh
 git
 glusterfs
 gluster
+grubby
+kpartx
 squashfs-tools
 sudo
 libvirt-daemon-qemu
