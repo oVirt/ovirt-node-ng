@@ -44,6 +44,9 @@ from virt import DiskImage, VM, CloudConfig
 NODE_IMG = os.environ.get("TEST_NODE_ROOTFS_IMG",
                           "ovirt-node-appliance.qcow2")
 
+NODE_INSTALLED_IMG = os.environ.get("TEST_NODE_INSTALLED_IMG",
+                                    "ovirt-node-ng-auto-installation.raw")
+
 ENGINE_IMG = os.environ.get("TEST_ENGINE_ROOTFS_IMG",
                             "ovirt-engine-appliance.qcow2")
 
@@ -110,16 +113,17 @@ class NodeTestCase(MachineTestCase):
     Mainly this set's up a VM based on the Node appliance image
     and ensures that each testcase runs in a fresh snapshot.
     """
+    _img = NODE_IMG
     node = None
 
     @classmethod
     def setUpClass(cls):
-        if not os.path.exists(NODE_IMG):
-            return
+        assert os.path.exists(cls._img)
+        debug("Using image: %s" % cls._img)
 
         try:
             n = "%s-node" % cls.__name__
-            cls.node = cls._start_vm(n, NODE_IMG, n + ".qcow2", 77)
+            cls.node = cls._start_vm(n, cls._img, n + ".qcow2", 77)
 
             debug("Install cloud-init")
             cls.node.fish("sh", "yum install -y sos cloud-init")
@@ -153,6 +157,16 @@ class NodeTestCase(MachineTestCase):
 
         debug("Tearing down %s" % self)
         self.snapshot.revert()
+
+
+@unittest.skipUnless(os.path.exists(NODE_INSTALLED_IMG),
+                     "Installed Node image is missing: " + NODE_INSTALLED_IMG)
+class InstalledNodeTestCase(NodeTestCase):
+    """Class to do just-Node specific testing on the installed image
+
+    FIXME https://bugzilla.redhat.com/show_bug.cgi?id=1278878
+    """
+    _img = NODE_INSTALLED_IMG
 
 
 class Test_Tier_0_NodeTestcase(NodeTestCase):

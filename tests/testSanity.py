@@ -22,11 +22,11 @@
 
 from logging import debug
 import unittest
-from testVirt import NodeTestCase
+from testVirt import InstalledNodeTestCase
 
 
-@unittest.skip("FIXME https://bugzilla.redhat.com/1278878")
-class TestImgbaseNode(NodeTestCase):
+
+class TestImgbaseNode(InstalledNodeTestCase):
     """Test functionality around imgbase on Node appliance (post-installation)
 
     Any testcase related to imgbase specific to Node should go here.
@@ -52,9 +52,11 @@ class TestImgbaseNode(NodeTestCase):
 
         The layout should have been created as part of the install process.
         """
-        self.node.ssh("imgbase layout")
-        import time
-        time.sleep(1000000)
+        try:
+            self.node.ssh("imgbase layout")
+        except:
+            debug("No layout", exc_info=True)
+            assert False, "No imgbase layout"
 
 
 if __name__ == "__main__":

@@ -41,10 +41,6 @@ import xml.etree.ElementTree as ET
 sh.ErrorReturnCode.truncate_cap = 999999
 
 
-squashfsimg = "ovirt-node-appliance.squashfs.img"
-qcowimg = "ovirt-node-appliance.qcow2"
-
-
 def logcall(func):
     def logged(*args, **kwargs):
         debug("%s(%s, %s)" % (func, args, kwargs))
@@ -205,7 +201,7 @@ class VM():
                   "network": "user,model=virtio",
                   "watchdog": "default,action=poweroff",
                   "serial": "pty",
-                  "graphics": "none",  # headless
+                  "graphics": "vnc",  # headless
                   "noautoconsole": True,
                   "filesystem": "%s,HOST,mode=squash" % os.getcwd(),
                   "memballoon": "virtio",  # To save some host-ram
