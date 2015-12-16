@@ -18,16 +18,16 @@ image-build: ovirt-node-ng.qcow2
 	cp -v virt-install.log virt-install-$@.log
 
 boot.iso:
-	curl -O http://mirror.centos.org/centos-7/7/os/x86_64/images/boot.iso
+	curl -O http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso
 
 image-install: data/ci-image-install.ks ovirt-node-ng.squashfs.img boot.iso
-	#curl "http://mirror.centos.org/centos/7/os/x86_64/Packages/" | grep centos-release-7-2 || ( echo "ERROR: CentOS 7.2 is required" ; exit 1  ; )
 	virt-install \
 		--name $@-$(shell date +%F-%H%M) \
 		--memory 4096 \
 		--vcpus 4 --cpu host \
 		--os-variant rhel7 \
 		--rng random \
+		--memballoon virtio \
 		--noreboot \
 		--location boot.iso \
 		--extra-args "inst.ks=file:///ci-image-install.ks" \
