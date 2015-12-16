@@ -52,11 +52,7 @@ class TestImgbaseNode(InstalledNodeTestCase):
 
         The layout should have been created as part of the install process.
         """
-        try:
-            self.node.ssh("imgbase layout")
-        except:
-            debug("No layout", exc_info=True)
-            assert False, "No imgbase layout"
+        self.node.assertSsh("imgbase layout", "No layout available")
 
 
 if __name__ == "__main__":

@@ -228,10 +228,30 @@ class VM():
 
         return vm
 
+    def wait_ssh(self, timeout=60):
+        debug("Waiting for ssh")
+        while timeout > 0:
+            try:
+                if sh.ssh_keyscan("-p%s" % self._ssh_port,
+                                  "127.0.0.1"):
+                    return
+            except:
+                debug("Experienced an exception during ssh wait",
+                      exc_info=True)
+            timeout -= 1
+            time.sleep(1)
+        assert False, "SSH not reachable"
+
     def ssh(self, *args, **kwargs):
         """SSH into the host
         """
         assert self._ssh_port
+        assert (len(args) + len(kwargs)) > 0
+
+        # FIXME we might want to start the VM and wait for
+        # ssh before taking the snapshot to improve speed
+        self.wait_ssh()
+
         args = ("root@127.0.0.1",
                 "-oPort=%s" % self._ssh_port,
                 "-oConnectTimeout=30",
@@ -246,6 +266,14 @@ class VM():
         data = sh.ssh(*args, **kwargs)
         debug("stdout: %s" % data)
         return data
+
+    def assertSsh(self, cmd, msg, *args, **kwargs):
+        try:
+            args = (cmd,) + args
+            return self.ssh(*args, **kwargs)
+        except sh.ErrorReturnCode as e:
+            msg = msg or "SSH failed with: %s" % e
+            assert False, msg
 
     def snapshot(self):
         """Create a snapshot to revert to
