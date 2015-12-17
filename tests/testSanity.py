@@ -25,7 +25,6 @@ import unittest
 from testVirt import InstalledNodeTestCase
 
 
-
 class TestImgbaseNode(InstalledNodeTestCase):
     """Test functionality around imgbase on Node appliance (post-installation)
 
