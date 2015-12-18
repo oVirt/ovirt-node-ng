@@ -68,7 +68,7 @@ yum clean all
 #
 # Adds the latest cockpit bits
 #
-%post
+%post --erroronfail
 set -x
 grep -i centos /etc/system-release && yum-config-manager --add-repo="https://copr.fedoraproject.org/coprs/sgallagh/cockpit-preview/repo/epel-7/sgallagh-cockpit-preview-epel-7.repo"
 #grep -i centos /etc/system-release && yum-config-manager --add-repo="http://cbs.centos.org/repos/virt7-testing/x86_64/os/"
