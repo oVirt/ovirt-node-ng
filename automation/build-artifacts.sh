@@ -11,14 +11,13 @@ export LIBGUESTFS_BACKEND=direct
 prepare() {
   git submodule update --init --recursive
   mkdir $TMPDIR
+  mkdir "$ARTIFACTSDIR"
 }
 
 build() {
   sudo -E make image-build
   sudo -E make ovirt-node-ng-manifest-rpm
   sudo -E make image-install
-
-  mkdir "$ARTIFACTSDIR"
 
   mv -v \
     *.qcow2 \
@@ -30,5 +29,14 @@ build() {
   ls -shal "$ARTIFACTSDIR/" || :
 }
 
+check() {
+  sudo -E make check
+  mv -fv tests/*.xml \
+    "$ARTIFACTSDIR/"
+
+  ls -shal "$ARTIFACTSDIR/" || :
+}
+
 prepare
 build
+check || :
