@@ -71,8 +71,6 @@ yum clean all
 %post --erroronfail
 set -x
 grep -i centos /etc/system-release && yum-config-manager --add-repo="https://copr.fedoraproject.org/coprs/sgallagh/cockpit-preview/repo/epel-7/sgallagh-cockpit-preview-epel-7.repo"
-#grep -i centos /etc/system-release && yum-config-manager --add-repo="http://cbs.centos.org/repos/virt7-testing/x86_64/os/"
-grep -i centos /etc/system-release && yum install -y https://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 yum install --nogpgcheck -y cockpit
 %end
 
@@ -83,10 +81,8 @@ yum install --nogpgcheck -y cockpit
 %post --erroronfail
 set -x
 
-yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release36.rpm
-yum install --nogpgcheck -y vdsm
-yum install --nogpgcheck -y vdsm-cli ovirt-engine-cli
-yum install --nogpgcheck -y glusterfs-server
+yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master.rpm \
+               http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-host-node.rpm
 %end
 
 
