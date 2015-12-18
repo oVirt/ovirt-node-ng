@@ -6,7 +6,7 @@
 # Direct for virt-sparsify: http://libguestfs.org/guestfs.3.html#backend
 export LIBGUESTFS_BACKEND=direct
 # Workaround nest problem: https://bugzilla.redhat.com/show_bug.cgi?id=1195278
-export LIBGUESTFS_BACKEND_SETTINGS=force_tcg
+# export LIBGUESTFS_BACKEND_SETTINGS=force_tcg
 
 TEST_DIR= $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 export TEST_ENGINE_ROOTFS_IMG=$(TEST_DIR)/ovirt-engine-appliance.qcow2

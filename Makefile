@@ -6,10 +6,6 @@ ifdef TMPDIR
 BUILD_ARGS = --tmp-dir $(TMPDIR)
 endif
 
-ifdef LIBGUESTFS_BACKEND
-GUESTFISH_ARGS = LIBGUESTFS_BACKEND=$(LIBGUESTFS_BACKEND)
-endif
-
 all: ovirt-node-ng.squashfs
 	echo Done
 
@@ -46,7 +42,7 @@ verrel:
 	python scripts/ovirt-node-ng-build-tool.py $(BUILD_ARGS) --base boot.iso --kickstart $< $@
 
 %-manifest-rpm: %.qcow2
-	 $(GUESTFISH_ARGS) guestfish --ro -i -a $< sh 'rpm -qa | sort -u' > $@
+	 guestfish --ro -i -a $< sh 'rpm -qa | sort -u' > $@
 
 clean:
 	-rm -vf ovirt-node-ng.qcow2 ovirt-node-ng.squashfs.img ovirt-node-ng-manifest-rpm
