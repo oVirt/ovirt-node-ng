@@ -200,6 +200,7 @@ def main():
 
     except RuntimeError as e:
         print("Fs creation failed : {}".format(e))
+        raise
 
     finally:
         if os.path.exists(iso):
