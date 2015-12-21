@@ -21,6 +21,7 @@ build() {
 
   mv -v \
     *.qcow2 \
+    *.raw \
     *.squashfs.img \
     *.log \
     *-manifest-rpm \
