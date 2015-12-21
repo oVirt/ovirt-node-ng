@@ -193,7 +193,8 @@ def main():
 
     try:
         # TODO: do something with the output?
-        output = subprocess.check_call(livemedia_creator_cmd)
+        output = subprocess.check_output(livemedia_creator_cmd,
+                                         stderr=subprocess.STDOUT)
 
         img = glob.glob('{}/*.img'.format(results))[0]
         shutil.move(img, args.disk_file)
