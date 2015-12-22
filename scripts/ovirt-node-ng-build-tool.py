@@ -199,6 +199,9 @@ def main():
         img = glob.glob('{}/*.img'.format(results))[0]
         shutil.move(img, args.disk_file)
 
+    except subprocess.CalledProcessError as e:
+        print("LMC failed with: %s" % e.output)
+
     except RuntimeError as e:
         print("Fs creation failed : {}".format(e))
         raise
