@@ -118,8 +118,8 @@ class NodeTestCase(MachineTestCase):
 
     @classmethod
     def setUpClass(cls):
-        assert os.path.exists(cls._img)
         debug("Using image: %s" % cls._img)
+        assert os.path.exists(cls._img)
 
         try:
             n = "%s-node" % cls.__name__
@@ -266,12 +266,6 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
 
     @classmethod
     def setUpClass(cls):
-        if not os.path.exists(NODE_IMG):
-            return
-
-        if not os.path.exists(ENGINE_IMG):
-            return
-
         try:
             n = "%s-" % cls.__name__
             cls.node = cls._start_vm(n + "node", NODE_IMG,

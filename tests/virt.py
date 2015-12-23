@@ -329,7 +329,7 @@ class VM():
         sh.virsh("destroy", self.name)
 
     @logcall
-    def shutdown(self, wait=True, timeout=60):
+    def shutdown(self, wait=True, timeout=90):
         """Ask the VM to shutdown (via ACPI)
 
         Also block until the VM is shutdown
