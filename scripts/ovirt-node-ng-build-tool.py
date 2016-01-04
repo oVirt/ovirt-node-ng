@@ -200,7 +200,8 @@ def main():
         shutil.move(img, args.disk_file)
 
     except subprocess.CalledProcessError as e:
-        print("LMC failed with: %s" % e.output)
+        print("LMC failed with:")
+        raise
 
     except RuntimeError as e:
         print("Fs creation failed : {}".format(e))
