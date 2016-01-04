@@ -6,11 +6,14 @@ ifdef TMPDIR
 BUILD_ARGS = --tmp-dir $(TMPDIR)
 endif
 
-all: ovirt-node-ng.squashfs
+all: image-build
 	echo Done
 
 # Builds the rootfs
-image-build: ovirt-node-ng.qcow2
+image-build: ovirt-node-ng.squashfs.img
+	cp -v virt-install.log virt-install-$@.log
+
+image-build-debug: ovirt-node-ng.qcow2
 	cp -v virt-install.log virt-install-$@.log
 
 boot.iso:
