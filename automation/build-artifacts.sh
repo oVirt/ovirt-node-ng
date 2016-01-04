@@ -1,6 +1,6 @@
 # vim: et sts=2 sw=2
 
-set -x
+set -ex
 
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
