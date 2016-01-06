@@ -272,7 +272,8 @@ class VM():
             args = (cmd,) + args
             return self.ssh(*args, **kwargs)
         except sh.ErrorReturnCode as e:
-            msg = msg or "SSH failed with: %s" % e
+            msg = msg + " / " if msg else ""
+            msg += "SSH failed with: %s" % e
             assert False, msg
 
     def snapshot(self):

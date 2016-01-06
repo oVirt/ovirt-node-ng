@@ -53,6 +53,24 @@ class TestImgbaseNode(NodeTestCase):
         """
         self.node.assertSsh("imgbase layout", "No layout available")
 
+    def test_selinux_denials(self):
+        """Ensure that there are no denials after boot
+        """
+        data = self.node.ssh("grep denied /var/log/audit/audit.log")
+        denials = data.splitlines()
+        assert len(denials) == 0, \
+            "To many denials: %s\n%s" % (len(denials), denials)
+
+    def test_packages(self):
+        """Ensure the main packages are installed
+        """
+        req_pkgs = ["vdsm", "cockpit"]
+
+        pkgs = self.node.ssh("rpm -q %s" % " ".join(req_pkgs))
+
+        assert len(pkgs) != len(req_pkgs), \
+            "Some packages are missing, there are: %s" % pkgs
+
 
 if __name__ == "__main__":
     unittest.main()

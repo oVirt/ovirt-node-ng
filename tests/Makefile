@@ -24,5 +24,5 @@ check-code:
 
 check: NOSE=nosetests --with-xunit -v --no-byte-compile
 check: check-code ovirt-engine-appliance.qcow2
-	$(NOSE) testVirt.py testImage.py testSanity.py testIntegration.py
+	$(NOSE)
 	-xsltproc nosetests.xslt nosetests.xml
