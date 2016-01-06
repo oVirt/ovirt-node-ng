@@ -37,11 +37,6 @@ dracut-config-generic
 grub2-efi
 memtest86+
 syslinux
-
-#
-# Needed at install time for layer mgmt
-lvm2
-imgbased
 %end
 
 
@@ -81,7 +76,6 @@ yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-maste
 
 # 2. Install oVirt Node release
 yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-host-node.rpm
-
 
 imgbase --debug --experimental image-build --postprocess
 %end
