@@ -82,18 +82,6 @@ yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-maste
 # 2. Install oVirt Node release
 yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-host-node.rpm
 
-#
-# Add imgbased
-#
-%post
-set -x
-yum install -y git automake autoconf
-git clone https://gerrit.ovirt.org/imgbased.git
-pushd imgbased
- ./autogen.sh && ./configure
- yum install -y $(make --silent rpm-build-deps)
- make install
-popd
 
 imgbase --debug --experimental image-build --postprocess
 %end
