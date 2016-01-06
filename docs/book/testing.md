@@ -9,7 +9,8 @@ The fact that there is also an Engine appliance is very beneficial.
   (user-session) VMs
 - virt-install is used to setup the VMs
 - cloud-init is used to do the basic OS configuration (passwords, ssh, and IP
-  configuration)
+  configuration) Note: cloud-init is not built into the squashfs, it will be
+  installed on-demand by the testing infrastructure.
 - Python's unittest infrastructure is used to provide the testing framework
 
 A [reference implementation](https://gerrit.ovirt.org/gitweb?p=ovirt-appliance.git;a=tree;f=tests)
