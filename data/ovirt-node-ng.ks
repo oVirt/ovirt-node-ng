@@ -76,10 +76,11 @@ yum install --nogpgcheck -y cockpit
 %post --erroronfail
 set -x
 
-yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master.rpm \
-               http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-host-node.rpm
-%end
+# 1. Install oVirt release fiel with repositories
+yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master.rpm
 
+# 2. Install oVirt Node release
+yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-host-node.rpm
 
 #
 # Add imgbased
