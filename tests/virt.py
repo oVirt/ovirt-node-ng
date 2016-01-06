@@ -340,7 +340,7 @@ class VM():
             self.wait_event("lifecycle", timeout=timeout)
 
     @logcall
-    def reboot(self, wait=True, timeout=60):
+    def reboot(self, wait=True, timeout=90):
         """Ask the VM to reboot (via ACPI)
         """
         sh.virsh("reboot", "--mode=acpi", self.name)
