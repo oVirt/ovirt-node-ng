@@ -22,10 +22,10 @@
 
 from logging import debug
 import unittest
-from testVirt import InstalledNodeTestCase
+from testVirt import NodeTestCase
 
 
-class TestImgbaseNode(InstalledNodeTestCase):
+class TestImgbaseNode(NodeTestCase):
     """Test functionality around imgbase on Node appliance (post-installation)
 
     Any testcase related to imgbase specific to Node should go here.

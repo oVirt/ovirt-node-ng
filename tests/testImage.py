@@ -34,10 +34,8 @@ import re
 sh.ErrorReturnCode.truncate_cap = 999999
 
 
-squashfsimg = os.environ.get("TEST_NODE_SQUASHFS_IMG",
-                             "ovirt-node-ng.squashfs.img")
-qcowimg = os.environ.get("TEST_NODE_ROOTFS_IMG",
-                         "ovirt-node-ng.qcow2")
+squashfsimg = os.environ.get("TEST_NODE_SQUASHFS_IMG", None)
+qcowimg = os.environ.get("TEST_NODE_INSTALLED_IMG", None)
 
 
 @unittest.skipUnless(os.path.exists(qcowimg), "qcow2 is missing")

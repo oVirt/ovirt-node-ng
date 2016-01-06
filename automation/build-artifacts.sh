@@ -9,19 +9,14 @@ export TMPDIR=$PWD/tmp
 export LIBGUESTFS_BACKEND=direct
 
 prepare() {
-  git submodule update --init --recursive
-  mkdir $TMPDIR
+  mkdir "$TMPDIR"
   mkdir "$ARTIFACTSDIR"
 }
 
 build() {
-  sudo -E make image-build
-  sudo -E make ovirt-node-ng-manifest-rpm
-  sudo -E make image-install
+  sudo -E make squashfs
 
   mv -v \
-    *.qcow2 \
-    *.raw \
     *.squashfs.img \
     *.log \
     *-manifest-rpm \
@@ -31,6 +26,7 @@ build() {
 }
 
 check() {
+  sudo -E make installed-squashfs
   sudo -E make check
   mv -fv tests/*.xml \
     "$ARTIFACTSDIR/"

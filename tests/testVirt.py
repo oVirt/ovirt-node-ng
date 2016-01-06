@@ -41,14 +41,9 @@ import time
 from virt import DiskImage, VM, CloudConfig
 
 
-NODE_IMG = os.environ.get("TEST_NODE_ROOTFS_IMG",
-                          "ovirt-node-appliance.qcow2")
+NODE_IMG = os.environ.get("TEST_NODE_INSTALLED_IMG", None)
 
-NODE_INSTALLED_IMG = os.environ.get("TEST_NODE_INSTALLED_IMG",
-                                    "ovirt-node-ng-auto-installation.raw")
-
-ENGINE_IMG = os.environ.get("TEST_ENGINE_ROOTFS_IMG",
-                            "ovirt-engine-appliance.qcow2")
+ENGINE_IMG = os.environ.get("TEST_ENGINE_ROOTFS_IMG", None)
 
 KEEP_TEST_ENV = bool(os.environ.get("TEST_KEEP_TEST_ENV"))
 
@@ -118,7 +113,7 @@ class NodeTestCase(MachineTestCase):
 
     @classmethod
     def setUpClass(cls):
-        debug("Using image: %s" % cls._img)
+        debug("Using %s image: %s" % (cls, cls._img))
         assert os.path.exists(cls._img)
 
         try:
@@ -157,16 +152,6 @@ class NodeTestCase(MachineTestCase):
 
         debug("Tearing down %s" % self)
         self.snapshot.revert()
-
-
-@unittest.skipUnless(os.path.exists(NODE_INSTALLED_IMG),
-                     "Installed Node image is missing: " + NODE_INSTALLED_IMG)
-class InstalledNodeTestCase(NodeTestCase):
-    """Class to do just-Node specific testing on the installed image
-
-    FIXME https://bugzilla.redhat.com/show_bug.cgi?id=1278878
-    """
-    _img = NODE_INSTALLED_IMG
 
 
 class Test_Tier_0_NodeTestcase(NodeTestCase):
