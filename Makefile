@@ -5,7 +5,8 @@ RELEASEVER=7
 IMAGEFILE=ovirt-node-ng.squashfs.img
 RPMMANIFEST=ovirt-node-ng-manifest-rpm
 INSTALLEDIMAGEFILE=installed-ovirt-node-ng-squashfs.raw
-BOOTISO=boot.iso
+ISOURL=http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso
+BOOTISO=$(shell basename $(ISOURL))
 TMPDIR=/var/tmp
 
 squashfs: $(IMAGEFILE) $(RPMMANIFEST)
@@ -31,8 +32,8 @@ installed-squashfs: data/ci-image-install.ks $(IMAGEFILE) $(BOOTISO)
 	virsh undefine $(DOMNAME)
 	@echo "The squashfs '$(IMAGEFILE)' got installed into the file '$(INSTALLEDIMAGEFILE)'"
 
-boot.iso:
-	curl -O http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso
+$(BOOTISO):
+	curl -O $(ISOURL)
 
 %.squashfs.img: data/%.ks $(BOOTISO)
 	livemedia-creator --make-pxe-live --iso $(BOOTISO) --ks $< --resultdir build --tmp "$(TMPDIR)"

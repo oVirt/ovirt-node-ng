@@ -5,6 +5,7 @@ set -ex
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
 export PATH=$PATH:/sbin:/usr/sbin
+export ISOURL=http://mirrors.easynews.com/linux/centos/7/os/x86_64/images/boot.iso
 export TMPDIR=$PWD/tmp
 export LIBGUESTFS_BACKEND=direct
 
