@@ -28,6 +28,7 @@ installed-squashfs: data/ci-image-install.ks $(IMAGEFILE) $(BOOTISO)
 		--check disk_size=off \
 		--disk path=$(INSTALLEDIMAGEFILE),size=20,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=raw \
 		--disk path=$(IMAGEFILE),readonly=on,device=disk,bus=virtio,serial=livesrc
+	virsh undefine $(DOMNAME)
 	@echo "The squashfs '$(IMAGEFILE)' got installed into the file '$(INSTALLEDIMAGEFILE)'"
 
 boot.iso:
