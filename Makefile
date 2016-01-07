@@ -35,7 +35,7 @@ boot.iso:
 	curl -O http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso
 
 %.squashfs.img: data/%.ks $(BOOTISO)
-	livemedia-creator --make-pxe-live --iso $(BOOTISO) --ks $< --resultdir build --tmp-dir "$(TMPDIR)"
+	livemedia-creator --make-pxe-live --iso $(BOOTISO) --ks $< --resultdir build --tmp "$(TMPDIR)"
 	mv -v build/*squash* "$@"
 
 %-manifest-rpm: %.squashfs.img
