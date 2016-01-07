@@ -1,2 +1,3 @@
 /var/run/libvirt
 /var/lib/libvirt
+/dev

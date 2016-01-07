@@ -18,7 +18,7 @@ prepare() {
 build() {
   sudo -E make squashfs
 
-  mv -v \
+  ln -v \
     *.squashfs.img \
     *.log \
     *-manifest-rpm \
@@ -30,7 +30,7 @@ build() {
 check() {
   sudo -E make installed-squashfs
   sudo -E make check
-  mv -fv tests/*.xml \
+  ln -fv tests/*.xml \
     "$ARTIFACTSDIR/"
 
   ls -shal "$ARTIFACTSDIR/" || :
