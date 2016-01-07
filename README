@@ -15,6 +15,8 @@ These few steps help you to get your hands onto Node.
 
 To get started with Node, you first need to clone the appliance and build it:
 
+    dnf install lorax libvirt libvirt-daemon-kvm virt-install libguestfs-tools
+
     git clone git://gerrit.ovirt.org/ovirt-node-ng.git
     
     # To build the squashfs image (liveimg):
