@@ -9,7 +9,7 @@ export TMPDIR=$PWD/tmp
 export LIBGUESTFS_BACKEND=direct
 
 prepare() {
-  virt-host-validate
+  virt-host-validate || :
 
   mkdir "$TMPDIR"
   mkdir "$ARTIFACTSDIR"
