@@ -5,9 +5,9 @@ RELEASEVER=7
 IMAGEFILE=ovirt-node-ng.squashfs.img
 RPMMANIFEST=ovirt-node-ng-manifest-rpm
 INSTALLEDIMAGEFILE=installed-ovirt-node-ng-squashfs.raw
-ISOURL=http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso
+ISOURL?=http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso
 BOOTISO=$(shell basename $(ISOURL))
-TMPDIR=/var/tmp
+TMPDIR?=/var/tmp
 
 squashfs: $(IMAGEFILE) $(RPMMANIFEST)
 	@echo squashfs: $(IMAGEFILE)
