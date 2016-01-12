@@ -22,7 +22,6 @@ check-code:
 	@pyflakes *.py
 	@pep8 *.py
 
-check: NOSE=nosetests --with-xunit -v --no-byte-compile
 check: check-code ovirt-engine-appliance.qcow2
-	$(NOSE)
+	nosetests --with-xunit -v --no-byte-compile
 	-xsltproc nosetests.xslt nosetests.xml
