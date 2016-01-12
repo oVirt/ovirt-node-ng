@@ -33,12 +33,12 @@ the `ovirt-node-ng` repository:
 
 ## Building the image
 
-To build the `ovirt-node-ng.squashfs.img` image from the
-`ovirt-node-ng.ks` you now just need to run the following command and
-be patient:
+To build the `rootfs:org.ovirt.Node.Next:x86_64:0.squashfs.img` image from
+the `rootfs:org.ovirt.Node.Next:x86_64:0.ks` you now just need to run the
+following command and be patient:
 
     # To build the squashfs image (liveimg):
-    make image-build
+    make squashfs
 
 **NOTE:** This will download a lot of packages from the internet
 
@@ -51,10 +51,10 @@ It can only be fed to dracut for booting, or to anaconda for installation.
 To be able to boot the squashfs, you first need to install it.
 This can be done by running:
 
-    make image-install
+    make installed-squashfs
 
 This will install the previously generated squashfs image to the
-`ovirt-node-ng-auto-install.qcow2` disk image.
+`installed-ovirt-node-ng-squashfs.raw` disk image.
 The auto-installation ensures that LVM Thin is used, otherwise the upgrade and
 rollbacks would not work.
 
@@ -66,8 +66,8 @@ This disk image can be booted in KVM and used for debugging and testing.
 
 ## Making Changes
 
-The appliance image itself is defined by the `ovirt-node-ng.ks` file.
-Any change to that file will lead to a change in the appliance.
+The appliance image itself is defined by the `rootfs:org.ovirt.Node.Next:x86_64:0.ks`
+file. Any change to that file will lead to a change in the appliance.
 
 Note that some changes (i.e. root password) might be overriden or deactivated
 at installation time by directives in the

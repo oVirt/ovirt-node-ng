@@ -10,7 +10,7 @@ export LIBGUESTFS_BACKEND=direct
 
 TEST_DIR= $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 export TEST_ENGINE_ROOTFS_IMG=$(TEST_DIR)/ovirt-engine-appliance.qcow2
-export TEST_NODE_SQUASHFS_IMG=$(TEST_DIR)/../ovirt-node-ng.squashfs.img
+export TEST_NODE_SQUASHFS_IMG=$(TEST_DIR)/../rootfs:org.ovirt.Node.Next:x86_64:0.squashfs.img
 export TEST_NODE_INSTALLED_IMG=$(TEST_DIR)/../installed-ovirt-node-ng-squashfs.raw
 
 export PYTHONPATH=$(PWD)
