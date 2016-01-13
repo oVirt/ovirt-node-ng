@@ -47,7 +47,7 @@ $(BOOTISO):
 clean:
 	-rm -vf $(IMAGEFILE) $(RPMMANIFEST) $(INSTALLEDIMAGEFILE)
 
-check:
+check: installed-squashfs
 	$(MAKE) -C tests check
 
 clean-build-and-check: | clean squashfs installed-squashfs check
