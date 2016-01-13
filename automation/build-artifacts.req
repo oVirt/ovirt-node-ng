@@ -16,6 +16,7 @@ libvirt-client
 libvirt-python
 libvirt-python3
 lorax
+python-nose
 python-pyflakes
 python-pep8
 virt-install
