@@ -414,6 +414,11 @@ cert_file = None
 
 
 class Test_Tier_0_IntegrationTestCase(IntegrationTestCase):
+    def download_sosreport(self):
+        debug("Fetching sosreports from Node and Engine")
+        self.node.download_sosreport()
+        self.engine.download_sosreport()
+
     def test_tier_1_intra_network_connectivity(self):
         """Check that the basic IP connectivity between VMs is given
         """

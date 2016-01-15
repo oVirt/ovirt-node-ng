@@ -404,4 +404,10 @@ class VM():
         """
         self.fish("write", remote, data)
 
+    def download_sosreport(self):
+        """Generate and download an sosreport
+        """
+        self.ssh("sosreport --all-logs --batch")
+        self.fish("--live", "glob", "download", "/var/tmp/sosreport-*", ".")
+
 # vim: et ts=4 sw=4 sts=4
