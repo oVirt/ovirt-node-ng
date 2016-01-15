@@ -22,6 +22,10 @@ check-code:
 	@pyflakes *.py
 	@pep8 *.py
 
-check: check-code ovirt-engine-appliance.qcow2
+pre-check:
+	@grep -q 0 /sys/fs/selinux/enforce || ( echo ERROR: Enable permissive mode: seteneforce 0 ; exit 1 )
+	@firewall-cmd -q --query-port 1234/udp || ( echo ERROR: Open port 1234/udp for multicaset for testing: firewall-cmd --add-port 1234/udp ; exit 1 )
+
+check: pre-check check-code ovirt-engine-appliance.qcow2
 	nosetests --with-xunit -v --no-byte-compile
 	-xsltproc nosetests.xslt nosetests.xml
