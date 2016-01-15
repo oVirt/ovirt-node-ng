@@ -335,6 +335,7 @@ class VM():
 
         Also block until the VM is shutdown
         """
+        self.ssh("systemctl poweroff &")
         sh.virsh("shutdown", "--mode=acpi", self.name)
         if wait:
             self.wait_event("lifecycle", timeout=timeout)
@@ -343,6 +344,7 @@ class VM():
     def reboot(self, wait=True, timeout=90):
         """Ask the VM to reboot (via ACPI)
         """
+        self.ssh("systemctl reboot &")
         sh.virsh("reboot", "--mode=acpi", self.name)
         if wait:
             self.wait_event("reboot", timeout=timeout)
