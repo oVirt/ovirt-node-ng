@@ -357,6 +357,13 @@ cert_file = None
         self.node.start()
         self.engine.start()
 
+        for host in [self.node, self.engine]:
+            host.wait_ssh()
+            host.ssh("while [ ! -e /var/lib/cloud/instance/boot-finished ]; " +
+                     "do sleep 5; done")
+
+        debug("Node and Engine are up")
+
     def tearDown(self):
         if KEEP_TEST_ENV:
             return
