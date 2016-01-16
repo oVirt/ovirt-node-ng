@@ -31,3 +31,8 @@ liveimg --url="file:///mnt/livesrc/LiveOS/rootfs.img"
 mkdir -p /mnt/livesrc
 mount /dev/disk/by-id/virtio-livesrc /mnt/livesrc
 %end
+
+%post
+imgbase layout --init
+imgbase --experimental volume --create /var 4G
+%end
