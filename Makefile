@@ -33,7 +33,7 @@ installed-squashfs: data/ci-image-install.ks $(IMAGEFILE) $(BOOTISO)
 	@echo "The squashfs '$(IMAGEFILE)' got installed into the file '$(INSTALLEDIMAGEFILE)'"
 
 $(BOOTISO):
-	curl -O $(ISOURL)
+	curl $(CURLOPTS) -O $(ISOURL)
 
 %.squashfs.img: data/%.ks $(BOOTISO)
 	livemedia-creator --make-pxe-live --iso $(BOOTISO) --ks $< --resultdir build --tmp "$(TMPDIR)"

@@ -16,16 +16,17 @@ prepare() {
   mkdir "$ARTIFACTSDIR"
 }
 
-check() {
-  sudo -E make installed-squashfs
-  sudo -E make check
-  ln -fv \
-    *.img \
-    tests/*.xml \
+build() {
+  sudo -E make squashfs
+
+  ln -v \
+    *.squashfs.img \
+    *.log \
+    *-manifest-rpm \
     "$ARTIFACTSDIR/"
 
   ls -shal "$ARTIFACTSDIR/" || :
 }
 
 prepare
-check || :
+build
