@@ -26,8 +26,6 @@ poweroff
 # Packages
 #
 %packages --excludedocs --ignoremissing
-@core
-
 #
 # Additional packages for EFI support
 # https://www.brianlane.com/creating-live-isos-with-livemedia-creator.html
@@ -47,8 +45,7 @@ syslinux
 
 # setup systemd to boot to the right runlevel
 echo "Setting default runlevel to multiuser text mode"
-rm -vf /etc/systemd/system/default.target
-ln -vs /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+ln -fvs /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
 echo "Cleaning old yum repodata."
 yum clean all
