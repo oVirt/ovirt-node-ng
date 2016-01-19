@@ -5,7 +5,7 @@ set -ex
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
 export PATH=$PATH:/sbin:/usr/sbin
-export CURLOPTS?="-x http://proxy.phx.ovirt.org:3128"
+export CURLOPTS="-x http://proxy.phx.ovirt.org:3128"
 export TMPDIR=$PWD/tmp
 export LIBGUESTFS_BACKEND=direct
 
