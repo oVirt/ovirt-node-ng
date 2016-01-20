@@ -16,8 +16,11 @@ prepare() {
   mkdir "$ARTIFACTSDIR"
 }
 
-check() {
+build() {
   sudo -E make installed-squashfs
+}
+
+check() {
   sudo -E make check
   ln -fv \
     *.img \
@@ -28,4 +31,5 @@ check() {
 }
 
 prepare
+build
 check || :
