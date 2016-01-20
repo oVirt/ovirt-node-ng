@@ -16,7 +16,6 @@ export TEST_NODE_INSTALLED_IMG=$(TEST_DIR)/../installed-ovirt-node-ng-squashfs.r
 export PYTHONPATH=$(PWD)
 
 ovirt-engine-appliance.qcow2:
-	# FIXME Use an Appliance image from a stable branch
 	curl -O http://jenkins.ovirt.org/job/ovirt-appliance_master_build-artifacts-el7-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-engine-appliance.qcow2
 
 check-code:
