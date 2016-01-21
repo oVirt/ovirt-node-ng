@@ -3,7 +3,7 @@ DISTRO=centos
 RELEASEVER=7
 
 IMAGEFILE=rootfs\:org.ovirt.Node.Next\:x86_64\:0.squashfs.img
-RPMMANIFEST=ovirt-node-ng-manifest-rpm
+RPMMANIFEST=rootfs\:org.ovirt.Node.Next\:x86_64\:0-manifest-rpm
 INSTALLEDIMAGEFILE=installed-ovirt-node-ng-squashfs.raw
 ISOURL?=http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso
 BOOTISO=$(shell basename $(ISOURL))
