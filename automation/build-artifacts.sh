@@ -32,4 +32,4 @@ check() {
 
 prepare
 build
-check || :
+# check || :
