@@ -17,7 +17,13 @@ prepare() {
 }
 
 build() {
-  sudo -E make installed-squashfs
+  # Build the squashfs for a later export
+  sudo -E make squashfs
+
+  ln -fv \
+    *manifest* \
+    *.squashfs.img \
+    "$ARTIFACTSDIR/"
 }
 
 check() {
