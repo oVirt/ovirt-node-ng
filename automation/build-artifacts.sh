@@ -19,9 +19,11 @@ prepare() {
 build() {
   # Build the squashfs for a later export
   sudo -E make squashfs
+  sudo -E make rpm
 
   ln -fv \
     *manifest* \
+    *.rpm \
     *.squashfs.img \
     "$ARTIFACTSDIR/"
 }

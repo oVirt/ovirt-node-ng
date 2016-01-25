@@ -2,3 +2,8 @@ livemedia.log
 program.log
 virt-install.log
 boot.iso
+logs/
+mocker-*
+ovirt-node-ng.spec
+ovirt-node-ng.squashfs.img
+tmp.repos/*

@@ -1,0 +1,36 @@
+%global	package_version @PACKAGE_VERSION@
+%global	_ovirt_node_ng_dir /usr/share/%{name}/image/
+%global	_ovirt_node_ng_file %{_ovirt_node_ng_dir}/%{name}-%{version}-%{release}.squashfs.img
+
+Name:       ovirt-node-ng
+Version:    @VERSION@
+Release:    @RELEASE@%{?dist}%{?extra_release}
+License:    GPLv2
+Summary:    oVirt Node Image
+
+URL:        http://www.ovirt.org/
+Source0:    @SQUASHFILENAME@
+
+Obsoletes:  ovirt-node-ng-image-placeholder <= @PLACEHOLDER@
+
+BuildArch:  noarch
+
+%description
+This package contains the prebuild oVirt Node image.
+
+%prep
+
+%build
+
+%install
+# Install the image
+/usr/bin/install -d %{buildroot}/%{_ovirt_node_ng_dir}
+/usr/bin/install -m 644 %{SOURCE0} %{buildroot}/%{_ovirt_node_ng_file}
+
+%files
+%dir %{_ovirt_node_ng_dir}
+%{_ovirt_node_ng_file}
+
+%changelog
+* Mon Jan 25 2016 Douglas Schilling Landgraf <dougsland@redhat.com>
+- Initial build

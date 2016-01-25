@@ -1,4 +1,19 @@
-
+# Copyright (C) 2016 Red Hat, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# MA  02110-1301, USA.  A copy of the GNU General Public License is
+# also available at http://www.gnu.org/copyleft/gpl.html.
 DISTRO=centos
 RELEASEVER=7
 
@@ -52,3 +67,29 @@ check: installed-squashfs
 
 clean-build-and-check: | clean squashfs installed-squashfs check
 	echo Done
+
+ovirt-node-ng.spec: VERSION=1.0
+ovirt-node-ng.spec: VERSION_EXTRA=
+ovirt-node-ng.spec: RELEASE=$(shell date +%Y%m%d).1
+ovirt-node-ng.spec: PLACEHOLDER=002-0.6
+ovirt-node-ng.spec: SQUASHFILENAME=$(IMAGEFILE)
+ovirt-node-ng.spec: data/ovirt-node-ng.spec.in
+	sed \
+	-e "s/@VERSION@/$(VERSION)$(VERSION_EXTRA)/" \
+	-e "s/@RELEASE@/$(RELEASE)/" \
+	-e "s/@SQUASHFILENAME@/$(SQUASHFILENAME)/" \
+	-e "s/@PLACEHOLDER@/$(PLACEHOLDER)/" \
+	$< > $@
+
+%.rpm: %.spec
+	rpmbuild --define "_sourcedir `pwd`" -ba $<
+
+RPMBUILD = rpmbuild
+TMPREPOS = tmp.repos
+rpm srpm: ovirt-node-ng.spec $(IMAGEFILE)
+	rm -fr "$(TMPREPOS)"
+	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
+	$(RPMBUILD) --define="_topdir `pwd`/$(TMPREPOS)" --define "_sourcedir `pwd`" -ba $<
+	@echo
+	@echo "srpm and rpm(s) available at '$(TMPREPOS)'"
+	@echo
