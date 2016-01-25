@@ -58,7 +58,7 @@ yum clean all
 %post --erroronfail
 set -x
 mkdir -p /etc/yum.repos.d
-curl -o /etc/yum.repos.d/cockpit-preview-epel-7.repo "https://copr.fedoraproject.org/coprs/g/cockpit/cockpit-preview/repo/epel-7/msuchy-cockpit-preview-epel-7.repo"
+curl -L -o /etc/yum.repos.d/cockpit-preview-epel-7.repo "https://copr.fedoraproject.org/coprs/g/cockpit/cockpit-preview/repo/epel-7/msuchy-cockpit-preview-epel-7.repo"
 yum install --nogpgcheck -y cockpit
 %end
 
