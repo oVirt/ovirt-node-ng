@@ -39,7 +39,7 @@ installed-squashfs: data/ci-image-install.ks $(IMAGEFILE) $(BOOTISO)
 	virt-install \
 		--name $(DOMNAME) \
 		--memory 4096 \
-		--vcpus 4 --cpu host \
+		--vcpus 4 \
 		--os-variant rhel7 \
 		--rng random \
 		--memballoon virtio \
