@@ -14,15 +14,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA  02110-1301, USA.  A copy of the GNU General Public License is
 # also available at http://www.gnu.org/copyleft/gpl.html.
+
+#
+# FIXME All these vars should go to configure.ac
+#
 DISTRO=centos
 RELEASEVER=7
-
 IMAGEFILE=rootfs\:org.ovirt.Node.Next\:x86_64\:0.squashfs.img
 RPMMANIFEST=rootfs\:org.ovirt.Node.Next\:x86_64\:0-manifest-rpm
 INSTALLEDIMAGEFILE=installed-ovirt-node-ng-squashfs.raw
 ISOURL?=http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso
 BOOTISO=$(shell basename $(ISOURL))
 TMPDIR?=/var/tmp
+OVIRT_RELEASE_RPM = http://resources.ovirt.org/pub/yum-repo/ovirt-release-master.rpm
+
+.PHONY: ovirt-node-ng.spec
 
 squashfs: $(IMAGEFILE) $(RPMMANIFEST)
 	@echo squashfs: $(IMAGEFILE)
@@ -59,30 +65,14 @@ $(BOOTISO):
 	guestfish --ro -i -a 'squashfs-root/LiveOS/rootfs.img' sh 'rpm -qa | sort -u' > $@
 	rm -vrf squashfs-root
 
-clean:
-	-rm -vf $(IMAGEFILE) $(RPMMANIFEST) $(INSTALLEDIMAGEFILE)
-
-check: installed-squashfs
-	$(MAKE) -C tests check
-
-clean-build-and-check: | clean squashfs installed-squashfs check
-	echo Done
-
-ovirt-node-ng.spec: VERSION=1.0
-ovirt-node-ng.spec: VERSION_EXTRA=
-ovirt-node-ng.spec: RELEASE=$(shell date +%Y%m%d).1
-ovirt-node-ng.spec: PLACEHOLDER=002-0.6
-ovirt-node-ng.spec: SQUASHFILENAME=$(IMAGEFILE)
+ovirt-node-ng.spec: VERSION=$(shell rpm -qp --qf "%{version}" $(OVIRT_RELEASE_RPM))
+ovirt-node-ng.spec: RELEASE=$(shell rpm -qp --qf "%{release}" $(OVIRT_RELEASE_RPM)).$(shell date +%Y%m%d).0
 ovirt-node-ng.spec: data/ovirt-node-ng.spec.in
 	sed \
-	-e "s/@VERSION@/$(VERSION)$(VERSION_EXTRA)/" \
+	-e "s/@VERSION@/$(VERSION)/" \
 	-e "s/@RELEASE@/$(RELEASE)/" \
-	-e "s/@SQUASHFILENAME@/$(SQUASHFILENAME)/" \
-	-e "s/@PLACEHOLDER@/$(PLACEHOLDER)/" \
+	-e "s/@SQUASHFILENAME@/$(IMAGEFILE)/" \
 	$< > $@
-
-%.rpm: %.spec
-	rpmbuild --define "_sourcedir `pwd`" -ba $<
 
 RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
@@ -93,3 +83,12 @@ rpm srpm: ovirt-node-ng.spec $(IMAGEFILE)
 	@echo
 	@echo "srpm and rpm(s) available at '$(TMPREPOS)'"
 	@echo
+
+clean:
+	-rm -vf $(IMAGEFILE) $(RPMMANIFEST) $(INSTALLEDIMAGEFILE) ovirt-node-ng.spec
+
+check: installed-squashfs
+	$(MAKE) -C tests check
+
+clean-build-and-check: | clean squashfs installed-squashfs check
+	echo Done
