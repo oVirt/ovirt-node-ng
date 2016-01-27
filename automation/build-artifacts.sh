@@ -21,9 +21,9 @@ build() {
   sudo -E make squashfs
   sudo -E make rpm
 
-  ln -fv \
+  mv -fv \
     *manifest* \
-    *.rpm \
+    tmp.repos/RPMS/noarch/*.rpm \
     *.squashfs.img \
     "$ARTIFACTSDIR/"
 }
