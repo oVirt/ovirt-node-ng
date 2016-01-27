@@ -16,6 +16,9 @@ Source0:    @IMAGENAME@.squashfs.img
 
 BuildArch:  noarch
 
+BuildRequires: autoconf
+BuildRequires: automake
+
 %package image-update
 Summary:    oVirt Node Next Image
 Requires:   imgbased
