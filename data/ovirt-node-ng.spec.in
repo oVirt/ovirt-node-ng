@@ -6,13 +6,13 @@
 %define _binary_payload w0.gzdio
 
 Name:       ovirt-node-ng
-Version:    @VERSION@
-Release:    @RELEASE@%{?dist}%{?extra_release}
+Version:    @PACKAGE_RPM_VERSION@
+Release:    @PACKAGE_RPM_RELEASE@%{?dist}%{?extra_release}
 License:    GPLv2
 Summary:    oVirt Node Next
 
 URL:        http://www.ovirt.org/
-Source0:    @SQUASHFILENAME@
+Source0:    @IMAGENAME@.squashfs.img
 
 BuildArch:  noarch
 

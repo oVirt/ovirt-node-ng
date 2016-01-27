@@ -7,3 +7,13 @@ mocker-*
 ovirt-node-ng.spec
 ovirt-node-ng.squashfs.img
 tmp.repos/*
+INSTALL
+Makefile.in
+Makefile
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+install-sh
+missing

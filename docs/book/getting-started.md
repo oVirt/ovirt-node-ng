@@ -33,8 +33,8 @@ the `ovirt-node-ng` repository:
 
 ## Building the image
 
-To build the `rootfs:org.ovirt.Node.Next:x86_64:0.squashfs.img` image from
-the `rootfs:org.ovirt.Node.Next:x86_64:0.ks` you now just need to run the
+To build the `ovirt-node-ng-image.squashfs.img` image from
+the `ovirt-node-ng-image.ks` you now just need to run the
 following command and be patient:
 
     # To build the squashfs image (liveimg):
@@ -66,7 +66,7 @@ This disk image can be booted in KVM and used for debugging and testing.
 
 ## Making Changes
 
-The appliance image itself is defined by the `rootfs:org.ovirt.Node.Next:x86_64:0.ks`
+The appliance image itself is defined by the `ovirt-node-ng-image.ks`
 file. Any change to that file will lead to a change in the appliance.
 
 Note that some changes (i.e. root password) might be overriden or deactivated

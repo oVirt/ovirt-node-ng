@@ -30,7 +30,7 @@ See the [official kickstart documentation](https://github.com/rhinstaller/pykick
 for more informations.
 
 The specific kickstart which defines the oVirt Node appliance is defined in the
-`rootfs:org.ovirt.Node.Next:x86_64:0.ks` file, which hosted in the`ovirt-node-ng` repository.
+`ovirt-node-ng-image.ks` file, which hosted in the`ovirt-node-ng` repository.
 See the [getting started section](getting-started.md) for how to clone that
 repository.
 
@@ -170,7 +170,7 @@ following arguments:
     --qcow-debug          creates a qcow2 image instead of fs for debugging
                           purposes
 
-To use it, simply pass `--kickstart data/rootfs:org.ovirt.Node.Next:x86_64:0.ks`
+To use it, simply pass `--kickstart data/ovirt-node-ng-image.ks`
 (for a manual, step-by-step install), and your choice of `--base fedora23` or
 `--base centos7`, depending on what you'd like your Node image based upon.
 

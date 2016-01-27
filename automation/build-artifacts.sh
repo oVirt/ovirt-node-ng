@@ -18,6 +18,7 @@ prepare() {
 
 build() {
   # Build the squashfs for a later export
+  ./autogen.sh --with-tmpdir=/var/tmp
   sudo -E make squashfs
   sudo -E make rpm
 
