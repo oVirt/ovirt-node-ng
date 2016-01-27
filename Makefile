@@ -65,8 +65,8 @@ $(BOOTISO):
 	guestfish --ro -i -a 'squashfs-root/LiveOS/rootfs.img' sh 'rpm -qa | sort -u' > $@
 	rm -vrf squashfs-root
 
-ovirt-node-ng.spec: VERSION=$(shell rpm -qp --qf "%{version}" $(OVIRT_RELEASE_RPM))
-ovirt-node-ng.spec: RELEASE=$(shell rpm -qp --qf "%{release}" $(OVIRT_RELEASE_RPM)).$(shell date +%Y%m%d).0
+ovirt-node-ng.spec: VERSION=$(shell rpm --dbpath=/tmp -qp --qf "%{version}" $(OVIRT_RELEASE_RPM))
+ovirt-node-ng.spec: RELEASE=$(shell rpm --dbpath=/tmp -qp --qf "%{release}" $(OVIRT_RELEASE_RPM)).$(shell date +%Y%m%d).0
 ovirt-node-ng.spec: data/ovirt-node-ng.spec.in
 	sed \
 	-e "s/@VERSION@/$(VERSION)/" \
