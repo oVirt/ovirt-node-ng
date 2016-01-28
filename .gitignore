@@ -5,7 +5,7 @@ boot.iso
 logs/
 mocker-*
 ovirt-node-ng.spec
-ovirt-node-ng.squashfs.img
+ovirt-node-ng-image.squashfs.img
 tmp.repos/*
 INSTALL
 Makefile.in
@@ -17,3 +17,4 @@ config.status
 configure
 install-sh
 missing
+build/
