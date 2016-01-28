@@ -16,7 +16,7 @@
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
 SQUASHFSFILENAME = @IMAGENAME@.squashfs.img
-RPMMANIFESTNAME = @IMAGENAME@.rpm-manifest
+RPMMANIFESTNAME = @IMAGENAME@.manifest-rpm
 INSTALLEDIMAGEFILE = @IMAGENAME@.installed.raw
 
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
@@ -49,7 +49,7 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 	livemedia-creator --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
 	mv -v build/*squash* "$@"
 
-%-manifest-rpm: %.squashfs.img
+%.manifest-rpm: %.squashfs.img
 	unsquashfs $<
 	guestfish --ro -i -a 'squashfs-root/LiveOS/rootfs.img' sh 'rpm -qa | sort -u' > $@
 	rm -vrf squashfs-root
