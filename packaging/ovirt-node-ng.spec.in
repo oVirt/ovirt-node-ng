@@ -1,5 +1,9 @@
 %global	_ovirt_node_ng_dir /usr/share/%{name}/image/
 %global	_ovirt_node_ng_file %{_ovirt_node_ng_dir}/%{name}-%{version}-%{release}.squashfs.img
+%global _stream ovirt-node-ng
+
+# Hardcode the dist to el7, because this is what the image contains
+%global dist el7
 
 # Disable compression, because the image is already compressed
 %define _source_payload w0.gzdio
@@ -32,7 +36,7 @@ Currently the main package is empty.
 This package contains the prebuild oVirt Node image.
 
 %post image-update
-# FIXME imgbased liveimg update --file %{_ovirt_node_ng_file}
+imgbase --debug liveimg update %{_stream}-%{version}-%{release} %{_ovirt_node_ng_file}
 
 %install
 # Install the image
