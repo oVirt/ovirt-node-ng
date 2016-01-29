@@ -55,6 +55,6 @@ AC_SUBST([TMPDIR])
 
 AC_CONFIG_FILES([
 	Makefile
-	data/ovirt-node-ng.spec
+	packaging/ovirt-node-ng.spec
 ])
 AC_OUTPUT

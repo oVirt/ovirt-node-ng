@@ -59,13 +59,13 @@ TMPREPOS = tmp.repos
 rpm srpm: $(SQUASHFSFILENAME)
 	rm -fr "$(TMPREPOS)"
 	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
-	$(RPMBUILD) --define="_topdir `pwd`/$(TMPREPOS)" --define "_sourcedir `pwd`" -ba data/ovirt-node-ng.spec
+	$(RPMBUILD) --define="_topdir `pwd`/$(TMPREPOS)" --define "_sourcedir `pwd`" -ba packaging/ovirt-node-ng.spec
 	@echo
 	@echo "srpm and rpm(s) available at '$(TMPREPOS)'"
 	@echo
 
 clean-local:
-	-rm -vf $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(INSTALLEDIMAGEFILE) data/ovirt-node-ng.spec
+	-rm -vf $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(INSTALLEDIMAGEFILE) packaging/ovirt-node-ng.spec
 
 check: installed-squashfs
 	$(MAKE) -C tests check
