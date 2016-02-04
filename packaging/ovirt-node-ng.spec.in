@@ -36,7 +36,7 @@ Currently the main package is empty.
 This package contains the prebuild oVirt Node image.
 
 %post image-update
-imgbase --debug update --mode=liveimg %{_stream}-%{version}-%{release} %{_ovirt_node_ng_file}
+imgbase --debug update --format liveimg %{_stream}-%{version}-%{release} %{_ovirt_node_ng_file}
 
 %install
 # Install the image
