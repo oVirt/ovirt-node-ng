@@ -17,7 +17,7 @@
 
 SQUASHFSFILENAME = @IMAGENAME@.squashfs.img
 RPMMANIFESTNAME = @IMAGENAME@.manifest-rpm
-INSTALLEDIMAGEFILE = @IMAGENAME@.installed.raw
+INSTALLEDIMAGEFILE = @IMAGENAME@.installed.qcow2
 
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
 	@echo squashfs: $(SQUASHFILENAME)
@@ -37,7 +37,7 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 		--extra-args "inst.ks=file:///ci-image-install.ks" \
 		--initrd-inject data/ci-image-install.ks \
 		--check disk_size=off \
-		--disk path=$(INSTALLEDIMAGEFILE),size=20,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=raw \
+		--disk path=$(INSTALLEDIMAGEFILE),size=20,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=qcow2 \
 		--disk path=$(SQUASHFSFILENAME),readonly=on,device=disk,bus=virtio,serial=livesrc
 	virsh undefine $(DOMNAME)
 	@echo "The squashfs '$(SQUASHFSFILENAME)' got installed into the file '$(INSTALLEDIMAGEFILE)'"
