@@ -3,7 +3,7 @@
 %global _stream ovirt-node-ng
 
 # Hardcode the dist to el7, because this is what the image contains
-%global dist el7
+%global dist .el7
 
 # Disable compression, because the image is already compressed
 %define _source_payload w0.gzdio
