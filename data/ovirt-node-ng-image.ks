@@ -74,7 +74,7 @@ yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-maste
 
 # 2. Install oVirt Node release
 yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-host-node.rpm
-yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-placeholder.rpm
+yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-node-ng-image-update-placeholder.rpm
 
 imgbase --debug --experimental image-build --postprocess
 %end
