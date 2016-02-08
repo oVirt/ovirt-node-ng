@@ -20,13 +20,13 @@ build() {
   # Build the squashfs for a later export
   ./autogen.sh --with-tmpdir=/var/tmp
 
+  # Add this jenkins job as a repository
   cat <<EOF >> data/ovirt-node-ng-image.ks
 
 %post
 yum-config-manager --add-repo "http://jenkins.ovirt.org/job/ovirt-node-ng_master_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/"
 %end
 EOF
-  fi
 
   sudo -E make squashfs
   sudo -E make rpm
