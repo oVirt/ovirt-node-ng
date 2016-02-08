@@ -76,5 +76,9 @@ yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-maste
 yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-host-node.rpm
 yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-node-ng-image-update-placeholder.rpm
 
+# Disable all repositories
+# FIXME should this be here or in imgbased post-processing?
+sed -i "s/^enabled=.*/enabled=0/" /etc/yum.repos.d/*
+
 imgbase --debug --experimental image-build --postprocess
 %end
