@@ -69,7 +69,7 @@ rpm srpm: $(SQUASHFSFILENAME)
 	@echo
 
 clean-local:
-	-rm -vf $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(INSTALLEDIMAGEFILE) packaging/ovirt-node-ng.spec
+	-rm -vrf $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(INSTALLEDIMAGEFILE) packaging/ovirt-node-ng.spec build
 
 check: installed-squashfs
 	$(MAKE) -C tests check
