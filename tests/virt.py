@@ -228,6 +228,11 @@ class VM():
 
         return vm
 
+    def wait_cloud_init_finished(self):
+        self.wait_ssh()
+        self.ssh("while [ ! -e /var/lib/cloud/instance/boot-finished ]; "
+                 "do sleep 5; done")
+
     def wait_ssh(self, timeout=60):
         debug("Waiting for ssh")
         while timeout > 0:

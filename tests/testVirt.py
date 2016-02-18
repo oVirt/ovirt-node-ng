@@ -367,9 +367,7 @@ cert_file = None
         self.engine.start()
 
         for host in [self.node, self.engine]:
-            host.wait_ssh()
-            host.ssh("while [ ! -e /var/lib/cloud/instance/boot-finished ]; " +
-                     "do sleep 5; done")
+            host.wait_cloud_init_finished()
 
         debug("Node and Engine are up")
 
