@@ -38,6 +38,7 @@ import sh
 import os
 import tempfile
 import time
+from concurrent import futures
 from virt import DiskImage, VM, CloudConfig
 
 
@@ -270,8 +271,9 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
             # This assumes that the engine was tested already and
             # this could probably be pulled in a separate testcase
             #
-            cls._node_setup()
-            cls._engine_setup()
+            with futures.ThreadPoolExecutor(max_workers=2) as executor:
+                executor.submit(lambda: cls._node_setup())
+                executor.submit(lambda: cls._engine_setup())
         except:
             if cls.node:
                 cls.node.undefine()
