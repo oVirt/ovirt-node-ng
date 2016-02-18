@@ -121,7 +121,9 @@ class NodeTestCase(MachineTestCase):
             cls.node = cls._start_vm(n, cls._img, n + ".qcow2", 77)
 
             debug("Install cloud-init")
-            cls.node.fish("sh", "yum install -y sos cloud-init")
+            cls.node.fish("sh", "yum --enablerepo=base --enablerepo=updates "
+                          "-y "
+                          "install sos cloud-init")
         except:
             if cls.node:
                 cls.node.undefine()
@@ -290,12 +292,13 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
     @classmethod
     def _node_setup(cls):
         debug("Install cloud-init")
-        cls.node.fish("sh", "yum install -y sos cloud-init")
+        cls.node.fish("sh", "yum --enablerepo=base --enablerepo=updates -y "
+                      "install sos cloud-init")
 
         cls.node.start()
 
         debug("Enable fake qemu support")
-        cls.node.ssh("yum install -y vdsm-hook-faqemu")
+        cls.node.ssh("yum --enablerepo=ovirt* -y install vdsm-hook-faqemu")
         cls.node.ssh("sed -i '/vars/ a fake_kvm_support = true' "
                      "/etc/vdsm/vdsm.conf")
 
