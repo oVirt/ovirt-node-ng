@@ -319,7 +319,7 @@ class VM():
         return self._fish(*args)
 
     def _fish(self, *args):
-        return sh.guestfish("--network", "-v", "-d", self.name, *args)
+        return sh.guestfish("--network", "-vx", "-d", self.name, *args)
 
     @logcall
     def start(self):
