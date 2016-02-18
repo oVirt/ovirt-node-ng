@@ -314,6 +314,12 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
         cls.node.ssh("sed -i '/fake_kvm_support/ s/false/true/' " +
                      "/usr/lib/python2.7/site-packages/vdsm/config.py")
 
+        # FIXME
+        # http://lists.ovirt.org/pipermail/devel/2016-February/012377.html
+        # This should be a dependency of something host-node or vdsm
+        # https://bugzilla.redhat.com/show_bug.cgi?id=1309912
+        cls.node.ssh("yum --enablerepo=ovirt* -y install vdsm-cli")
+
         cls.node.shutdown()
 
     @classmethod
