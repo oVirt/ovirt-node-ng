@@ -129,6 +129,9 @@ class NodeTestCase(MachineTestCase):
             cls.node.fish("sh", "yum --enablerepo=base --enablerepo=updates "
                           "-y "
                           "install sos cloud-init")
+
+            cls.node.start()
+            cls.node.wait_cloud_init_finished()
         except:
             if cls.node:
                 cls.node.undefine()
@@ -147,7 +150,6 @@ class NodeTestCase(MachineTestCase):
     def setUp(self):
         debug("Setting up %s" % self)
         self.snapshot = self.node.snapshot()
-        self.node.start()
 
     def tearDown(self):
         if self._resultForDoCleanups.failures:
