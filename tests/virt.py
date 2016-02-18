@@ -315,7 +315,11 @@ class VM():
     def fish(self, *args):
         """Run guestfish on the disk of the VM
         """
-        return sh.guestfish("--network", "-v", "-d", self.name, "-i", *args)
+        args = ("-i",) + args
+        return self._fish(*args)
+
+    def _fish(self, *args):
+        return sh.guestfish("--network", "-v", "-d", self.name, *args)
 
     @logcall
     def start(self):
@@ -382,6 +386,16 @@ class VM():
         with open(pty, "rb") as src:
             for line in src:
                 yield line
+
+    def layout_fish(self, *args):
+        """Same as fish but for the installed case
+        Guestfish can not handle images with multiple roots
+        """
+        lvm_name = "centos_installed/ovirt-node-ng-1.0-0.0+1"
+        args = ("run",
+                ":",
+                "mount", "/dev/%s" % lvm_name, "/", ":") + args
+        self._fish(*args)
 
     def set_cloud_config(self, cc):
         """Inject a cloud config into the VM by editing the disk

@@ -10,8 +10,8 @@ export LIBGUESTFS_BACKEND=direct
 
 TEST_DIR= $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 export TEST_ENGINE_ROOTFS_IMG=$(TEST_DIR)/ovirt-engine-appliance.qcow2
-export TEST_NODE_SQUASHFS_IMG=$(TEST_DIR)/../rootfs:org.ovirt.Node.Next:x86_64:0.squashfs.img
-export TEST_NODE_INSTALLED_IMG=$(TEST_DIR)/../installed-ovirt-node-ng-squashfs.raw
+export TEST_NODE_SQUASHFS_IMG=$(TEST_DIR)/../ovirt-node-ng-image.squashfs.img
+export TEST_NODE_INSTALLED_IMG=$(TEST_DIR)/../ovirt-node-ng-image.installed.qcow2
 
 export PYTHONPATH=$(PWD)
 
@@ -27,5 +27,5 @@ pre-check:
 	@firewall-cmd -q --query-port 1234/udp || ( echo ERROR: Open port 1234/udp for multicaset for testing: firewall-cmd --add-port 1234/udp ; exit 1 )
 
 check: pre-check check-code ovirt-engine-appliance.qcow2
-	nosetests --with-xunit -v --no-byte-compile
+	nosetests --with-xunit -v --no-byte-compile --stop
 	-xsltproc nosetests.xslt nosetests.xml

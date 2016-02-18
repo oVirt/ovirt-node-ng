@@ -82,6 +82,10 @@ class MachineTestCase(unittest.TestCase):
         dom = VM.create(name, img, ssh_port=ssh_port, memory_gb=memory_gb)
         dom._ssh_identity_file = gen_ssh_identity_file()
 
+        if "+1" in dom._fish("run", ":", "list-filesystems"):
+            # Redefine fish with a layout capable one
+            dom.fish = dom.layout_fish
+
         cc = CloudConfig()
         cc.instanceid = name + "-ci"
         cc.password = str(magicnumber)
