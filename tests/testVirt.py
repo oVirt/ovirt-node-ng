@@ -262,20 +262,11 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
     def setUpClass(cls):
         try:
             n = "%s-" % cls.__name__
-            cls.node = cls._start_vm(n + "node", NODE_IMG,
-                                     n + "node.qcow2", 77)
-            cls.engine = cls._start_vm(n + "engine", ENGINE_IMG,
-                                       n + "engine.qcow2", 88,
-                                       memory_gb=4)
 
-            #
-            # Do the engine setup
-            # This assumes that the engine was tested already and
-            # this could probably be pulled in a separate testcase
-            #
+            # Perform the VM setups in parallel
             with futures.ThreadPoolExecutor(max_workers=2) as executor:
-                executor.submit(lambda: cls._node_setup())
-                executor.submit(lambda: cls._engine_setup())
+                executor.submit(cls._node_setup, n)
+                executor.submit(cls._engine_setup, n)
         except:
             if cls.node:
                 cls.node.undefine()
@@ -298,7 +289,10 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
             cls.engine.undefine()
 
     @classmethod
-    def _node_setup(cls):
+    def _node_setup(cls, n):
+        cls.node = cls._start_vm(n + "node", NODE_IMG,
+                                 n + "node.qcow2", 77)
+
         debug("Install cloud-init")
         cls.node.fish("sh", "yum --enablerepo=base --enablerepo=updates -y "
                       "install sos cloud-init")
@@ -323,7 +317,11 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
         cls.node.shutdown()
 
     @classmethod
-    def _engine_setup(cls):
+    def _engine_setup(cls, n):
+        cls.engine = cls._start_vm(n + "engine", ENGINE_IMG,
+                                   n + "engine.qcow2", 88,
+                                   memory_gb=4)
+
         debug("Installing engine")
 
         cls.engine.post("/root/ovirt-engine-answers",
@@ -358,6 +356,11 @@ cert_file = None
         cls.engine.ssh("sed -i '/^127.0.0.1/ s/$/ engine.example.com/' "
                        "/etc/hosts")
 
+        #
+        # Do the engine setup
+        # This assumes that the engine was tested already and
+        # this could probably be pulled in a separate testcase
+        #
         debug("Run engine setup")
         cls.engine.ssh("engine-setup --offline "
                        "--config-append=/root/ovirt-engine-answers")
