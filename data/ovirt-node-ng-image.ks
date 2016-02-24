@@ -69,7 +69,7 @@ yum install --nogpgcheck -y cockpit
 %post --erroronfail
 set -x
 
-# 1. Install oVirt release fiel with repositories
+# 1. Install oVirt release file with repositories
 yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master.rpm
 
 # 2. Install oVirt Node release
@@ -83,6 +83,8 @@ yum install -y vdsm-cli
 # Disable all repositories
 # FIXME should this be here or in imgbased post-processing?
 sed -i "s/^enabled=.*/enabled=0/" /etc/yum.repos.d/*
+
+yum clean all
 
 imgbase --debug --experimental image-build --postprocess
 %end
