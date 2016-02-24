@@ -76,6 +76,10 @@ yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-maste
 yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-release-master-host-node.rpm
 yum install -y http://plain.resources.ovirt.org/pub/yum-repo/ovirt-node-ng-image-update-placeholder.rpm
 
+# HACKS
+# FIXME https://bugzilla.redhat.com/show_bug.cgi?id=1309912
+yum install -y vdsm-cli
+
 # Disable all repositories
 # FIXME should this be here or in imgbased post-processing?
 sed -i "s/^enabled=.*/enabled=0/" /etc/yum.repos.d/*
