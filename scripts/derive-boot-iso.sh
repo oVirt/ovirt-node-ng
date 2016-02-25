@@ -45,7 +45,7 @@ create_iso() {
   echo "[4/4] Creating new ISO"
   local volid=$(isoinfo -d -i $BOOTISO | grep "Volume id" | cut -d ":" -f2 | sed "s/^ //")
   cond_out mkisofs -J -T -o $NEWBOOTISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -graft-points -V "$volid" $TMPDIR
-  implantisomd5 --force $NEWBOOTISO
+  cond_out implantisomd5 --force $NEWBOOTISO
 }
 
 main() {
