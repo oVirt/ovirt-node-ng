@@ -10,8 +10,11 @@ NEWBOOTISO=${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)}
 
 TMPDIR=$(realpath bootiso.d)
 
+die() { echo $@ >&2 ; exit 2 ; }
+
 extract_iso() {
   echo "[1/4] Extracting ISO"
+  checkisomd5 --verbose $BOOTISO || die "boot.iso media check failed"
   local ISOFILES=$(isoinfo -i $BOOTISO -RJ -f | sort -r | egrep "/.*/")
   for F in $ISOFILES
   do
@@ -40,6 +43,7 @@ create_iso() {
   echo "[4/4] Creating new ISO"
   local volid=$(isoinfo -d -i $BOOTISO | grep "Volume id" | cut -d ":" -f2 | sed "s/^ //")
   mkisofs -J -T -o $NEWBOOTISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -graft-points -V "$volid" $TMPDIR > mkisofs.log 2>&1 || { cat mkisofs.log ; exit 1 ; } && rm mkisofs.log
+  implantisomd5 --force $NEWBOOTISO
 }
 
 main() {
