@@ -50,7 +50,7 @@ debug-installed: installed-squashfs
 	curl $(CURLOPTS) -O @BOOTISOURL@
 
 %.squashfs.img: data/%.ks @BOOTISO@
-	livemedia-creator --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
+	livemedia-creator --ram 2048 --vcpus 4 --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
 	mv -v build/*squash* "$@"
 
 %.manifest-rpm: %.squashfs.img
