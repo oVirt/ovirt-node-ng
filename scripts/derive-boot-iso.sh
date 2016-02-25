@@ -10,7 +10,7 @@ NEWBOOTISO=${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)}
 
 TMPDIR=$(realpath bootiso.d)
 
-die() { echo $@ >&2 ; exit 2 ; }
+die() { echo "ERROR: $@" >&2 ; exit 2 ; }
 
 extract_iso() {
   echo "[1/4] Extracting ISO"
@@ -25,6 +25,7 @@ extract_iso() {
 
 add_payload() {
   echo "[2/4] Adding squashfs to ISO"
+  unsquashfs -ll $SQUASHFS >/dev/null 2>&1 || die "squashfs seems to be corrupted."
   local DST=$(basename $SQUASHFS)
   cp $SQUASHFS $DST
   echo "liveimg --url=file:///run/install/repo/$DST" > liveimg.ks
