@@ -11,7 +11,7 @@ NEWBOOTISO=${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)}
 TMPDIR=$(realpath bootiso.d)
 
 die() { echo "ERROR: $@" >&2 ; exit 2 ; }
-cond_out() { "$@" > .tmp.log 2>&1 || { cat .tmp.log >&2 ; die "Failed to run $@" ; } && rm .tmp.log ; }
+cond_out() { "$@" > .tmp.log 2>&1 || { cat .tmp.log >&2 ; die "Failed to run $@" ; } && rm .tmp.log || : ; return $? ; }
 
 extract_iso() {
   echo "[1/4] Extracting ISO"
@@ -20,7 +20,7 @@ extract_iso() {
   for F in $ISOFILES
   do
     mkdir -p ./$(dirname $F)
-    [[ -d .$F ]] || ( isoinfo -i $BOOTISO -RJ -x $F > .$F )
+    [[ -d .$F ]] || { isoinfo -i $BOOTISO -RJ -x $F > .$F ; }
   done
 }
 
