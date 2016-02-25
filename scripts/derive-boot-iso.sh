@@ -11,10 +11,11 @@ NEWBOOTISO=${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)}
 TMPDIR=$(realpath bootiso.d)
 
 die() { echo "ERROR: $@" >&2 ; exit 2 ; }
+cond_out() { $@ > .tmp.log 2>&1 || { cat .tmp.log >&2 ; die "Failed to run $@" ; } && rm .tmp.log ; }
 
 extract_iso() {
   echo "[1/4] Extracting ISO"
-  checkisomd5 --verbose $BOOTISO || die "boot.iso media check failed"
+  cond_out checkisomd5 --verbose $BOOTISO
   local ISOFILES=$(isoinfo -i $BOOTISO -RJ -f | sort -r | egrep "/.*/")
   for F in $ISOFILES
   do
@@ -25,7 +26,7 @@ extract_iso() {
 
 add_payload() {
   echo "[2/4] Adding squashfs to ISO"
-  unsquashfs -ll $SQUASHFS >/dev/null 2>&1 || die "squashfs seems to be corrupted."
+  cond_out unsquashfs -ll $SQUASHFS
   local DST=$(basename $SQUASHFS)
   cp $SQUASHFS $DST
   echo "liveimg --url=file:///run/install/repo/$DST" > liveimg.ks
@@ -43,7 +44,7 @@ modify_bootloader() {
 create_iso() {
   echo "[4/4] Creating new ISO"
   local volid=$(isoinfo -d -i $BOOTISO | grep "Volume id" | cut -d ":" -f2 | sed "s/^ //")
-  mkisofs -J -T -o $NEWBOOTISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -graft-points -V "$volid" $TMPDIR > mkisofs.log 2>&1 || { cat mkisofs.log ; exit 1 ; } && rm mkisofs.log
+  cond_out mkisofs -J -T -o $NEWBOOTISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -graft-points -V "$volid" $TMPDIR
   implantisomd5 --force $NEWBOOTISO
 }
 
