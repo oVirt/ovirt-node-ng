@@ -30,6 +30,7 @@ add_payload() {
   local DST=$(basename $SQUASHFS)
   cp $SQUASHFS $DST
   echo "liveimg --url=file:///run/install/repo/$DST" > liveimg.ks
+  echo "autopart --type=thinp" >> liveimg.ks
 }
 
 modify_bootloader() {
