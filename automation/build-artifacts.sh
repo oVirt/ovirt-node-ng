@@ -24,7 +24,13 @@ build() {
   cat <<EOF >> data/ovirt-node-ng-image.ks
 
 %post
-yum-config-manager --add-repo "http://jenkins.ovirt.org/job/ovirt-node-ng_master_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/"
+cat > /etc/yum.repos.d/ovirt-node.repo <<__EOR__
+[ovirt-node-nightly]
+name=oVirt Node Next (Nightly)
+baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_master_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
+enabled=1
+gpgcheck=0
+__EOR__
 %end
 EOF
 
