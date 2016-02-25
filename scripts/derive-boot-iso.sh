@@ -31,6 +31,7 @@ add_payload() {
   cp $SQUASHFS $DST
   echo "liveimg --url=file:///run/install/repo/$DST" > liveimg.ks
   echo "autopart --type=thinp" >> liveimg.ks
+  echo -e "%post\nimgbase layout --init ovirt-node-ng-1.0-0.0\nimgbase --experimental volume --create /var 4G\n%end" >> liveimg.ks
 }
 
 modify_bootloader() {
