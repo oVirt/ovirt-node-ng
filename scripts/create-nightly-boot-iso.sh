@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-NEWISO=${1:-$(realpath .)/ovirt-node-ng-nightly-boot.iso}
+NEWISO=${1:-$(realpath .)/ovirt-node-ng-nightly-boot-$(date +%Y%m%d).iso}
 
 BOOTISO=boot.iso
 SQUASHFS=ovirt-node-ng-image.squashfs.img
