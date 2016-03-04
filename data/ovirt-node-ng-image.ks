@@ -39,20 +39,6 @@ syslinux
 
 
 #
-# Add custom post scripts after the base post.
-#
-%post --erroronfail
-
-# setup systemd to boot to the right runlevel
-echo "Setting default runlevel to multiuser text mode"
-ln -fvs /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
-
-echo "Cleaning old yum repodata."
-yum clean all
-%end
-
-
-#
 # Adds the latest cockpit bits
 #
 %post --erroronfail
@@ -79,7 +65,6 @@ yum install -y \
 # Disable all repositories
 # FIXME should this be here or in imgbased post-processing?
 sed -i "s/^enabled=.*/enabled=0/" /etc/yum.repos.d/*
-
 yum clean all
 
 imgbase --debug --experimental image-build --postprocess
