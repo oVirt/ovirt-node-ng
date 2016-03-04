@@ -26,7 +26,9 @@ BuildRequires: automake
 %package image-update
 Summary:    oVirt Node Next Image
 Requires:   imgbased
-Obsoletes:  ovirt-node-ng-image-update-placeholder <= %{version}-%{release}
+
+Obsoletes:  ovirt-node-ng-image-update-placeholder < %{version}-%{release}
+Provides:  ovirt-node-ng-image-update-placeholder = %{version}-%{release}
 
 %description
 This package provides some tooling around building oVirt Node Next.
