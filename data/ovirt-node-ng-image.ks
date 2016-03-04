@@ -68,14 +68,13 @@ yum install --nogpgcheck -y cockpit
 #
 %post --erroronfail
 set -x
-
-repo_ovirt="plain.resources.ovirt.org/pub/yum-repo"
 # 1. Install oVirt release file with repositories
-yum install -y http://${repo_ovirt}/ovirt-release-master.rpm
+yum install -y http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/noarch/ovirt-release-master.rpm
 
-# 2. Install oVirt Node release
-yum install -y http://${repo_ovirt}/ovirt-release-master-host-node.rpm
-yum install -y http://${repo_ovirt}/ovirt-node-ng-image-update-placeholder.rpm
+# 2. Install oVirt Node release and placeholder
+yum install -y \
+  ovirt-release-master-host-node \
+  ovirt-node-ng-image-update-placeholder
 
 # HACKS
 # FIXME https://bugzilla.redhat.com/show_bug.cgi?id=1309912
