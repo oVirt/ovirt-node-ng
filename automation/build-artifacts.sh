@@ -41,6 +41,7 @@ EOF
     *manifest* \
     tmp.repos/RPMS/noarch/*.rpm \
     *.squashfs.img \
+    *.log \
     "$ARTIFACTSDIR/"
 }
 
