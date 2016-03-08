@@ -29,9 +29,14 @@ add_payload() {
   cond_out unsquashfs -ll $SQUASHFS
   local DST=$(basename $SQUASHFS)
   cp $SQUASHFS $DST
-  echo "liveimg --url=file:///run/install/repo/$DST" > liveimg.ks
-  echo "autopart --type=thinp" >> liveimg.ks
-  echo -e "%post\nimgbase layout --init ovirt-node-ng-1.0-0.0\nimgbase --experimental volume --create /var 4G\n%end" >> liveimg.ks
+  cat > liveimg.ks <<EOK
+liveimg --url=file:///run/install/repo/$DST
+autopart --type=thinp
+%post
+imgbase layout --init ovirt-node-ng-1.0-0.0
+imgbase --experimental volume --create /var 4G
+%end
+EOK
 }
 
 modify_bootloader() {
