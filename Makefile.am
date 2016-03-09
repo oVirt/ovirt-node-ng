@@ -51,7 +51,7 @@ debug-installed: installed-squashfs
 
 LMC ?= livemedia-creator
 %.squashfs.img: data/%.ks @BOOTISO@
-	$(LMC) --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
+	$(LMC) --timeout 60 --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
 	mv -v build/*squash* "$@"
 
 %.manifest-rpm: %.squashfs.img
