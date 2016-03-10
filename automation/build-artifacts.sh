@@ -36,11 +36,13 @@ EOF
 
   sudo -E make squashfs
   sudo -E make rpm
+  sudo -E make offline-installation-iso
 
   mv -fv \
     *manifest* \
     tmp.repos/RPMS/noarch/*.rpm \
     *.squashfs.img \
+    *.iso \
     *.log \
     "$ARTIFACTSDIR/"
 }
