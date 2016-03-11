@@ -53,8 +53,16 @@ AC_ARG_WITH([tmpdir],
     [TMPDIR="/tmp"])
 AC_SUBST([TMPDIR])
 
+AC_ARG_WITH([ovirt-release-rpm-url],
+    [AS_HELP_STRING([--with-ovirt-release-rpm-url=URL],
+        [URL to the ovirt-release rpm (default: http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/noarch/ovirt-release-master.rpm)])],
+    [OVIRTRELEASERPMURL="$withval"],
+    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/noarch/ovirt-release-master.rpm"])
+AC_SUBST([OVIRTRELEASERPMURL])
+
 AC_CONFIG_FILES([
 	Makefile
+	data/ovirt-node-ng-image.ks
 	packaging/ovirt-node-ng.spec
 ])
 AC_OUTPUT
