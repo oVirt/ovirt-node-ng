@@ -55,10 +55,10 @@ yum install --nogpgcheck -y cockpit
 %post --erroronfail
 set -x
 # 1. Install oVirt release file with repositories
-yum install -y @OVIRTRELEASERPMURL@
+yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 
 # 2. Install oVirt Node release and placeholder
-yum install -y \
+yum install -y --nogpgcheck \
   ovirt-release-master-host-node \
   ovirt-node-ng-image-update-placeholder
 
