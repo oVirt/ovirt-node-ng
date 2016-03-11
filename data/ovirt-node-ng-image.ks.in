@@ -55,7 +55,7 @@ yum install --nogpgcheck -y cockpit
 %post --erroronfail
 set -x
 # 1. Install oVirt release file with repositories
-yum install -y http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/noarch/ovirt-release-master.rpm
+yum install -y @OVIRTRELEASERPMURL@
 
 # 2. Install oVirt Node release and placeholder
 yum install -y \
