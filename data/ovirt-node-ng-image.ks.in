@@ -59,7 +59,7 @@ yum install -y @OVIRTRELEASERPMURL@
 
 # 2. Install oVirt Node release and placeholder
 yum install -y \
-  ovirt-release-master-host-node \
+  ovirt-release-host-node \
   ovirt-node-ng-image-update-placeholder
 
 # Disable all repositories
