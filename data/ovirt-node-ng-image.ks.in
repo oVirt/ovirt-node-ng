@@ -64,7 +64,7 @@ yum install -y \
 
 # Disable all repositories
 # FIXME should this be here or in imgbased post-processing?
-sed -i "s/^enabled=.*/enabled=0/" /etc/yum.repos.d/*
+sed -i "/enabled=/ d ; /\[/ a enabled=0" /etc/yum.repos.d/*
 yum clean all
 
 imgbase --debug --experimental image-build --postprocess
