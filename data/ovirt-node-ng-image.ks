@@ -72,12 +72,14 @@ set -x
 repo_ovirt="plain.resources.ovirt.org/pub/yum-repo"
 # 1. Install oVirt release file with repositories
 yum install -y http://${repo_ovirt}/ovirt-release36.rpm
+yum install -y http://${repo_ovirt}/ovirt-release36-snapshot.rpm
+
 
 # 2. Install oVirt Node release
-yum install -y http://${repo_ovirt}/ovirt-release-master-host-node.rpm
+yum install -y ovirt-release36-host-node
 
 # 3. Add the placeholder for subsequent updates
-yum install -y http://${repo_ovirt}/ovirt-node-ng-image-update-placeholder.rpm
+yum install -y ovirt-node-ng-image-update-placeholder
 
 # HACKS
 # FIXME https://bugzilla.redhat.com/show_bug.cgi?id=1309912
