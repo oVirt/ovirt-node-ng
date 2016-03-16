@@ -20,8 +20,6 @@ build() {
   # Build the squashfs for a later export
   ./autogen.sh --with-tmpdir=/var/tmp
 
-  BRANCH=$(git branch | sed -n '/\* /s///p')
-
   # Add this jenkins job as a repository
   cat <<EOF >> data/ovirt-node-ng-image.ks
 
@@ -29,7 +27,7 @@ build() {
 cat > /etc/yum.repos.d/ovirt-node.repo <<__EOR__
 [ovirt-node-nightly]
 name=oVirt Node Next (Nightly)
-baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_${BRANCH}_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
+baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_master_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
 enabled=1
 gpgcheck=0
 __EOR__
@@ -38,7 +36,7 @@ EOF
 
   sudo -E make squashfs
   sudo -E make rpm
-  sudo -E make offline-installation-iso BRANCH=${BRANCH}
+  sudo -E make offline-installation-iso
 
   mv -fv \
     *manifest* \
