@@ -27,7 +27,7 @@ build() {
 cat > /etc/yum.repos.d/ovirt-node.repo <<__EOR__
 [ovirt-node-nightly]
 name=oVirt Node Next (Nightly)
-baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_master_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
+baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_ovirt-4.0_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
 enabled=1
 gpgcheck=0
 __EOR__
@@ -36,11 +36,13 @@ EOF
 
   sudo -E make squashfs
   sudo -E make rpm
+  sudo -E make offline-installation-iso
 
   mv -fv \
     *manifest* \
     tmp.repos/RPMS/noarch/*.rpm \
     *.squashfs.img \
+    *.iso \
     *.log \
     "$ARTIFACTSDIR/"
 }
