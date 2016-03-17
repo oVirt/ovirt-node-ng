@@ -39,20 +39,6 @@ syslinux
 
 
 #
-# Add custom post scripts after the base post.
-#
-%post --erroronfail
-
-# setup systemd to boot to the right runlevel
-echo "Setting default runlevel to multiuser text mode"
-ln -fvs /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
-
-echo "Cleaning old yum repodata."
-yum clean all
-%end
-
-
-#
 # Adds the latest cockpit bits
 #
 %post --erroronfail
@@ -68,27 +54,17 @@ yum install --nogpgcheck -y cockpit
 #
 %post --erroronfail
 set -x
-
-repo_ovirt="plain.resources.ovirt.org/pub/yum-repo"
 # 1. Install oVirt release file with repositories
-yum install -y http://${repo_ovirt}/ovirt-release36.rpm
-yum install -y http://${repo_ovirt}/ovirt-release36-snapshot.rpm
+yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 
-
-# 2. Install oVirt Node release
-yum install -y ovirt-release36-host-node
-
-# 3. Add the placeholder for subsequent updates
-yum install -y ovirt-node-ng-image-update-placeholder
-
-# HACKS
-# FIXME https://bugzilla.redhat.com/show_bug.cgi?id=1309912
-yum install -y vdsm-cli
+# 2. Install oVirt Node release and placeholder
+yum install -y --nogpgcheck \
+  ovirt-release-host-node \
+  ovirt-node-ng-image-update-placeholder
 
 # Disable all repositories
 # FIXME should this be here or in imgbased post-processing?
-sed -i "s/^enabled=.*/enabled=0/" /etc/yum.repos.d/*
-
+sed -i "/enabled=/ d ; /\[/ a enabled=0" /etc/yum.repos.d/*
 yum clean all
 
 imgbase --debug --experimental image-build --postprocess
