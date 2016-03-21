@@ -9,7 +9,7 @@ CLEAN=
 
 cond_curl() {
   if [[ -e "$1" ]]; then echo "Reusing existing $1" ;
-  else echo "Fetching $1" ; curl --fail -# -o "$1" $2 ; CLEAN="$CLEAN $1" ; fi
+  else echo "Fetching $1 from $2 " ; curl --fail -# -o "$1" $2 ; CLEAN="$CLEAN $1" ; fi
   [[ -n "$3" ]] && $3 $1
 }
 
