@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 BRANCH=${BRANCH:-master}
-NEWISO=${1:-$(realpath .)/ovirt-node-ng-${BRANCH}-boot-$(date +%Y%m%d).iso}
+NEWISO=${1:-$(realpath .)/ovirt-node-ng-installer-${BRANCH}-$(date +%Y%m%d).iso}
 BOOTISO=${BOOTISO:-boot.iso}
 SQUASHFS=${SQUASHFS:-ovirt-node-ng-image.squashfs.img}
 DERVICEBOOTISOSCRIPT=${DERVICEBOOTISOSCRIPT:-derive-boot-iso.sh}
