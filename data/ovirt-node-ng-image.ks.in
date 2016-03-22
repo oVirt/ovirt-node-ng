@@ -62,10 +62,5 @@ yum install -y --nogpgcheck \
   ovirt-release-host-node \
   ovirt-node-ng-image-update-placeholder
 
-# Disable all repositories
-# FIXME should this be here or in imgbased post-processing?
-sed -i "/enabled=/ d ; /\[/ a enabled=0" /etc/yum.repos.d/*
-yum clean all
-
 imgbase --debug --experimental image-build --postprocess
 %end
