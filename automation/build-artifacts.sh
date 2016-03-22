@@ -41,8 +41,8 @@ EOF
   mv -fv \
     *manifest* \
     tmp.repos/RPMS/noarch/*.rpm \
-    *.squashfs.img \
-    *.iso \
+    ovirt-node*.squashfs.img \
+    ovirt-node*.iso \
     *.log \
     "$ARTIFACTSDIR/"
 }
