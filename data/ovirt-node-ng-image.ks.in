@@ -58,7 +58,9 @@ set -x
 yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 
 # 2. Install oVirt Node release and placeholder
+# (exclude ovirt-node-ng-image-update to prevent the obsoletes logic)
 yum install -y --nogpgcheck \
+  --exclude ovirt-node-ng-image-update \
   ovirt-release-host-node \
   ovirt-node-ng-image-update-placeholder
 
