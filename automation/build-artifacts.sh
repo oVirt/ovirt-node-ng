@@ -60,7 +60,7 @@ check() {
 repofy_and_checksum() {
   pushd "$ARTIFACTSDIR/"
   createrepo .
-  sha256sum * > CHECKSUMS.sha256
+  sha256sum * > CHECKSUMS.sha256 || :
   popd
 }
 
