@@ -62,5 +62,9 @@ yum install -y --nogpgcheck \
   ovirt-release-host-node \
   ovirt-node-ng-image-update-placeholder
 
-imgbase --debug --experimental image-build --postprocess
+imgbase --debug --experimental \
+  image-build \
+  --postprocess \
+  --set-build-nvr-from-package=ovirt-node-ng-image-update-placeholder
+
 %end
