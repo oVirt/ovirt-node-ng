@@ -3,5 +3,12 @@
 # Use LVM Thin and use the liveimg source
 #
 
-autopart --type=thinp --fstype=ext4
-liveimg --url=http://jenkins.ovirt.org/job/ovirt-node-ng_master_build-artifacts-fc22-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-node-ng-image.squashfs.img
+liveimg --url=URL_TO_SQUASHFS
+
+autopart --type=thinp
+
+%post --erroronfail
+imgbase layout --init
+imgbase --experimental volume --create /var 4G
+%end
+

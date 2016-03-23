@@ -41,8 +41,8 @@ EOF
   mv -fv \
     *manifest* \
     tmp.repos/RPMS/noarch/*.rpm \
-    *.squashfs.img \
-    *.iso \
+    ovirt-node*.squashfs.img \
+    ovirt-node*.iso \
     *.log \
     "$ARTIFACTSDIR/"
 }
@@ -57,13 +57,14 @@ check() {
   ls -shal "$ARTIFACTSDIR/" || :
 }
 
-repofy() {
+repofy_and_checksum() {
   pushd "$ARTIFACTSDIR/"
   createrepo .
+  sha256sum * > CHECKSUMS.sha256 || :
   popd
 }
 
 prepare
 build
 
-repofy
+repofy_and_checksum
