@@ -25,3 +25,4 @@ python-pep8
 virt-install
 createrepo
 python-futures
+coreutils

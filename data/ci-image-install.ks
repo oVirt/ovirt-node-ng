@@ -35,7 +35,6 @@ mount /dev/disk/by-id/virtio-livesrc /mnt/livesrc
 %post
 # FIXME maybe the folowing lines can be collapsed
 # in future into i.e. "nodectl init"
-# FIXME ovirt-node-ng-1.0-0.0 can be guessed in the anaconda env
-imgbase layout --init ovirt-node-ng-1.0-0.0
+imgbase layout --init
 imgbase --experimental volume --create /var 4G
 %end

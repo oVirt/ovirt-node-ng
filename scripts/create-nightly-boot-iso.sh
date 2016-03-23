@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
-NEWISO=${1:-$(realpath .)/ovirt-node-ng-nightly-boot-$(date +%Y%m%d).iso}
-BRANCH=${BRANCH:-ovirt-3.6}
+BRANCH=${BRANCH:-master}
+NEWISO=${1:-$(realpath .)/ovirt-node-ng-installer-${BRANCH}-$(date +%Y%m%d).iso}
 BOOTISO=${BOOTISO:-boot.iso}
 SQUASHFS=${SQUASHFS:-ovirt-node-ng-image.squashfs.img}
 DERVICEBOOTISOSCRIPT=${DERVICEBOOTISOSCRIPT:-derive-boot-iso.sh}
@@ -9,7 +9,7 @@ CLEAN=
 
 cond_curl() {
   if [[ -e "$1" ]]; then echo "Reusing existing $1" ;
-  else echo "Fetching $1" ; curl --fail -# -o "$1" $2 ; CLEAN="$CLEAN $1" ; fi
+  else echo "Fetching $1 from $2 " ; curl --fail -# -o "$1" $2 ; CLEAN="$CLEAN $1" ; fi
   [[ -n "$3" ]] && $3 $1
 }
 
