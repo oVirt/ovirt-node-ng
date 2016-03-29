@@ -164,7 +164,7 @@ class NodeTestCase(MachineTestCase):
         self.snapshot.revert()
 
 
-class Test_Tier_0_NodeTestcase(NodeTestCase):
+class TestNodeTestcase(NodeTestCase):
     """Class to test that the NodeTestCase class works correctly
 
     To prevent regressions in the lower layer.
