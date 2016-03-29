@@ -37,7 +37,6 @@ import unittest
 import sh
 import os
 import tempfile
-import time
 from virt import DiskImage, VM, CloudConfig
 
 

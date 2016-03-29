@@ -15,9 +15,6 @@ export TEST_NODE_INSTALLED_IMG=$(TEST_DIR)/../ovirt-node-ng-image.installed.qcow
 
 export PYTHONPATH=$(PWD)
 
-ovirt-engine-appliance.qcow2:
-	curl -O http://jenkins.ovirt.org/job/ovirt-appliance_master_build-artifacts-el7-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-engine-appliance.qcow2
-
 check-code:
 	@pyflakes *.py
 	@pep8 *.py
@@ -26,6 +23,6 @@ pre-check:
 	@grep -q 0 /sys/fs/selinux/enforce || ( echo ERROR: Enable permissive mode: seteneforce 0 ; exit 1 )
 	@firewall-cmd -q --query-port 1234/udp || ( echo ERROR: Open port 1234/udp for multicaset for testing: firewall-cmd --add-port 1234/udp ; exit 1 )
 
-check: pre-check check-code ovirt-engine-appliance.qcow2
+check: pre-check check-code
 	nosetests --with-xunit -v --no-byte-compile --stop
 	-xsltproc nosetests.xslt nosetests.xml

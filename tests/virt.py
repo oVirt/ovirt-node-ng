@@ -392,13 +392,13 @@ class VM():
             for line in src:
                 yield line
 
-    def layout_fish(self, *args, idx=0):
+    def layout_fish(self, *args):
         """Same as fish but for the installed case
         Guestfish can not handle images with multiple roots
         """
         lvm_names = self._fish("run", ":", "lvs").splitlines()
         lvm_name = sorted(n for n in lvm_names
-                          if "+1" in n)[idx]
+                          if "+1" in n)[0]
         args = ("run",
                 ":",
                 "mount",

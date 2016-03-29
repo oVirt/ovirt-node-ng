@@ -60,7 +60,7 @@ dist_nodetools_DATA = \
 	$(NULL)
 
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
-	@echo squashfs: $(SQUASHFILENAME)
+	@echo squashfs: $(SQUASHFSFILENAME)
 	@echo squashfs rpm-manifest: $(RPMMANIFESTNAME)
 
 installed-squashfs: DOMNAME=node-$(shell date +%F-%H%M)
