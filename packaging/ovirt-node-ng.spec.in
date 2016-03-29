@@ -3,6 +3,8 @@
 %global	_ovirt_node_ng_file %{_ovirt_node_ng_dir}/%{name}-%{version}-%{release}.squashfs.img
 %global _stream ovirt-node-ng
 
+%global with_image_update @IMAGE_UPDATE@
+
 # Hardcode the dist to el7, because this is what the image contains
 %global dist .el7
 
@@ -24,6 +26,11 @@ BuildArch:  noarch
 BuildRequires: autoconf
 BuildRequires: automake
 
+%description
+This package provides some tooling around building oVirt Node Next.
+Currently the main package is empty.
+
+%if 0%{?with_image_update}
 %package image-update
 Summary:    oVirt Node Next Image
 Requires:   imgbased
@@ -31,12 +38,9 @@ Requires:   imgbased
 Obsoletes:  ovirt-node-ng-image-update-placeholder < %{version}-%{release}
 Provides:  ovirt-node-ng-image-update-placeholder = %{version}-%{release}
 
-%description
-This package provides some tooling around building oVirt Node Next.
-Currently the main package is empty.
-
 %description image-update
 This package contains the prebuild oVirt Node image.
+%endif
 
 %package docs
 Summary:     Documentation for %{name}
@@ -62,6 +66,7 @@ make %{?_smp_mflags}
 %install
 %make_install
 
+%if 0%{?with_image_update}
 # Install the image
 /usr/bin/install -d %{buildroot}/%{_ovirt_node_ng_dir}
 /usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_ovirt_node_ng_file}
@@ -72,6 +77,7 @@ imgbase --debug update --format liveimg %{_stream}-%{version}-%{release} %{_ovir
 %files image-update
 %dir %{_ovirt_node_ng_dir}
 %{_ovirt_node_ng_file}
+%endif
 
 %files tools
 %dir %{_ovirt_node_ng_tools_dir}

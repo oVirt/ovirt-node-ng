@@ -60,6 +60,20 @@ AC_ARG_WITH([ovirt-release-rpm-url],
     [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/noarch/ovirt-release-master.rpm"])
 AC_SUBST([OVIRTRELEASERPMURL])
 
+AC_ARG_ENABLE(
+    [image-update],
+    [AS_HELP_STRING(
+        [--enable-image-update],
+        [include image update package @<:@default=yes@:>@]
+    )],
+    ,
+    [enable_image_update="yes"]
+)
+AM_CONDITIONAL([IMAGE_UPDATE], [test "${enable_image_update}" = "yes"])
+AS_IF([test "${enable_image_update}" = "yes"],
+      AC_SUBST([IMAGE_UPDATE], ['1']),
+      AC_SUBST([IMAGE_UPDATE], ['0']))
+
 AC_CONFIG_FILES([
 	Makefile
 	data/ovirt-node-ng-image.ks
