@@ -126,9 +126,11 @@ class NodeTestCase(MachineTestCase):
             cls.node = cls._start_vm(n, cls._img, n + ".qcow2", 77)
 
             debug("Install cloud-init")
-            cls.node.fish("sh", "yum --enablerepo=base --enablerepo=updates "
+            cls.node.fish("sh", "yum --enablerepo=* "
+                          "--setopt=*.skip_if_unavailable=true "
                           "-y "
                           "install sos cloud-init")
+            cls.node.fish("sh", "rpm -q cloud-init")
 
             cls.node.start()
             cls.node.wait_cloud_init_finished()
