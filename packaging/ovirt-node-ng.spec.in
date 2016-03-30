@@ -1,4 +1,5 @@
 %global	_ovirt_node_ng_dir /usr/share/%{name}/image/
+%global	_ovirt_node_ng_tools_dir /usr/share/%{name}/tools/
 %global	_ovirt_node_ng_file %{_ovirt_node_ng_dir}/%{name}-%{version}-%{release}.squashfs.img
 %global _stream ovirt-node-ng
 
@@ -16,8 +17,8 @@ License:    GPLv2
 Summary:    oVirt Node Next
 
 URL:        http://www.ovirt.org/
-Source0:    @IMAGENAME@.squashfs.img
-
+Source0:    %{name}-@PACKAGE_VERSION@.tar.gz
+Source1:    @IMAGENAME@.squashfs.img
 BuildArch:  noarch
 
 BuildRequires: autoconf
@@ -37,17 +38,47 @@ Currently the main package is empty.
 %description image-update
 This package contains the prebuild oVirt Node image.
 
-%post image-update
-imgbase --debug update --format liveimg %{_stream}-%{version}-%{release} %{_ovirt_node_ng_file}
+%package docs
+Summary:     Documentation for %{name}
+Requires:    %{name} = %{version}-%{release}
+
+%description docs
+Subpackage for docs related to %{name}
+
+%package tools
+Summary:     Tools for %{name}
+Requires:    %{name} = %{version}-%{release}
+
+%description tools
+Subpackage for tools related to %{name}
+
+%prep
+%setup -q -n %{name}-@PACKAGE_VERSION@
+
+%build
+%configure
+make %{?_smp_mflags}
 
 %install
+%make_install
+
 # Install the image
 /usr/bin/install -d %{buildroot}/%{_ovirt_node_ng_dir}
-/usr/bin/install -m 644 %{SOURCE0} %{buildroot}/%{_ovirt_node_ng_file}
+/usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_ovirt_node_ng_file}
+
+%post image-update
+imgbase --debug update --format liveimg %{_stream}-%{version}-%{release} %{_ovirt_node_ng_file}
 
 %files image-update
 %dir %{_ovirt_node_ng_dir}
 %{_ovirt_node_ng_file}
+
+%files tools
+%dir %{_ovirt_node_ng_tools_dir}
+%{_ovirt_node_ng_tools_dir}/*
+
+%files docs
+%{_docdir}/%{name}/*
 
 %changelog
 * Mon Jan 25 2016 Douglas Schilling Landgraf <dougsland@redhat.com>
