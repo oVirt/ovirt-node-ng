@@ -19,8 +19,48 @@ SQUASHFSFILENAME = @IMAGENAME@.squashfs.img
 RPMMANIFESTNAME = @IMAGENAME@.manifest-rpm
 INSTALLEDIMAGEFILE = @IMAGENAME@.installed.qcow2
 
+docbookdir = $(prefix)/share/doc/@PACKAGE_NAME@/book
+docbookimgsdir = $(prefix)/share/doc/@PACKAGE_NAME@/book/imgs
+nodetoolsdir = $(prefix)/share/@PACKAGE_NAME@/tools
+
+dist_doc_DATA = \
+	README \
+	$(NULL)
+
+dist_docbook_DATA = \
+	docs/book/administration.md \
+	docs/book/book.json \
+	docs/book/build.md \
+	docs/book/cover.jpg \
+	docs/book/customization.md \
+	docs/book/design.md \
+	docs/book/engine.md \
+	docs/book/fsh.md \
+	docs/book/getting-started.md \
+	docs/book/install.md \
+	docs/book/testing.md \
+	docs/book/upgrade.md \
+	docs/book/imgs/build-flow.dot \
+	$(NULL)
+
+dist_docbookimgs_DATA = \
+	docs/book/imgs/build-flow.dot \
+	docs/book/imgs/build-flow.dot.png \
+	docs/book/imgs/ngn-flow-components.dot \
+	docs/book/imgs/ngn-flow-components.dot.png \
+	docs/book/imgs/ngn-flow.dot \
+	docs/book/imgs/ngn-flow.dot.png \
+	$(NULL)
+
+dist_nodetools_DATA = \
+	scripts/create-nightly-boot-iso.sh \
+	scripts/derive-boot-iso.sh \
+	scripts/liveimg-comparison.sh \
+	scripts/ovirt-node-ng-build-tool.py \
+	$(NULL)
+
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
-	@echo squashfs: $(SQUASHFILENAME)
+	@echo squashfs: $(SQUASHFSFILENAME)
 	@echo squashfs rpm-manifest: $(RPMMANIFESTNAME)
 
 installed-squashfs: DOMNAME=node-$(shell date +%F-%H%M)
@@ -67,6 +107,7 @@ TMPREPOS = tmp.repos
 rpm srpm: $(SQUASHFSFILENAME)
 	rm -fr "$(TMPREPOS)"
 	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
+	make dist
 	$(RPMBUILD) --define="_topdir `pwd`/$(TMPREPOS)" --define "_sourcedir `pwd`" -ba packaging/ovirt-node-ng.spec
 	@echo
 	@echo "srpm and rpm(s) available at '$(TMPREPOS)'"

@@ -396,10 +396,13 @@ class VM():
         """Same as fish but for the installed case
         Guestfish can not handle images with multiple roots
         """
-        lvm_name = "centos_installed/ovirt-node-ng-1.0-0.0+1"
+        lvm_names = self._fish("run", ":", "lvs").splitlines()
+        lvm_name = sorted(n for n in lvm_names
+                          if "+1" in n)[0]
         args = ("run",
                 ":",
-                "mount", "/dev/%s" % lvm_name, "/", ":") + args
+                "mount",
+                lvm_name, "/", ":") + args
         self._fish(*args)
 
     def set_cloud_config(self, cc):
