@@ -44,14 +44,12 @@ This package contains the prebuild oVirt Node image.
 
 %package docs
 Summary:     Documentation for %{name}
-Requires:    %{name} = %{version}-%{release}
 
 %description docs
 Subpackage for docs related to %{name}
 
 %package tools
 Summary:     Tools for %{name}
-Requires:    %{name} = %{version}-%{release}
 
 %description tools
 Subpackage for tools related to %{name}

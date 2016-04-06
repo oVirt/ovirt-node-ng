@@ -35,6 +35,7 @@ mount /dev/disk/by-id/virtio-livesrc /mnt/livesrc
 %post
 # FIXME maybe the folowing lines can be collapsed
 # in future into i.e. "nodectl init"
-imgbase layout --init
-imgbase --experimental volume --create /var 4G
+set -x
+imgbase --debug layout --init
+imgbase --debug --experimental volume --create /var 4G
 %end
