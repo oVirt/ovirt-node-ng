@@ -25,10 +25,14 @@ extract_iso() {
 }
 
 add_payload() {
-  echo "[2/4] Adding squashfs to ISO"
+  echo "[2/4] Adding squashfs and branding to ISO"
   cond_out unsquashfs -ll $SQUASHFS
   local DST=$(basename $SQUASHFS)
+  # Add squashfs
   cp $SQUASHFS $DST
+  # Add branding
+  local PRODURL="http://jenkins.ovirt.org/job/fabiand_boo_build_testing/lastSuccessfulBuild/artifact/product.img"
+  curl -s -o product.img "$PRODURL"
   cat > liveimg.ks <<EOK
 liveimg --url=file:///run/install/repo/$DST
 autopart --type=thinp
@@ -43,15 +47,16 @@ modify_bootloader() {
   echo "[3/4] Updating bootloader"
   # grep -rn stage2 *
   local CFGS="EFI/BOOT/grub.cfg isolinux/isolinux.cfg"
-  local PRODURL="http://jenkins.ovirt.org/job/fabiand_boo_build_testing/lastSuccessfulBuild/artifact/product.img"
   sed -i "/stage2/ s%$% inst.ks=cdrom:/liveimg.ks%" $CFGS
-  sed -i "/stage2/ s%$% inst.updates=$PRODURL%" $CFGS
+  echo "[FIXME] Not adding branding due to https://bugzilla.redhat.com/1324008"
+  #sed -i "/stage2/ s%$% inst.updates=cdrom:product.img%" $CFGS
 }
 
 create_iso() {
   echo "[4/4] Creating new ISO"
   local volid=$(isoinfo -d -i $BOOTISO | grep "Volume id" | cut -d ":" -f2 | sed "s/^ //")
   cond_out mkisofs -J -T -o $NEWBOOTISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -graft-points -V "$volid" $TMPDIR
+  cond_out isohybrid $NEWBOOTISO
   cond_out implantisomd5 --force $NEWBOOTISO
 }
 
