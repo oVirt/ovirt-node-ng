@@ -9,6 +9,8 @@ export CURLOPTS="-x http://proxy.phx.ovirt.org:3128"
 export TMPDIR=$PWD/tmp
 export LIBGUESTFS_BACKEND=direct
 
+export BRANCH=master
+
 prepare() {
   virt-host-validate || :
 
@@ -27,7 +29,7 @@ build() {
 cat > /etc/yum.repos.d/ovirt-node.repo <<__EOR__
 [ovirt-node-nightly]
 name=oVirt Node Next (Nightly)
-baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_master_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
+baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_${BRANCH}_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
 enabled=1
 gpgcheck=0
 __EOR__
