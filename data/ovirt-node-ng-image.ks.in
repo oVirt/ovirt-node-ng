@@ -77,6 +77,6 @@ yum install -y --nogpgcheck \
 imgbase --debug --experimental \
   image-build \
   --postprocess \
-  --set-nvr=$(rpm -q --qf "ovirt-node-ng-%{version}-%{release}" ovirt-release-host-node | sed "s/\.git[^.]\+//")
+  --set-nvr=$(rpm -q --qf "ovirt-node-ng-%{version}-0.$(date +%Y%m%d).0" ovirt-release-host-node)
 
 %end
