@@ -48,6 +48,16 @@ curl -L -o /etc/yum.repos.d/cockpit-preview-epel-7.repo "https://copr.fedoraproj
 yum install --nogpgcheck -y cockpit
 %end
 
+#
+# Adds the latest cockpit bits
+#
+%post --erroronfail
+set -x
+mkdir -p /etc/yum.repos.d
+curl -L -o /etc/yum.repos.d/cockpit-ovirt-epel-7.repo "https://copr.fedorainfracloud.org/coprs/rbarry/cockpit-ovirt/repo/epel-7/rbarry-cockpit-ovirt-epel-7.repo"
+yum install --nogpgcheck -y cockpit-ovirt
+%end
+
 
 #
 # Adding upstream oVirt vdsm
