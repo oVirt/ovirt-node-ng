@@ -70,7 +70,7 @@ make %{?_smp_mflags}
 /usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_ovirt_node_ng_file}
 
 %post image-update
-imgbase --debug update --format liveimg %{_stream}-%{version}-%{release} %{_ovirt_node_ng_file}
+imgbase --debug update --format liveimg %{_ovirt_node_ng_file}
 
 %files image-update
 %dir %{_ovirt_node_ng_dir}
