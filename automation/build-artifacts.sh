@@ -27,7 +27,7 @@ build() {
 
 %post
 cat > /etc/yum.repos.d/ovirt-node.repo <<__EOR__
-[ovirt-node-nightly]
+[ovirt-node-ng-master]
 name=oVirt Node Next (Nightly)
 baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_${BRANCH}_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
 enabled=1
