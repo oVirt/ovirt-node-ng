@@ -27,7 +27,7 @@ build() {
 
 %post
 cat > /etc/yum.repos.d/ovirt-node.repo <<__EOR__
-[ovirt-node-3.6-nightly]
+[ovirt-node-3.6]
 name=oVirt Node Next (Nightly)
 baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_${BRANCH}_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
 enabled=1
@@ -63,6 +63,10 @@ repofy_and_checksum() {
   pushd "$ARTIFACTSDIR/"
   createrepo .
   sha256sum * > CHECKSUMS.sha256 || :
+
+  # Helper to redirect to latest installation iso
+  INSTALLATIONISO=$(ls *.iso)
+  echo "<html><head><meta http-equiv='refresh' content='0; url=$INSTALLATIONISO' /></head></html>" > latest-installation-iso.html
   popd
 }
 
