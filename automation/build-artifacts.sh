@@ -45,6 +45,7 @@ EOF
     tmp.repos/RPMS/noarch/*.rpm \
     ovirt-node*.squashfs.img \
     ovirt-node*.iso \
+    data/ovirt-node*.ks
     *.log \
     "$ARTIFACTSDIR/"
 }
