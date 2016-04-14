@@ -2,7 +2,7 @@
 
 # Usage: bash derive-boot-iso.sh boot.iso ovirt-node-ng-image.squashfs.img
 
-set -e
+set -ex
 
 BOOTISO=$(realpath $1)
 SQUASHFS=$(realpath $2)
@@ -31,8 +31,7 @@ add_payload() {
   # Add squashfs
   cp $SQUASHFS $DST
   # Add branding
-  local PRODURL="http://jenkins.ovirt.org/job/fabiand_boo_build_testing/lastSuccessfulBuild/artifact/product.img"
-  curl -s -o product.img "$PRODURL"
+  [[ -f "$PRODUCTIMG" ]] && cp "$PRODUCTIMG" images/product.img
   cat > liveimg.ks <<EOK
 liveimg --url=file:///run/install/repo/$DST
 autopart --type=thinp
@@ -48,8 +47,6 @@ modify_bootloader() {
   # grep -rn stage2 *
   local CFGS="EFI/BOOT/grub.cfg isolinux/isolinux.cfg"
   sed -i "/stage2/ s%$% inst.ks=cdrom:/liveimg.ks%" $CFGS
-  echo "[FIXME] Not adding branding due to https://bugzilla.redhat.com/1324008"
-  #sed -i "/stage2/ s%$% inst.updates=cdrom:product.img%" $CFGS
 }
 
 create_iso() {
