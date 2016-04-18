@@ -55,9 +55,9 @@ AC_SUBST([TMPDIR])
 
 AC_ARG_WITH([ovirt-release-rpm-url],
     [AS_HELP_STRING([--with-ovirt-release-rpm-url=URL],
-        [URL to the ovirt-release rpm (default: http://resources.ovirt.org/pub/yum-repo/ovirt-release36.rpm)])],
+        [URL to the ovirt-release rpm (default: http://resources.ovirt.org/pub/yum-repo/ovirt-release36-snapshot.rpm)])],
     [OVIRTRELEASERPMURL="$withval"],
-    [OVIRTRELEASERPMURL="http://resources.ovirt.org/pub/yum-repo/ovirt-release36.rpm"])
+    [OVIRTRELEASERPMURL="http://resources.ovirt.org/pub/yum-repo/ovirt-release36-snapshot.rpm"])
 AC_SUBST([OVIRTRELEASERPMURL])
 
 AC_ARG_ENABLE(
