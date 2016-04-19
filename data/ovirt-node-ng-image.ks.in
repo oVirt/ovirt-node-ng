@@ -53,10 +53,10 @@ yum install --nogpgcheck -y cockpit
 yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 
 # 1.a Temporarily add imgbased from master
-cat > /etc/yum.repos.d/ovirt-imgbased-master.repo <<EOR
-[imgbased]
-name=imgbased from oVirt master
-includepkgs=imgbased
+cat > /etc/yum.repos.d/ovirt-ngn-master.repo <<EOR
+[ngn]
+name=Next gen Node from oVirt master
+includepkgs=imgbased cockpit-ovirt
 enabled=1
 gpgcheck=0
 baseurl=http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/
@@ -68,15 +68,6 @@ yum install -y --nogpgcheck \
   --exclude ovirt-node-ng-image-update \
   ovirt-release-host-node \
   ovirt-node-ng-image-update-placeholder
-
-
-
-# Adds the latest cockpit-plugin bits
-# FIXME should be a dependency of ovirt-release-host-node and should be in ovirt-repos
-curl -L -o /etc/yum.repos.d/cockpit-ovirt-epel-7.repo "https://copr.fedorainfracloud.org/coprs/rbarry/cockpit-ovirt/repo/epel-7/rbarry-cockpit-ovirt-epel-7.repo"
-yum install --nogpgcheck -y cockpit-ovirt
-
-
 
 # Postprocess (always the last step)
 imgbase --debug --experimental \
