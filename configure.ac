@@ -16,17 +16,16 @@ dnl MA  02110-1301, USA.  A copy of the GNU General Public License is
 dnl also available at http://www.gnu.org/copyleft/gpl.html.
 
 define([VERSION_NUMBER], [4.0.0])
-define([VERSION_SUFFIX], [_master])
 define([DISTRO], [centos])
 define([RELEASEVER], [7])
 
-AC_INIT([ovirt-node-ng], VERSION_NUMBER[]VERSION_SUFFIX, [devel@ovirt.org])
+AC_INIT([ovirt-node-ng], VERSION_NUMBER, [devel@ovirt.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dependencies])
 
 PACKAGE_RPM_VERSION="VERSION_NUMBER"
 AC_SUBST([PACKAGE_RPM_VERSION])
 
-PACKAGE_RPM_RELEASE="0.999.$(echo VERSION_SUFFIX | sed 's/^_//').$(date +%Y%m%d).0"
+PACKAGE_RPM_RELEASE="999.$(date +%Y%m%d).0"
 AC_SUBST([PACKAGE_RPM_RELEASE])
 
 IMAGENAME="ovirt-node-ng-image"
