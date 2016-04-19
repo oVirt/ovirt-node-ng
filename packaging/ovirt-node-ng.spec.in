@@ -13,6 +13,7 @@
 %define _binary_payload w0.gzdio
 
 Name:       ovirt-node-ng
+Epoch:      1
 Version:    @PACKAGE_RPM_VERSION@
 Release:    @PACKAGE_RPM_RELEASE@%{?dist}%{?extra_release}
 License:    GPLv2
