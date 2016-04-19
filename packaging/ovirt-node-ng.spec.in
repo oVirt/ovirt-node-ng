@@ -36,8 +36,8 @@ Currently the main package is empty.
 Summary:    oVirt Node Next Image
 Requires:   imgbased
 
-Obsoletes:  ovirt-node-ng-image-update-placeholder < %{version}-%{release}
-Provides:  ovirt-node-ng-image-update-placeholder = %{version}-%{release}
+Obsoletes:  ovirt-node-ng-image-update-placeholder < %{epoch}:%{version}-%{release}
+Provides:  ovirt-node-ng-image-update-placeholder = %{epoch}:%{version}-%{release}
 
 %description image-update
 This package contains the prebuild oVirt Node image.
