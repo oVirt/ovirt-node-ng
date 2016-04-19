@@ -38,22 +38,17 @@ syslinux
 %end
 
 
-#
-# Adds the latest cockpit bits
-#
 %post --erroronfail
 set -x
 mkdir -p /etc/yum.repos.d
+
+# Adds the latest cockpit bits
 curl -L -o /etc/yum.repos.d/cockpit-preview-epel-7.repo "https://copr.fedoraproject.org/coprs/g/cockpit/cockpit-preview/repo/epel-7/msuchy-cockpit-preview-epel-7.repo"
 yum install --nogpgcheck -y cockpit
-%end
 
 
-#
+
 # Adding upstream oVirt vdsm
-#
-%post --erroronfail
-set -x
 # 1. Install oVirt release file with repositories
 yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 
@@ -67,16 +62,6 @@ gpgcheck=0
 baseurl=http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/
 EOR
 
-#
-# Adds the latest cockpit bits
-#
-%post --erroronfail
-set -x
-mkdir -p /etc/yum.repos.d
-curl -L -o /etc/yum.repos.d/cockpit-ovirt-epel-7.repo "https://copr.fedorainfracloud.org/coprs/rbarry/cockpit-ovirt/repo/epel-7/rbarry-cockpit-ovirt-epel-7.repo"
-yum install --nogpgcheck -y cockpit-ovirt
-%end
-
 # 2. Install oVirt Node release and placeholder
 # (exclude ovirt-node-ng-image-update to prevent the obsoletes logic)
 yum install -y --nogpgcheck \
@@ -84,6 +69,16 @@ yum install -y --nogpgcheck \
   ovirt-release-host-node \
   ovirt-node-ng-image-update-placeholder
 
+
+
+# Adds the latest cockpit-plugin bits
+# FIXME should be a dependency of ovirt-release-host-node and should be in ovirt-repos
+curl -L -o /etc/yum.repos.d/cockpit-ovirt-epel-7.repo "https://copr.fedorainfracloud.org/coprs/rbarry/cockpit-ovirt/repo/epel-7/rbarry-cockpit-ovirt-epel-7.repo"
+yum install --nogpgcheck -y cockpit-ovirt
+
+
+
+# Postprocess (always the last step)
 imgbase --debug --experimental \
   image-build \
   --postprocess \
