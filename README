@@ -18,7 +18,10 @@ To get started with Node, you first need to clone the appliance and build it:
     dnf install lorax libvirt libvirt-daemon-kvm virt-install libguestfs-tools
 
     git clone git://gerrit.ovirt.org/ovirt-node-ng.git
-    
+
+    # Create makefile using bash script:
+    ./autogen.sh
+
     # To build the squashfs image (liveimg):
     sudo make squashfs
 
@@ -30,7 +33,7 @@ The installation is using
 
 1. a CentOS 7 boot ISO and
 2. a kickstart which tells anaconda where to get the squashfs image from
- 
+
 There is a `Makefile` target to simulate this locally using `virt-manager`:
 
     sudo make installed-squashfs
@@ -46,6 +49,5 @@ The squashfs image, a kickstart, and  `livecd-iso-to-disk` can be used to create
 
 1. Fetch a CentOS 7 installation ISO
 2. Create a kickstart file using: `echo "liveimg --url=file://ovirt-node-ng-image.squashfs.img" > liveimg-install.ks`
-3. Run `livecd-iso-to-disk --ks liveimg-install.ks $CENTOS_ISO $DISK` 
+3. Run `livecd-iso-to-disk --ks liveimg-install.ks $CENTOS_ISO $DISK`
 4. Mount the created disk, and copy the squashfs image to the same directory as the `liveimg-install.ks` file.
-
