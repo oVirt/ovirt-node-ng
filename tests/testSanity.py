@@ -25,7 +25,7 @@ import unittest
 from testVirt import NodeTestCase
 
 
-class TestImgbaseNode(NodeTestCase):
+class TestBasicNode(NodeTestCase):
     """Test functionality around imgbase on Node appliance (post-installation)
 
     Any testcase related to imgbase specific to Node should go here.
@@ -46,13 +46,6 @@ class TestImgbaseNode(NodeTestCase):
         debug("VGs: %s" % vgs)
         self.assertGreater(len(vgs), 0, "No VGs found")
 
-    def test_has_layout(self):
-        """Check if there is a valid imgbase layout
-
-        The layout should have been created as part of the install process.
-        """
-        self.node.assertSsh("imgbase layout", "No layout available")
-
     @unittest.skip("FIXME Track down denials")
     def test_selinux_denials(self):
         """Ensure that there are no denials after boot
@@ -71,6 +64,19 @@ class TestImgbaseNode(NodeTestCase):
 
         assert len(pkgs) != len(req_pkgs), \
             "Some packages are missing, there are: %s" % pkgs
+
+
+class TestImgbaseNode(NodeTestCase):
+    def test_has_layout(self):
+        """Check if there is a valid imgbase layout
+
+        The layout should have been created as part of the install process.
+        """
+        self.node.assertSsh("imgbase layout", "No layout available")
+
+    def test_has_w(self):
+        self.node.assertSsh("imgbase w",
+                            "Failed to get current layer")
 
 
 if __name__ == "__main__":
