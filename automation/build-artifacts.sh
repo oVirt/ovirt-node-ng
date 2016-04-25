@@ -54,9 +54,15 @@ EOF
 }
 
 check() {
-  sudo -E make check
+  sudo -E make check | tee check.log || :
+  (
+    echo "<html><body><pre>"
+    cat check.log
+    echo "</pre></body></html>"
+  ) > index.html
   ln -fv \
     *.img \
+    index.html \
     tests/*.xml \
     "$ARTIFACTSDIR/"
 
@@ -76,5 +82,5 @@ repofy_and_checksum() {
 
 prepare
 build
-
+check
 repofy_and_checksum
