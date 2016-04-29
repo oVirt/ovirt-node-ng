@@ -6,7 +6,7 @@ set -ex
 
 BOOTISO=$(realpath $1)
 SQUASHFS=$(realpath $2)
-NEWBOOTISO=${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)}
+NEWBOOTISO=$(realpath ${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)})
 
 TMPDIR=$(realpath bootiso.d)
 

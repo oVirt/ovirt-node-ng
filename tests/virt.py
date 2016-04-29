@@ -233,7 +233,7 @@ class VM():
         self.ssh("while [ ! -e /var/lib/cloud/instance/boot-finished ]; "
                  "do sleep 5; done")
 
-    def wait_ssh(self, timeout=60):
+    def wait_ssh(self, timeout=300):
         debug("Waiting for ssh")
         while timeout > 0:
             try:
@@ -339,7 +339,7 @@ class VM():
         sh.virsh("destroy", self.name)
 
     @logcall
-    def shutdown(self, wait=True, timeout=90):
+    def shutdown(self, wait=True, timeout=300):
         """Ask the VM to shutdown (via ACPI)
 
         Also block until the VM is shutdown
@@ -350,7 +350,7 @@ class VM():
             self.wait_event("lifecycle", timeout=timeout)
 
     @logcall
-    def reboot(self, wait=True, timeout=90):
+    def reboot(self, wait=True, timeout=300):
         """Ask the VM to reboot (via ACPI)
         """
         self.ssh("systemctl reboot &")
@@ -379,7 +379,7 @@ class VM():
             args += ["--timeout", timeout]
         sh.virsh("event", "--domain", self.name, *args)
 
-    def wait_reboot(self, timeout=30):
+    def wait_reboot(self, timeout=300):
         """Wait for the VM to reboot
         """
         return self.wait_event("reboot", timeout=timeout)
@@ -392,13 +392,17 @@ class VM():
             for line in src:
                 yield line
 
+    def layout_inital_lvmname(self):
+        lvm_names = self._fish("run", ":", "lvs").splitlines()
+        lvm_name = sorted(n for n in lvm_names
+                          if "+1" in n)[0]
+        return lvm_name.strip()
+
     def layout_fish(self, *args):
         """Same as fish but for the installed case
         Guestfish can not handle images with multiple roots
         """
-        lvm_names = self._fish("run", ":", "lvs").splitlines()
-        lvm_name = sorted(n for n in lvm_names
-                          if "+1" in n)[0]
+        lvm_name = self.layout_inital_lvmname()
         args = ("run",
                 ":",
                 "mount",
