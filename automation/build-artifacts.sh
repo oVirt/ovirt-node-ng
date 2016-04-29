@@ -27,11 +27,14 @@ build() {
 
 %post
 cat > /etc/yum.repos.d/ovirt-node.repo <<__EOR__
-[ovirt-node-3.6]
-name=oVirt Node Next (Nightly)
+[ovirt-node-ng-${BRANCH}]
+name=oVirt Node Next (${BRANCH} Nightly)
 baseurl=http://jenkins.ovirt.org/job/ovirt-node-ng_${BRANCH}_build-artifacts-fc22-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
 enabled=1
 gpgcheck=0
+metadata_expire=60
+skip_if_unavailable=1
+keepcache=0
 __EOR__
 %end
 EOF
