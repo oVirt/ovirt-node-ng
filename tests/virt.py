@@ -206,6 +206,7 @@ class VM():
                   "filesystem": "%s,HOST,mode=squash" % os.getcwd(),
                   "memballoon": "virtio",  # To save some host-ram
                   "rng": "/dev/random",  # For entropy
+                  "channel": "unix,target_type=virtio,name=org.libguestfs.channel.0",
                   }
 
         # FIXME Remove the conditiong once there are F22+ builders

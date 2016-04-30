@@ -54,8 +54,10 @@ class TimedoutError(Exception):
 
 
 def gen_ssh_identity_file():
-    f = tempfile.mkdtemp("testing-ssh") + "/id_rsa"
-    sh.ssh_keygen(b=2048, t="rsa", f=f, N="", q=True)
+    f = os.path.expanduser("~/.ssh/id_rsa")
+    if not os.path.exists(f):
+        f = tempfile.mkdtemp("testing-ssh") + "/id_rsa"
+        sh.ssh_keygen(b=2048, t="rsa", f=f, N="", q=True)
     return f
 
 
@@ -211,14 +213,20 @@ class IntegrationTestCase(MachineTestCase):
 
     # FIXME reduce the number of answers to the minimum
     ENGINE_ANSWERS = """
-# For 3.6
+# For master
 [environment:default]
 OVESETUP_CONFIG/adminPassword=str:password
 OVESETUP_CONFIG/fqdn=str:engine.example.com
 OVESETUP_ENGINE_CONFIG/fqdn=str:engine.example.com
 OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyHost=str:engine.example.com
 
-OVESETUP_DIALOG/confirmSettings=bool:True
+OVESETUP_AIO/configure=none:None
+OVESETUP_AIO/storageDomainName=none:None
+OVESETUP_AIO/storageDomainDir=none:None
+
+OVESETUP_APACHE/configureRootRedirection=bool:True
+OVESETUP_APACHE/configureSsl=bool:True
+
 OVESETUP_CONFIG/applicationMode=str:both
 OVESETUP_CONFIG/remoteEngineSetupStyle=none:None
 OVESETUP_CONFIG/storageIsLocal=bool:False
@@ -228,8 +236,16 @@ OVESETUP_CONFIG/firewallChangesReview=bool:False
 OVESETUP_CONFIG/updateFirewall=bool:True
 OVESETUP_CONFIG/remoteEngineHostSshPort=none:None
 OVESETUP_CONFIG/storageType=none:None
-OSETUP_RPMDISTRO/requireRollback=none:None
-OSETUP_RPMDISTRO/enableUpgrade=none:None
+OVESETUP_CONFIG/engineHeapMax=str:3987M
+OVESETUP_CONFIG/isoDomainName=str:ISO_DOMAIN
+OVESETUP_CONFIG/isoDomainMountPoint=str:/var/lib/exports/iso
+OVESETUP_CONFIG/isoDomainACL=str:*(rw)
+OVESETUP_CONFIG/engineHeapMin=str:100M
+OVESETUP_CONFIG/websocketProxyConfig=bool:True
+OVESETUP_CONFIG/sanWipeAfterDelete=bool:True
+
+OVESETUP_CORE/engineStop=none:None
+
 OVESETUP_DB/database=str:engine
 OVESETUP_DB/fixDbViolations=none:None
 OVESETUP_DB/secured=bool:False
@@ -237,27 +253,27 @@ OVESETUP_DB/host=str:localhost
 OVESETUP_DB/user=str:engine
 OVESETUP_DB/securedHostValidation=bool:False
 OVESETUP_DB/port=int:5432
+
+OVESETUP_DIALOG/confirmSettings=bool:True
+
+OVESETUP_DWH_CORE/enable=bool:False
+
 OVESETUP_ENGINE_CORE/enable=bool:True
-OVESETUP_CORE/engineStop=none:None
+
+OVESETUP_PKI/organization=str:Test
+
+OVESETUP_PROVISIONING/postgresProvisioningEnabled=bool:True
+
+OVESETUP_RHEVM_SUPPORT/configureRedhatSupportPlugin=bool:False
+
 OVESETUP_SYSTEM/memCheckEnabled=bool:False
 OVESETUP_SYSTEM/nfsConfigEnabled=bool:False
-OVESETUP_CONFIG/sanWipeAfterDelete=bool:True
-OVESETUP_PKI/organization=str:Test
-OVESETUP_CONFIG/engineHeapMax=str:3987M
-OVESETUP_CONFIG/isoDomainName=str:ISO_DOMAIN
-OVESETUP_CONFIG/isoDomainMountPoint=str:/var/lib/exports/iso
-OVESETUP_CONFIG/isoDomainACL=str:*(rw)
-OVESETUP_CONFIG/engineHeapMin=str:100M
-OVESETUP_AIO/configure=none:None
-OVESETUP_AIO/storageDomainName=none:None
-OVESETUP_AIO/storageDomainDir=none:None
-OVESETUP_PROVISIONING/postgresProvisioningEnabled=bool:True
-OVESETUP_APACHE/configureRootRedirection=bool:True
-OVESETUP_APACHE/configureSsl=bool:True
-OVESETUP_CONFIG/websocketProxyConfig=bool:True
-OVESETUP_RHEVM_SUPPORT/configureRedhatSupportPlugin=bool:False
+
 OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyConfig=bool:True
 OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
+
+OSETUP_RPMDISTRO/requireRollback=none:None
+OSETUP_RPMDISTRO/enableUpgrade=none:None
 """
 
     @classmethod
@@ -265,10 +281,8 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
         try:
             n = "%s-" % cls.__name__
 
-            # Perform the VM setups in parallel
-            with futures.ThreadPoolExecutor(max_workers=2) as executor:
-                executor.submit(cls._node_setup, n)
-                executor.submit(cls._engine_setup, n)
+            cls._node_setup(n)
+            cls._engine_setup(n)
         except:
             if cls.node:
                 cls.node.undefine()
@@ -296,10 +310,12 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
                                  n + "node.qcow2", 77)
 
         debug("Install cloud-init")
-        cls.node.fish("sh", "yum --enablerepo=base --enablerepo=updates -y "
-                      "install sos cloud-init")
+        print(cls.node.fish("sh", "yum --enablerepo=* -y "
+                          "--setopt=*.skip_if_unavailable=true "
+                      "install sos cloud-init"))
 
         cls.node.start()
+        cls.node.wait_cloud_init_finished()
 
         debug("Enable fake qemu support")
         cls.node.ssh("yum --enablerepo=ovirt* -y install vdsm-hook-faqemu")
@@ -310,7 +326,7 @@ OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
         cls.node.ssh("sed -i '/fake_kvm_support/ s/false/true/' " +
                      "/usr/lib/python2.7/site-packages/vdsm/config.py")
 
-        cls.node.shutdown()
+        cls.node_snapshot = cls.node.snapshot()
 
     @classmethod
     def _engine_setup(cls, n):
@@ -347,6 +363,8 @@ cert_file = None
 """)
 
         cls.engine.start()
+        time.sleep(30)
+        cls.engine.wait_cloud_init_finished()
 
         debug("Add static hostname for name resolution")
         cls.engine.ssh("sed -i '/^127.0.0.1/ s/$/ engine.example.com/' "
@@ -363,19 +381,12 @@ cert_file = None
 
         debug("Install sos for log collection")
         cls.engine.ssh("yum install -y sos")
+        cls.engine.ssh("yum install -y python-ovirt-engine-sdk4")
 
-        cls.engine.shutdown()
         debug("Installation completed")
+        cls.engine_snapshot = cls.engine.snapshot()
 
     def setUp(self):
-        self.node_snapshot = self.node.snapshot()
-        self.engine_snapshot = self.engine.snapshot()
-        self.node.start()
-        self.engine.start()
-
-        for host in [self.node, self.engine]:
-            host.wait_cloud_init_finished()
-
         debug("Node and Engine are up")
 
     def tearDown(self):
@@ -425,38 +436,6 @@ cert_file = None
                 time.sleep(1)
         debug(self.engine_shell(final_cmd))
         return reply
-
-
-class Test_Tier_0_IntegrationTestCase(IntegrationTestCase):
-    def download_sosreport(self):
-        debug("Fetching sosreports from Node and Engine")
-        self.node.download_sosreport()
-        self.engine.download_sosreport()
-
-    def test_tier_1_intra_network_connectivity(self):
-        """Check that the basic IP connectivity between VMs is given
-        """
-        self.node.ssh("ifconfig")
-        self.engine.ssh("ifconfig")
-
-        self.node.ssh("arp -n")
-        self.engine.ssh("arp -n")
-
-        self.node.ssh("ping -c10 10.11.12.88")
-        self.engine.ssh("ping -c10 10.11.12.77")
-
-    def test_tier_1_node_can_reach_engine(self):
-        """Check if the node can reach the engine
-        """
-        self.node.ssh("ping -c3 -i3 10.11.12.88")
-        self.engine.ssh("ping -c3 -i3 10.11.12.77")
-        self.node.ssh("curl --fail 10.11.12.88 | grep -i engine")
-
-    def test_tier_2_engine_is_up(self):
-        """Check that the engine comes up and provides it's API
-        """
-        self.engine.ssh("curl --fail 127.0.0.1 | grep -i engine")
-        self.engine_shell("ping")
 
 
 if __name__ == "__main__":
