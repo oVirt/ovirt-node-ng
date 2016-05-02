@@ -1,8 +1,10 @@
 
+%global _product_name oVirt Node Next
+%global _product_id ovirt-node-ng
+
 %global	_node_image_dir /usr/share/%{name}/image/
 %global	_node_image_file %{_node_image_dir}/%{name}-%{version}-%{release}.squashfs.img
 %global	_node_tools_dir /usr/share/%{name}/tools/
-%global _node_stream ovirt-node-ng
 
 %global with_image @WITH_IMAGE@
 
@@ -13,14 +15,14 @@
 %define _source_payload w0.gzdio
 %define _binary_payload w0.gzdio
 
-Name:       ovirt-node-ng
+Name:       %{_product_id}
 Epoch:      1
 Version:    @PACKAGE_RPM_VERSION@
 Release:    @PACKAGE_RPM_RELEASE@%{?dist}%{?extra_release}
 License:    GPLv2
-Summary:    oVirt Node Next
+Summary:    %{_product_name}
 
-URL:        http://www.ovirt.org/
+URL:        http://www.ovirt.org/node/
 Source0:    %{name}-@PACKAGE_VERSION@.tar.gz
 Source1:    @IMAGENAME@.squashfs.img
 BuildArch:  noarch
@@ -29,40 +31,40 @@ BuildRequires: autoconf
 BuildRequires: automake
 
 %description
-This package provides some tooling around building oVirt Node Next.
+This package provides some tooling around building %{_product_name}.
 Currently the main package is empty.
 
 %if 0%{?with_image}
 %package image
-Summary: oVirt Node Next Image
+Summary: %{_product_name} Image
 
 %description image
-This package contains the prebuild oVirt Node image.
+This package contains the prebuild %{_product_name} image.
+It can be used to create the %{_product_name} installer.
 
 %package image-update
-Summary:    oVirt Node Next Image Update
-Requires:   ovirt-node-ng-image
+Summary:    %{_product_name} Image Update
+Requires:   %{_product_id}-image = %{epoch}:%{version}-%{release}
 Requires:   imgbased
 
-Obsoletes:  ovirt-node-ng-image-update-placeholder < %{epoch}:%{version}-%{release}
-Provides:  ovirt-node-ng-image-update-placeholder = %{epoch}:%{version}-%{release}
+Obsoletes:  %{_product_id}-image-update-placeholder < %{epoch}:%{version}-%{release}
+Provides:  %{_product_id}-image-update-placeholder = %{epoch}:%{version}-%{release}
 
 %description image-update
-This package will install the oVirt Node Image update to a host where
-imgbased is used.
+This package will update an %{_product_name} host with the new image.
 %endif
 
 %package docs
-Summary:     Documentation for %{name}
+Summary:     Documentation for %{_product_name}
 
 %description docs
-Subpackage for docs related to %{name}
+Subpackage for docs related to %{_product_name}
 
 %package tools
-Summary:     Tools for %{name}
+Summary:     Tools for %{_product_name}
 
 %description tools
-Subpackage for tools related to %{name}
+Subpackage for tools related to %{_product_name}
 
 %prep
 %setup -q -n %{name}-@PACKAGE_VERSION@
@@ -85,6 +87,9 @@ imgbase --debug update --format liveimg %{_node_image_file}
 %files image
 %dir %{_node_image_dir}
 %{_node_image_file}
+
+%files image-update
+# Empty, just the post-let is relevant
 %endif
 
 %files tools
