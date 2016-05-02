@@ -66,7 +66,7 @@ AC_ARG_ENABLE(
         [include image package @<:@default=yes@:>@]
     )],
     ,
-    [enable_image_update="yes"]
+    [enable_image="yes"]
 )
 AM_CONDITIONAL([WITH_IMAGE], [test "${enable_image}" = "yes"])
 AS_IF([test "${enable_image}" = "yes"],
