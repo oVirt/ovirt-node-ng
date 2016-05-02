@@ -109,7 +109,12 @@ LMC ?= livemedia-creator
 
 RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
+
+if WITH_IMAGE_UPDATE
 rpm srpm: $(SQUASHFSFILENAME)
+else
+rpm srpm:
+endif
 	rm -fr "$(TMPREPOS)"
 	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
 	make dist

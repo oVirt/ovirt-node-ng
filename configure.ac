@@ -68,10 +68,10 @@ AC_ARG_ENABLE(
     ,
     [enable_image_update="yes"]
 )
-AM_CONDITIONAL([IMAGE_UPDATE], [test "${enable_image_update}" = "yes"])
+AM_CONDITIONAL([WITH_IMAGE_UPDATE], [test "${enable_image_update}" = "yes"])
 AS_IF([test "${enable_image_update}" = "yes"],
-      AC_SUBST([IMAGE_UPDATE], ['1']),
-      AC_SUBST([IMAGE_UPDATE], ['0']))
+      AC_SUBST([WITH_IMAGE_UPDATE], ['1']),
+      AC_SUBST([WITH_IMAGE_UPDATE], ['0']))
 
 AC_CONFIG_FILES([
 	Makefile
