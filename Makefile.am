@@ -56,7 +56,6 @@ dist_nodetools_DATA = \
 	scripts/create-nightly-boot-iso.sh \
 	scripts/derive-boot-iso.sh \
 	scripts/liveimg-comparison.sh \
-	scripts/ovirt-node-ng-build-tool.py \
 	$(NULL)
 
 dist_bin_SCRIPTS = \

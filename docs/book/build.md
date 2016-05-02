@@ -159,21 +159,6 @@ The `ovirt-node-ng` repository includes a wrapper around `livemedia-creator`
 to simplify usage, and only two arguments need to be provided, with an
 optional flag which may be used for development.
 
-`scripts/ovirt-node-ng-build-tool.py` is used to build, and takes the
-following arguments:
-
-    --kickstart KICKSTART
-                          the kickstart describing the image to create
-    --base BASE           The path to a netinstall ISO, or one of
-                          [fedora23|centos7] and the image will be retrieved
-                          automatically
-    --qcow-debug          creates a qcow2 image instead of fs for debugging
-                          purposes
-
-To use it, simply pass `--kickstart data/ovirt-node-ng-image.ks`
-(for a manual, step-by-step install), and your choice of `--base fedora23` or
-`--base centos7`, depending on what you'd like your Node image based upon.
-
 Recent versions of Fedora should work, as should other distros (as long as
 they're RPM-based, and derived from EL7/F21 or later. Please don't try this
 with CentOS 6!), but they probably won't be supported. We'd love to know if
