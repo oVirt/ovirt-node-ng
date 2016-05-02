@@ -59,6 +59,10 @@ dist_nodetools_DATA = \
 	scripts/ovirt-node-ng-build-tool.py \
 	$(NULL)
 
+dist_bin_SCRIPTS = \
+	scripts/create-node-installation-iso \
+	$(NULL)
+
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
 	@echo squashfs: $(SQUASHFSFILENAME)
 	@echo squashfs rpm-manifest: $(RPMMANIFESTNAME)

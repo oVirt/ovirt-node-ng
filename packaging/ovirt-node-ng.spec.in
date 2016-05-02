@@ -81,6 +81,7 @@ imgbase --debug update --format liveimg %{_ovirt_node_ng_file}
 %files tools
 %dir %{_ovirt_node_ng_tools_dir}
 %{_ovirt_node_ng_tools_dir}/*
+%{_bindir}/create-node-installation-iso
 
 %files docs
 %{_docdir}/%{name}/*

@@ -1,0 +1,35 @@
+#!/usr/bin/bash
+#
+# Mainly intended to be as the high-level tool to be used at runtime
+# to create an installation iso.
+#
+
+SQUASHFS=/usr/share/*/image/*.squashfs.img
+DERVICEBOOTISOSCRIPT=/usr/share/*/tools/derive-boot-iso.sh
+PRODUCTIMG=/usr/share/*/tools/product.img
+
+BOOTISO=${1}
+NEWISO=${2:-$(realpath .)/ovirt-node-ng-installer-$(date +%Y%m%d%H).iso}
+
+usage() { echo "Usage: $0 <boot.iso> [<new-installation.iso>]" ; }
+err() { echo -e "ERROR: $@" >&2 ; exit 2 ; }
+assert() { $1 || err $2 ; }
+
+{
+  set -e
+  [[ -z "$1" ]] && { usage ; exit 2 ; }
+  assert "test -f '$BOOTISO'" "boot iso '$BOOTISO' not found" &
+  assert "test -f '$SQUASHFS'" "squashfs image '$SQUASHFS' not found" &
+  assert "test -f '$DERVICEBOOTISOSCRIPT'" "derive-iso script not found" &
+  wait -n
+}
+
+echo "Building an installation ISO for '$SQUASHFS'"
+echo "This can take a while ..."
+{
+  set -e
+  # FIXME https://bugzilla.redhat.com/show_bug.cgi?id=1330020
+  PRODUCTIMG=$PWD/$PRODUCTIMG bash $DERVICEBOOTISOSCRIPT "$BOOTISO" "$SQUASHFS" "$NEWISO"
+  echo "New installation ISO: $NEWISO"
+}
+
