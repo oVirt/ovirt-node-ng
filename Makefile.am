@@ -110,7 +110,7 @@ LMC ?= livemedia-creator
 RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
 
-if WITH_IMAGE_UPDATE
+if WITH_IMAGE
 rpm srpm: $(SQUASHFSFILENAME)
 else
 rpm srpm:

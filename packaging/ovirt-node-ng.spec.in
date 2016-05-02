@@ -1,9 +1,10 @@
-%global	_ovirt_node_ng_dir /usr/share/%{name}/image/
-%global	_ovirt_node_ng_tools_dir /usr/share/%{name}/tools/
-%global	_ovirt_node_ng_file %{_ovirt_node_ng_dir}/%{name}-%{version}-%{release}.squashfs.img
-%global _stream ovirt-node-ng
 
-%global with_image_update @WITH_IMAGE_UPDATE@
+%global	_node_image_dir /usr/share/%{name}/image/
+%global	_node_image_file %{_node_image_dir}/%{name}-%{version}-%{release}.squashfs.img
+%global	_node_tools_dir /usr/share/%{name}/tools/
+%global _node_stream ovirt-node-ng
+
+%global with_image @WITH_IMAGE@
 
 # Hardcode the dist to el7, because this is what the image contains
 %global dist .el7
@@ -31,16 +32,24 @@ BuildRequires: automake
 This package provides some tooling around building oVirt Node Next.
 Currently the main package is empty.
 
-%if 0%{?with_image_update}
+%if 0%{?with_image}
+%package image
+Summary: oVirt Node Next Image
+
+%description image
+This package contains the prebuild oVirt Node image.
+
 %package image-update
-Summary:    oVirt Node Next Image
+Summary:    oVirt Node Next Image Update
+Requires:   ovirt-node-ng-image
 Requires:   imgbased
 
 Obsoletes:  ovirt-node-ng-image-update-placeholder < %{epoch}:%{version}-%{release}
 Provides:  ovirt-node-ng-image-update-placeholder = %{epoch}:%{version}-%{release}
 
 %description image-update
-This package contains the prebuild oVirt Node image.
+This package will install the oVirt Node Image update to a host where
+imgbased is used.
 %endif
 
 %package docs
@@ -65,22 +74,22 @@ make %{?_smp_mflags}
 %install
 %make_install
 
-%if 0%{?with_image_update}
+%if 0%{?with_image}
 # Install the image
-/usr/bin/install -d %{buildroot}/%{_ovirt_node_ng_dir}
-/usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_ovirt_node_ng_file}
+/usr/bin/install -d %{buildroot}/%{_node_image_dir}
+/usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_node_image_file}
 
 %post image-update
-imgbase --debug update --format liveimg %{_ovirt_node_ng_file}
+imgbase --debug update --format liveimg %{_node_image_file}
 
-%files image-update
-%dir %{_ovirt_node_ng_dir}
-%{_ovirt_node_ng_file}
+%files image
+%dir %{_node_image_dir}
+%{_node_image_file}
 %endif
 
 %files tools
-%dir %{_ovirt_node_ng_tools_dir}
-%{_ovirt_node_ng_tools_dir}/*
+%dir %{_node_tools_dir}
+%{_node_tools_dir}/*
 %{_bindir}/create-node-installation-iso
 
 %files docs

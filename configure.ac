@@ -60,18 +60,18 @@ AC_ARG_WITH([ovirt-release-rpm-url],
 AC_SUBST([OVIRTRELEASERPMURL])
 
 AC_ARG_ENABLE(
-    [image-update],
+    [image],
     [AS_HELP_STRING(
-        [--enable-image-update],
-        [include image update package @<:@default=yes@:>@]
+        [--enable-image],
+        [include image package @<:@default=yes@:>@]
     )],
     ,
     [enable_image_update="yes"]
 )
-AM_CONDITIONAL([WITH_IMAGE_UPDATE], [test "${enable_image_update}" = "yes"])
-AS_IF([test "${enable_image_update}" = "yes"],
-      AC_SUBST([WITH_IMAGE_UPDATE], ['1']),
-      AC_SUBST([WITH_IMAGE_UPDATE], ['0']))
+AM_CONDITIONAL([WITH_IMAGE], [test "${enable_image}" = "yes"])
+AS_IF([test "${enable_image}" = "yes"],
+      AC_SUBST([WITH_IMAGE], ['1']),
+      AC_SUBST([WITH_IMAGE], ['0']))
 
 AC_CONFIG_FILES([
 	Makefile
