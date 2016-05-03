@@ -1,4 +1,10 @@
 #
+# THIS KICKSTART IS ONLY USED FOR BUILDING OVIRT NODE
+#
+#              NOT FOR INSTALLATION
+#
+
+#
 # Platform repositories
 #
 url --url=http://mirror.centos.org/centos/7/os/x86_64/
