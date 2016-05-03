@@ -343,25 +343,6 @@ OSETUP_RPMDISTRO/enableUpgrade=none:None
         # cls.engine.post("/etc/ovirt-engine/engine.conf.d/90-mem.conf",
         #                 "ENGINE_PERM_MIN=128m\nENGINE_HEAP_MIN=1g\n")
 
-        cls.engine.post("/root/.ovirtshellrc", """
-[ovirt-shell]
-username = admin@internal
-password = password
-
-renew_session = False
-timeout = None
-extended_prompt = False
-url = https://127.0.0.1/ovirt-engine/api
-insecure = True
-kerberos = False
-filter = False
-session_timeout = None
-ca_file = None
-dont_validate_cert_chain = True
-key_file = None
-cert_file = None
-""")
-
         cls.engine.start()
         time.sleep(30)
         cls.engine.wait_cloud_init_finished()
@@ -395,48 +376,6 @@ cert_file = None
 
         self.node_snapshot.revert()
         self.engine_snapshot.revert()
-
-    def engine_shell(self, cmd, tries=60):
-        """Run a command in the ovirt-shell on the Engine VM
-
-        Before running this command will ensure that the Engine
-        is really available (using the ping command)
-        """
-        oshell = lambda cmd: self.engine.ssh("ovirt-shell --connect -E %r" %
-                                             cmd)
-
-        def wait_for_engine(tries=tries):
-            while tries >= 0:
-                debug("Waiting for engine ...")
-                tries -= 1
-                if tries == 0:
-                    raise TimedoutError()
-                if "disconnected" in oshell("ping"):
-                    time.sleep(1)
-                else:
-                    break
-
-        wait_for_engine()
-
-        return oshell(cmd)
-
-    def engine_shell_wait(self, needle, cmd, tries=60, final_cmd="ping"):
-        """Wait for a needle to turn up in an ovirt-shell command reply
-        """
-        while tries >= 0:
-            debug("Waiting for %r in engine change: %s" % (needle, cmd))
-            tries -= 1
-            if tries == 0:
-                debug(self.engine_shell(final_cmd))
-                raise TimedoutError()
-            reply = self.engine_shell(cmd)
-            if needle in reply:
-                break
-            else:
-                time.sleep(1)
-        debug(self.engine_shell(final_cmd))
-        return reply
-
 
 if __name__ == "__main__":
     unittest.main()
