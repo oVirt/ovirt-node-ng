@@ -90,7 +90,10 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 debug-installed: installed-squashfs
 	virsh define installed-squashfs-domain.xml
 
-offline-installation-iso:
+product.img:
+	pushd scripts && sh create-product-img.sh && popd
+
+offline-installation-iso: product.img
 	BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
 
 @BOOTISO@:
