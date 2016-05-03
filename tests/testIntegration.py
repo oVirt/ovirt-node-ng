@@ -79,8 +79,7 @@ class Test_Tier_0_IntegrationTestCase(IntegrationTestCase):
         """Check that the engine comes up and provides it's API
         """
         self.engine.ssh("curl --fail 127.0.0.1 | grep -i engine")
-        self.engine_shell("ping")
-
+        # FIXME check connectivity
 
 if __name__ == "__main__":
     unittest.main()
