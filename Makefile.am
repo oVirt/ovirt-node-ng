@@ -113,7 +113,7 @@ RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
 
 if WITH_IMAGE
-rpm srpm: $(SQUASHFSFILENAME)
+rpm srpm: $(SQUASHFSFILENAME) product.img
 else
 rpm srpm:
 endif
