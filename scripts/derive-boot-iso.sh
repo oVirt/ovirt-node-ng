@@ -2,7 +2,7 @@
 
 # Usage: bash derive-boot-iso.sh boot.iso ovirt-node-ng-image.squashfs.img
 
-set -ex
+set -e
 
 BOOTISO=$(realpath $1)
 SQUASHFS=$(realpath $2)
@@ -25,14 +25,12 @@ extract_iso() {
 }
 
 add_payload() {
-  echo "[2/4] Adding squashfs and branding to ISO"
+  echo "[2/4] Adding image to iso"
   cond_out unsquashfs -ll $SQUASHFS
   local DST=$(basename $SQUASHFS)
   # Add squashfs
   cp $SQUASHFS $DST
-  # Add branding
-  [[ -f "$PRODUCTIMG" ]] && cp "$PRODUCTIMG" images/product.img
-  cat > liveimg.ks <<EOK
+  cat > interactive-defaults.ks <<EOK
 liveimg --url=file:///run/install/repo/$DST
 autopart --type=thinp
 %post --erroronfail
@@ -40,6 +38,11 @@ imgbase layout --init
 imgbase --experimental volume --create /var 4G
 %end
 EOK
+  # Add branding
+  # and the kickstart
+  if [[ -e "$PRODUCTIMG" ]]; then
+    cp "$PRODUCTIMG" images/product.img
+  fi
 }
 
 modify_bootloader() {
