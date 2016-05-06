@@ -50,7 +50,7 @@ modify_bootloader() {
   # grep -rn stage2 *
   local CFGS="EFI/BOOT/grub.cfg isolinux/isolinux.cfg isolinux/grub.conf"
   local LABEL=$(egrep -h -o "hd:LABEL[^ :]*" $CFGS  | sort -u)
-  sed -i "/stage2/ s%$% inst.ks=${LABEL}:/interactive-defaults.ks%" $CFGS
+  sed -i "/stage2/ s%$% inst.ks=${LABEL//\\/\\\\}:/interactive-defaults.ks%" $CFGS
 }
 
 create_iso() {
