@@ -18,8 +18,8 @@ assert() { $1 || err $2 ; }
 {
   set -e
   [[ -z "$1" ]] && { usage ; exit 2 ; }
-  assert "test -f '$BOOTISO'" "boot iso '$BOOTISO' not found" &
-  assert "test -f '$SQUASHFS'" "squashfs image '$SQUASHFS' not found" &
+  assert "test -f '$BOOTISO'" "boot iso '$BOOTISO' not found, please download it" &
+  assert "test -f '$SQUASHFS'" "squashfs image '$SQUASHFS' not found, please install the -image package" &
   assert "test -f '$DERVICEBOOTISOSCRIPT'" "derive-iso script not found" &
   wait -n
 }
@@ -28,8 +28,7 @@ echo "Building an installation ISO for '$SQUASHFS'"
 echo "This can take a while ..."
 {
   set -e
-  # FIXME https://bugzilla.redhat.com/show_bug.cgi?id=1330020
-  PRODUCTIMG=$PWD/$PRODUCTIMG bash $DERVICEBOOTISOSCRIPT "$BOOTISO" "$SQUASHFS" "$NEWISO"
+  PRODUCTIMG=$PRODUCTIMG bash $DERVICEBOOTISOSCRIPT "$BOOTISO" "$SQUASHFS" "$NEWISO"
   echo "New installation ISO: $NEWISO"
 }
 
