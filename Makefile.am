@@ -94,7 +94,7 @@ product.img:
 	bash scripts/create-product-img.sh $@
 
 offline-installation-iso: product.img
-	BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
+	PRODUCTIMG=$(PWD)/product.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
 
 @BOOTISO@:
 	curl $(CURLOPTS) -O @BOOTISOURL@
