@@ -38,6 +38,7 @@ poweroff
 # http://lorax.readthedocs.org/en/latest/livemedia-creator.html#kickstarts
 dracut-config-generic
 -dracut-config-rescue
+efibootmgr
 grub2-efi
 memtest86+
 syslinux
