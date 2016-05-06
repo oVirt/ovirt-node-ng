@@ -91,7 +91,7 @@ debug-installed: installed-squashfs
 	virsh define installed-squashfs-domain.xml
 
 product.img:
-	pushd scripts && sh create-product-img.sh && popd
+	bash scripts/create-product-img.sh $@
 
 offline-installation-iso: product.img
 	BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
