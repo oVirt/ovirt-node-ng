@@ -40,13 +40,14 @@ __EOR__
 EOF
 
   sudo -E make squashfs
-  sudo -E make rpm
+  sudo -E make product.img rpm
   sudo -E make offline-installation-iso
 
   mv -fv \
     *manifest* \
     tmp.repos/RPMS/noarch/*.rpm \
     ovirt-node*.squashfs.img \
+    product.img \
     ovirt-node*.iso \
     data/ovirt-node*.ks \
     *.log \
