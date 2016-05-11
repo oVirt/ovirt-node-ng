@@ -1,9 +1,12 @@
-%global	_ovirt_node_ng_dir /usr/share/%{name}/image/
-%global	_ovirt_node_ng_tools_dir /usr/share/%{name}/tools/
-%global	_ovirt_node_ng_file %{_ovirt_node_ng_dir}/%{name}-%{version}-%{release}.squashfs.img
-%global _stream ovirt-node-ng
 
-%global with_image_update @IMAGE_UPDATE@
+%global _product_name oVirt Node Next
+%global _product_id ovirt-node-ng
+
+%global	_node_image_dir /usr/share/%{name}/image/
+%global	_node_image_file %{_node_image_dir}/%{name}-%{version}-%{release}.squashfs.img
+%global	_node_tools_dir /usr/share/%{name}/tools/
+
+%global with_image @WITH_IMAGE@
 
 # Hardcode the dist to el7, because this is what the image contains
 %global dist .el7
@@ -12,48 +15,57 @@
 %define _source_payload w0.gzdio
 %define _binary_payload w0.gzdio
 
-Name:       ovirt-node-ng
+Name:       %{_product_id}
 Epoch:      1
 Version:    @PACKAGE_RPM_VERSION@
 Release:    @PACKAGE_RPM_RELEASE@%{?dist}%{?extra_release}
 License:    GPLv2
-Summary:    oVirt Node Next
+Summary:    %{_product_name}
 
-URL:        http://www.ovirt.org/
+URL:        http://www.ovirt.org/node/
 Source0:    %{name}-@PACKAGE_VERSION@.tar.gz
 Source1:    @IMAGENAME@.squashfs.img
+Source2:    product.img
 BuildArch:  noarch
 
 BuildRequires: autoconf
 BuildRequires: automake
 
 %description
-This package provides some tooling around building oVirt Node Next.
+This package provides some tooling around building %{_product_name}.
 Currently the main package is empty.
 
-%if 0%{?with_image_update}
+%if 0%{?with_image}
+%package image
+Summary: %{_product_name} Image
+
+%description image
+This package contains the prebuild %{_product_name} image.
+It can be used to create the %{_product_name} installer.
+
 %package image-update
-Summary:    oVirt Node Next Image
+Summary:    %{_product_name} Image Update
+Requires:   %{_product_id}-image = %{epoch}:%{version}-%{release}
 Requires:   imgbased
 
-Obsoletes:  ovirt-node-ng-image-update-placeholder < %{epoch}:%{version}-%{release}
-Provides:  ovirt-node-ng-image-update-placeholder = %{epoch}:%{version}-%{release}
+Obsoletes:  %{_product_id}-image-update-placeholder < %{epoch}:%{version}-%{release}
+Provides:  %{_product_id}-image-update-placeholder = %{epoch}:%{version}-%{release}
 
 %description image-update
-This package contains the prebuild oVirt Node image.
+This package will update an %{_product_name} host with the new image.
 %endif
 
 %package docs
-Summary:     Documentation for %{name}
+Summary:     Documentation for %{_product_name}
 
 %description docs
-Subpackage for docs related to %{name}
+Subpackage for docs related to %{_product_name}
 
 %package tools
-Summary:     Tools for %{name}
+Summary:     Tools for %{_product_name}
 
 %description tools
-Subpackage for tools related to %{name}
+Subpackage for tools related to %{_product_name}
 
 %prep
 %setup -q -n %{name}-@PACKAGE_VERSION@
@@ -65,22 +77,28 @@ make %{?_smp_mflags}
 %install
 %make_install
 
-%if 0%{?with_image_update}
+%if 0%{?with_image}
 # Install the image
-/usr/bin/install -d %{buildroot}/%{_ovirt_node_ng_dir}
-/usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_ovirt_node_ng_file}
+/usr/bin/install -d %{buildroot}/%{_node_image_dir}
+/usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_node_image_file}
+/usr/bin/install -m 644 %{SOURCE2} %{buildroot}/%{_node_image_dir}/product.img
 
 %post image-update
-imgbase --debug update --format liveimg %{_ovirt_node_ng_file}
+imgbase --debug update --format liveimg %{_node_image_file}
+
+%files image
+%dir %{_node_image_dir}
+%{_node_image_file}
+%{_node_image_dir}/product.img
 
 %files image-update
-%dir %{_ovirt_node_ng_dir}
-%{_ovirt_node_ng_file}
+# Empty, just the post-let is relevant
 %endif
 
 %files tools
-%dir %{_ovirt_node_ng_tools_dir}
-%{_ovirt_node_ng_tools_dir}/*
+%dir %{_node_tools_dir}
+%{_node_tools_dir}/*
+%{_bindir}/create-node-installation-iso
 
 %files docs
 %{_docdir}/%{name}/*

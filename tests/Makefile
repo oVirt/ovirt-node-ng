@@ -23,6 +23,17 @@ pre-check:
 	@grep -q 0 /sys/fs/selinux/enforce || ( echo ERROR: Enable permissive mode: seteneforce 0 ; exit 1 )
 	@firewall-cmd -q --query-port 1234/udp || ( echo ERROR: Open port 1234/udp for multicaset for testing: firewall-cmd --add-port 1234/udp ; exit 1 )
 
-check: pre-check check-code
-	nosetests --with-xunit -v --no-byte-compile --stop
+PYTEST=nosetests --with-xunit -v --no-byte-compile --stop
+check: pre-check check-code check-sanity
+	@echo PASSED
+
+check-sanity:
+	$(PYTEST) testVirt.py testSanity.py
 	-xsltproc nosetests.xslt nosetests.xml
+
+check-integration: #check-sanity ovirt-engine-appliance.qcow2
+	$(PYTEST) testIntegration.py
+	-xsltproc nosetests.xslt nosetests.xml
+
+ovirt-engine-appliance.qcow2:
+	curl -O http://jenkins.ovirt.org/job/ovirt-appliance_master_build-artifacts-el7-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-engine-appliance.qcow2

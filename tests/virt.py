@@ -206,6 +206,7 @@ class VM():
                   "filesystem": "%s,HOST,mode=squash" % os.getcwd(),
                   "memballoon": "virtio",  # To save some host-ram
                   "rng": "/dev/random",  # For entropy
+                  "channel": "unix,target_type=virtio,name=org.libguestfs.channel.0",
                   }
 
         # FIXME Remove the conditiong once there are F22+ builders
@@ -299,10 +300,13 @@ class VM():
                 # Snapshots just use seconds, sometimes we have more than
                 # one snap per second, thus we add an extra sleep to prevent
                 # snap-id collisions
-                time.sleep(1.2)
+                time.sleep(2.0)
 
             def revert(self):
-                sh.virsh("snapshot-revert", dom.name, self.sname)
+                time.sleep(2.0)
+                sh.virsh("snapshot-revert", dom.name,
+                         "--snapshotname", self.sname,
+                         "--force")
                 sh.virsh("snapshot-delete", dom.name, self.sname)
                 debug("Deleted snap %r of dom %r" % (self.sname, dom.name))
 
