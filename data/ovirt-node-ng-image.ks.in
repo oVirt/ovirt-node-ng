@@ -63,7 +63,7 @@ yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 cat > /etc/yum.repos.d/ovirt-ngn-master.repo <<EOR
 [ngn]
 name=Next gen Node from oVirt master
-includepkgs=imgbased cockpit-ovirt
+includepkgs=imgbased
 enabled=1
 gpgcheck=0
 baseurl=http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/
