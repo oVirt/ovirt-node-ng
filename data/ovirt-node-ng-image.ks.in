@@ -1,4 +1,10 @@
 #
+# THIS KICKSTART IS ONLY USED FOR BUILDING OVIRT NODE
+#
+#              NOT FOR INSTALLATION
+#
+
+#
 # Platform repositories
 #
 url --url=http://mirror.centos.org/centos/7/os/x86_64/
@@ -32,6 +38,7 @@ poweroff
 # http://lorax.readthedocs.org/en/latest/livemedia-creator.html#kickstarts
 dracut-config-generic
 -dracut-config-rescue
+efibootmgr
 grub2-efi
 memtest86+
 syslinux
@@ -56,7 +63,7 @@ yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 cat > /etc/yum.repos.d/ovirt-ngn-master.repo <<EOR
 [ngn]
 name=Next gen Node from oVirt master
-includepkgs=imgbased cockpit-ovirt
+includepkgs=imgbased
 enabled=1
 gpgcheck=0
 baseurl=http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/

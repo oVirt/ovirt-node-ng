@@ -56,7 +56,10 @@ dist_nodetools_DATA = \
 	scripts/create-nightly-boot-iso.sh \
 	scripts/derive-boot-iso.sh \
 	scripts/liveimg-comparison.sh \
-	scripts/ovirt-node-ng-build-tool.py \
+	$(NULL)
+
+dist_bin_SCRIPTS = \
+	scripts/create-node-installation-iso \
 	$(NULL)
 
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
@@ -87,8 +90,11 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 debug-installed: installed-squashfs
 	virsh define installed-squashfs-domain.xml
 
-offline-installation-iso:
-	BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
+product.img:
+	bash scripts/create-product-img.sh $@
+
+offline-installation-iso: product.img
+	PRODUCTIMG=$(PWD)/product.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
 
 @BOOTISO@:
 	curl $(CURLOPTS) -O @BOOTISOURL@
@@ -105,7 +111,12 @@ LMC ?= livemedia-creator
 
 RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
-rpm srpm: $(SQUASHFSFILENAME)
+
+if WITH_IMAGE
+rpm srpm: $(SQUASHFSFILENAME) product.img
+else
+rpm srpm:
+endif
 	rm -fr "$(TMPREPOS)"
 	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
 	make dist

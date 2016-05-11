@@ -1,0 +1,3 @@
+create-nightly-boot-iso.sh   - Creates an ISO by fetching it from Jenkins.
+create-node-installation-iso - Creates an ISO by looking at the local host.
+derive-boot-iso.sh           - Does the heavy lifting of creating the iso.

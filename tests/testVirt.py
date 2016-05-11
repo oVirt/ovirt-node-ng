@@ -37,6 +37,8 @@ import unittest
 import sh
 import os
 import tempfile
+import time
+from concurrent import futures
 from virt import DiskImage, VM, CloudConfig
 
 
@@ -52,8 +54,10 @@ class TimedoutError(Exception):
 
 
 def gen_ssh_identity_file():
-    f = tempfile.mkdtemp("testing-ssh") + "/id_rsa"
-    sh.ssh_keygen(b=2048, t="rsa", f=f, N="", q=True)
+    f = os.path.expanduser("~/.ssh/id_rsa")
+    if not os.path.exists(f):
+        f = tempfile.mkdtemp("testing-ssh") + "/id_rsa"
+        sh.ssh_keygen(b=2048, t="rsa", f=f, N="", q=True)
     return f
 
 
@@ -199,6 +203,239 @@ class TestNodeTestcase(NodeTestCase):
         self.node.ssh("echo We could log in, the host is up")
         self.node.reboot()
         self.node.ssh("pwd")
+
+
+@unittest.skipUnless(os.path.exists(NODE_IMG), "Node image is missing")
+@unittest.skipUnless(os.path.exists(ENGINE_IMG), "Engine image is missing")
+class IntegrationTestCase(MachineTestCase):
+    node = None
+    engine = None
+
+    # FIXME reduce the number of answers to the minimum
+    ENGINE_ANSWERS = """
+# For master
+[environment:default]
+OVESETUP_CONFIG/adminPassword=str:password
+OVESETUP_CONFIG/fqdn=str:engine.example.com
+OVESETUP_ENGINE_CONFIG/fqdn=str:engine.example.com
+OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyHost=str:engine.example.com
+
+OVESETUP_AIO/configure=none:None
+OVESETUP_AIO/storageDomainName=none:None
+OVESETUP_AIO/storageDomainDir=none:None
+
+OVESETUP_APACHE/configureRootRedirection=bool:True
+OVESETUP_APACHE/configureSsl=bool:True
+
+OVESETUP_CONFIG/applicationMode=str:both
+OVESETUP_CONFIG/remoteEngineSetupStyle=none:None
+OVESETUP_CONFIG/storageIsLocal=bool:False
+OVESETUP_CONFIG/firewallManager=str:firewalld
+OVESETUP_CONFIG/remoteEngineHostRootPassword=none:None
+OVESETUP_CONFIG/firewallChangesReview=bool:False
+OVESETUP_CONFIG/updateFirewall=bool:True
+OVESETUP_CONFIG/remoteEngineHostSshPort=none:None
+OVESETUP_CONFIG/storageType=none:None
+OVESETUP_CONFIG/engineHeapMax=str:3987M
+OVESETUP_CONFIG/isoDomainName=str:ISO_DOMAIN
+OVESETUP_CONFIG/isoDomainMountPoint=str:/var/lib/exports/iso
+OVESETUP_CONFIG/isoDomainACL=str:*(rw)
+OVESETUP_CONFIG/engineHeapMin=str:100M
+OVESETUP_CONFIG/websocketProxyConfig=bool:True
+OVESETUP_CONFIG/sanWipeAfterDelete=bool:True
+
+OVESETUP_CORE/engineStop=none:None
+
+OVESETUP_DB/database=str:engine
+OVESETUP_DB/fixDbViolations=none:None
+OVESETUP_DB/secured=bool:False
+OVESETUP_DB/host=str:localhost
+OVESETUP_DB/user=str:engine
+OVESETUP_DB/securedHostValidation=bool:False
+OVESETUP_DB/port=int:5432
+
+OVESETUP_DIALOG/confirmSettings=bool:True
+
+OVESETUP_DWH_CORE/enable=bool:False
+
+OVESETUP_ENGINE_CORE/enable=bool:True
+
+OVESETUP_PKI/organization=str:Test
+
+OVESETUP_PROVISIONING/postgresProvisioningEnabled=bool:True
+
+OVESETUP_RHEVM_SUPPORT/configureRedhatSupportPlugin=bool:False
+
+OVESETUP_SYSTEM/memCheckEnabled=bool:False
+OVESETUP_SYSTEM/nfsConfigEnabled=bool:False
+
+OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyConfig=bool:True
+OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
+
+OSETUP_RPMDISTRO/requireRollback=none:None
+OSETUP_RPMDISTRO/enableUpgrade=none:None
+"""
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            n = "%s-" % cls.__name__
+
+            cls._node_setup(n)
+            cls._engine_setup(n)
+        except:
+            if cls.node:
+                cls.node.undefine()
+
+            if cls.engine:
+                cls.engine.undefine()
+
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        if KEEP_TEST_ENV:
+            return
+
+        debug("Tearing down %s" % cls)
+        if cls.node:
+            cls.node.undefine()
+
+        if cls.engine:
+            cls.engine.undefine()
+
+    @classmethod
+    def _node_setup(cls, n):
+        cls.node = cls._start_vm(n + "node", NODE_IMG,
+                                 n + "node.qcow2", 77)
+
+        debug("Install cloud-init")
+        print(cls.node.fish("sh", "yum --enablerepo=* -y "
+                          "--setopt=*.skip_if_unavailable=true "
+                      "install sos cloud-init"))
+
+        cls.node.start()
+        cls.node.wait_cloud_init_finished()
+
+        debug("Enable fake qemu support")
+        cls.node.ssh("yum --enablerepo=ovirt* -y install vdsm-hook-faqemu")
+        cls.node.ssh("sed -i '/vars/ a fake_kvm_support = true' "
+                     "/etc/vdsm/vdsm.conf")
+
+        # Bug-Url: https://bugzilla.redhat.com/show_bug.cgi?id=1279555
+        cls.node.ssh("sed -i '/fake_kvm_support/ s/false/true/' " +
+                     "/usr/lib/python2.7/site-packages/vdsm/config.py")
+
+        cls.node_snapshot = cls.node.snapshot()
+
+    @classmethod
+    def _engine_setup(cls, n):
+        cls.engine = cls._start_vm(n + "engine", ENGINE_IMG,
+                                   n + "engine.qcow2", 88,
+                                   memory_gb=4)
+
+        debug("Installing engine")
+
+        cls.engine.post("/root/ovirt-engine-answers",
+                        cls.ENGINE_ANSWERS)
+
+        # To reduce engines mem requirements
+        # cls.engine.post("/etc/ovirt-engine/engine.conf.d/90-mem.conf",
+        #                 "ENGINE_PERM_MIN=128m\nENGINE_HEAP_MIN=1g\n")
+
+        cls.engine.post("/root/.ovirtshellrc", """
+[ovirt-shell]
+username = admin@internal
+password = password
+
+renew_session = False
+timeout = None
+extended_prompt = False
+url = https://127.0.0.1/ovirt-engine/api
+insecure = True
+kerberos = False
+filter = False
+session_timeout = None
+ca_file = None
+dont_validate_cert_chain = True
+key_file = None
+cert_file = None
+""")
+
+        cls.engine.start()
+        time.sleep(30)
+        cls.engine.wait_cloud_init_finished()
+
+        debug("Add static hostname for name resolution")
+        cls.engine.ssh("sed -i '/^127.0.0.1/ s/$/ engine.example.com/' "
+                       "/etc/hosts")
+
+        #
+        # Do the engine setup
+        # This assumes that the engine was tested already and
+        # this could probably be pulled in a separate testcase
+        #
+        debug("Run engine setup")
+        cls.engine.ssh("engine-setup --offline "
+                       "--config-append=/root/ovirt-engine-answers")
+
+        debug("Install sos for log collection")
+        cls.engine.ssh("yum install -y sos")
+        cls.engine.ssh("yum install -y python-ovirt-engine-sdk4")
+
+        debug("Installation completed")
+        cls.engine_snapshot = cls.engine.snapshot()
+
+    def setUp(self):
+        debug("Node and Engine are up")
+
+    def tearDown(self):
+        if KEEP_TEST_ENV:
+            return
+
+        self.node_snapshot.revert()
+        self.engine_snapshot.revert()
+
+    def engine_shell(self, cmd, tries=60):
+        """Run a command in the ovirt-shell on the Engine VM
+
+        Before running this command will ensure that the Engine
+        is really available (using the ping command)
+        """
+        oshell = lambda cmd: self.engine.ssh("ovirt-shell --connect -E %r" %
+                                             cmd)
+
+        def wait_for_engine(tries=tries):
+            while tries >= 0:
+                debug("Waiting for engine ...")
+                tries -= 1
+                if tries == 0:
+                    raise TimedoutError()
+                if "disconnected" in oshell("ping"):
+                    time.sleep(1)
+                else:
+                    break
+
+        wait_for_engine()
+
+        return oshell(cmd)
+
+    def engine_shell_wait(self, needle, cmd, tries=60, final_cmd="ping"):
+        """Wait for a needle to turn up in an ovirt-shell command reply
+        """
+        while tries >= 0:
+            debug("Waiting for %r in engine change: %s" % (needle, cmd))
+            tries -= 1
+            if tries == 0:
+                debug(self.engine_shell(final_cmd))
+                raise TimedoutError()
+            reply = self.engine_shell(cmd)
+            if needle in reply:
+                break
+            else:
+                time.sleep(1)
+        debug(self.engine_shell(final_cmd))
+        return reply
 
 
 if __name__ == "__main__":
