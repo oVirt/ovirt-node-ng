@@ -104,7 +104,9 @@ LMC ?= livemedia-creator
 	$(LMC) --timeout 60 --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
 	mv -v build/*squash* "$@"
 
-IN_ROOTFS=guestfish --ro -a $(SQUASHFSFILENAME) run : mount /dev/sda / : mount-loop /LiveOS/rootfs.img / : sh 
+# Short TMPDIR otherwise we run into trouble with guestfish < 1.33.27-1.fc24
+# # -x -v to be more verbose
+IN_ROOTFS=export LIBGUESTFS_TMPDIR=/var/tmp ; guestfish --ro -a $(SQUASHFSFILENAME) run : mount /dev/sda / : mount-loop /LiveOS/rootfs.img / : sh
 $(RPMMANIFESTNAME): $(SQUASHFSFILENAME)
 	$(IN_ROOTFS) "rpm -qa" > $@
 
