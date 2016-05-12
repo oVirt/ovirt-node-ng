@@ -7,6 +7,7 @@ set -e
 BOOTISO=$(realpath $1)
 SQUASHFS=$(realpath $2)
 NEWBOOTISO=$(realpath ${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)})
+PRODUCTIMG=$(realpath ./product.img)
 
 TMPDIR=$(realpath bootiso.d)
 
