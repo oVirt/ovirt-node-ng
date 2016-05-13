@@ -76,6 +76,5 @@ AS_IF([test "${enable_image}" = "yes"],
 AC_CONFIG_FILES([
 	Makefile
 	data/ovirt-node-ng-image.ks
-	packaging/ovirt-node-ng.spec
 ])
 AC_OUTPUT

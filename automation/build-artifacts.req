@@ -3,6 +3,7 @@ autoconf
 make
 libguestfs-tools
 qemu-system-x86
+kernel-modules
 python-requests
 python-sh
 git

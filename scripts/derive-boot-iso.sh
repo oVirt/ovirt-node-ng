@@ -7,11 +7,13 @@ set -e
 BOOTISO=$(realpath $1)
 SQUASHFS=$(realpath $2)
 NEWBOOTISO=$(realpath ${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)})
+PRODUCTIMG=$(realpath ./product.img)
 
 TMPDIR=$(realpath bootiso.d)
 
 die() { echo "ERROR: $@" >&2 ; exit 2 ; }
 cond_out() { "$@" > .tmp.log 2>&1 || { cat .tmp.log >&2 ; die "Failed to run $@" ; } && rm .tmp.log || : ; return $? ; }
+in_squashfs() { export TMPDIR=/var/tmp ; guestfish --ro -a ${SQUASHFS} run : mount /dev/sda / : mount-loop /LiveOS/rootfs.img / : sh "$1" ; }
 
 extract_iso() {
   echo "[1/4] Extracting ISO"
@@ -25,7 +27,7 @@ extract_iso() {
 }
 
 add_payload() {
-  echo "[2/4] Adding image to iso"
+  echo "[2/4] Adding image to ISO"
   cond_out unsquashfs -ll $SQUASHFS
   local DST=$(basename $SQUASHFS)
   # Add squashfs
@@ -50,7 +52,11 @@ modify_bootloader() {
   # grep -rn stage2 *
   local CFGS="EFI/BOOT/grub.cfg isolinux/isolinux.cfg isolinux/grub.conf"
   local LABEL=$(egrep -h -o "hd:LABEL[^ :]*" $CFGS  | sort -u)
-  sed -i "/stage2/ s%$% inst.ks=${LABEL//\\/\\\\}:/interactive-defaults.ks%" $CFGS
+  local INNER_PRETTY_NAME=$(in_squashfs "grep PRETTY_NAME /etc/os-release" | cut -d "=" -f2 | tr -d \")
+  sed -i \
+	-e "/stage2/ s%$% inst.ks=${LABEL//\\/\\\\}:/interactive-defaults.ks%" \
+	-e "/^\s*\(append\|initrd\|linux\|search\)/! s%CentOS .%${INNER_PRETTY_NAME}%g" \
+	$CFGS
 }
 
 create_iso() {

@@ -104,23 +104,43 @@ LMC ?= livemedia-creator
 	$(LMC) --timeout 60 --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
 	mv -v build/*squash* "$@"
 
-%.manifest-rpm: %.squashfs.img
-	unsquashfs $<
-	guestfish --ro -i -a 'squashfs-root/LiveOS/rootfs.img' sh 'rpm -qa | sort -u' > $@
-	rm -vrf squashfs-root
+# Short TMPDIR otherwise we run into trouble with guestfish < 1.33.27-1.fc24
+# # -x -v to be more verbose
+IN_ROOTFS=export LIBGUESTFS_TMPDIR=/var/tmp ; guestfish --ro -a $(SQUASHFSFILENAME) run : mount /dev/sda / : mount-loop /LiveOS/rootfs.img / : sh
+$(RPMMANIFESTNAME): $(SQUASHFSFILENAME)
+	$(IN_ROOTFS) "rpm -qa" > $@
+
+packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM=ovirt-node-ng-image-update-placeholder
+packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_EPOCH=$(shell $(IN_ROOTFS) "rpm -q --qf %{?epoch} $(PLACEHOLDER_RPM)")
+packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_VERSION=$(shell $(IN_ROOTFS) "rpm -q --qf %{version} $(PLACEHOLDER_RPM)")
+packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_RELEASE=$(shell $(IN_ROOTFS) "rpm -q --qf %{release} $(PLACEHOLDER_RPM)")
+packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in $(RPMMANIFESTNAME)
+	sed \
+		-e "s/\@WITH_IMAGE\@/$(WITH_IMAGE)/" \
+		-e "s/\@IMAGENAME\@/$(IMAGENAME)/" \
+		-e "s/\@PACKAGE_VERSION\@/$(PACKAGE_VERSION)/" \
+		-e "s/\@PACKAGE_RPM_VERSION\@/$(PACKAGE_RPM_VERSION)/" \
+		-e "s/\@PACKAGE_RPM_RELEASE\@/$(PACKAGE_RPM_RELEASE)/" \
+		-e "s/\@PLACEHOLDER_RPM_EPOCH\@/$(PLACEHOLDER_RPM_EPOCH)/" \
+		-e "s/\@PLACEHOLDER_RPM_VERSION\@/$(PLACEHOLDER_RPM_VERSION)/" \
+		-e "s/\@PLACEHOLDER_RPM_RELEASE\@/$(PLACEHOLDER_RPM_RELEASE)/" \
+		$< > $@
 
 RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
 
 if WITH_IMAGE
-rpm srpm: $(SQUASHFSFILENAME) product.img
+rpm srpm: packaging/ovirt-node-ng.spec $(SQUASHFSFILENAME) product.img
 else
-rpm srpm:
+rpm srpm: packaging/ovirt-node-ng.spec
 endif
 	rm -fr "$(TMPREPOS)"
 	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
 	make dist
-	$(RPMBUILD) --define="_topdir `pwd`/$(TMPREPOS)" --define "_sourcedir `pwd`" -ba packaging/ovirt-node-ng.spec
+	$(RPMBUILD) \
+		--define="_topdir `pwd`/$(TMPREPOS)" \
+		--define "_sourcedir `pwd`" \
+		-ba packaging/ovirt-node-ng.spec
 	@echo
 	@echo "srpm and rpm(s) available at '$(TMPREPOS)'"
 	@echo
