@@ -39,6 +39,7 @@ poweroff
 dracut-config-generic
 -dracut-config-rescue
 efibootmgr
+shim
 grub2-efi
 memtest86+
 syslinux
