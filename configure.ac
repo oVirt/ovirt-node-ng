@@ -54,9 +54,9 @@ AC_SUBST([TMPDIR])
 
 AC_ARG_WITH([ovirt-release-rpm-url],
     [AS_HELP_STRING([--with-ovirt-release-rpm-url=URL],
-        [URL to the ovirt-release rpm (default: http://plain.resources.ovirt.org/pub/ovirt-4.0_prealpha-latest/rpm/el7/noarch/ovirt-release40.rpm)])],
+        [URL to the ovirt-release rpm])],
     [OVIRTRELEASERPMURL="$withval"],
-    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.0_prealpha-latest/rpm/el7/noarch/ovirt-release40.rpm"])
+    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.0_beta1/rpm/el7/noarch/ovirt-release40.rpm"])
 AC_SUBST([OVIRTRELEASERPMURL])
 
 AC_ARG_ENABLE(
