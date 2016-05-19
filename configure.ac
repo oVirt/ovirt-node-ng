@@ -25,7 +25,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dependencies
 PACKAGE_RPM_VERSION="VERSION_NUMBER"
 AC_SUBST([PACKAGE_RPM_VERSION])
 
-PACKAGE_RPM_RELEASE="0.999.$(date +%Y%m%d).0"
+PACKAGE_RPM_RELEASE="0.$(date +%Y%m%d).0"
 AC_SUBST([PACKAGE_RPM_RELEASE])
 
 IMAGENAME="ovirt-node-ng-image"
