@@ -39,6 +39,7 @@ poweroff
 dracut-config-generic
 -dracut-config-rescue
 efibootmgr
+shim
 grub2-efi
 memtest86+
 syslinux
@@ -58,16 +59,6 @@ yum install --nogpgcheck -y cockpit
 # Adding upstream oVirt vdsm
 # 1. Install oVirt release file with repositories
 yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
-
-# 1.a Temporarily add imgbased from master
-cat > /etc/yum.repos.d/ovirt-ngn-master.repo <<EOR
-[ngn]
-name=Next gen Node from oVirt master
-includepkgs=imgbased
-enabled=1
-gpgcheck=0
-baseurl=http://plain.resources.ovirt.org/pub/ovirt-master-snapshot/rpm/el7/
-EOR
 
 # 2. Install oVirt Node release and placeholder
 # (exclude ovirt-node-ng-image-update to prevent the obsoletes logic)
