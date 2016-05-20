@@ -36,13 +36,9 @@ poweroff
 # Additional packages for EFI support
 # https://www.brianlane.com/creating-live-isos-with-livemedia-creator.html
 # http://lorax.readthedocs.org/en/latest/livemedia-creator.html#kickstarts
+@anaconda-tools
 dracut-config-generic
 -dracut-config-rescue
-efibootmgr
-shim
-grub2-efi
-memtest86+
-syslinux
 %end
 
 
