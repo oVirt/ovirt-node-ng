@@ -38,8 +38,8 @@ import sh
 import os
 import tempfile
 import time
-from concurrent import futures
 from virt import DiskImage, VM, CloudConfig
+import agent
 
 
 NODE_IMG = os.environ.get("TEST_NODE_INSTALLED_IMG", None)
@@ -61,6 +61,15 @@ def gen_ssh_identity_file():
     return f
 
 
+def check_selinux():
+    # FIXME We need permissive mode to work correctly
+    SELINUX_ENFORCEMENT_FILE = "/sys/fs/selinux/enforce"
+    if os.path.exists(SELINUX_ENFORCEMENT_FILE):
+        with open(SELINUX_ENFORCEMENT_FILE, "rt") as src:
+            assert "0" == src.read().strip(), \
+                   "SELinux is enforcing, but needs to be permissive"
+
+
 class MachineTestCase(unittest.TestCase):
     """Basic test case to ease VM based testcases
 
@@ -69,13 +78,7 @@ class MachineTestCase(unittest.TestCase):
     """
     @staticmethod
     def _start_vm(name, srcimg, tmpimg, magicnumber, memory_gb=2):
-        # FIXME We need permissive mode to work correctly
-        SELINUX_ENFORCEMENT_FILE = "/sys/fs/selinux/enforce"
-        if os.path.exists(SELINUX_ENFORCEMENT_FILE):
-            with open(SELINUX_ENFORCEMENT_FILE, "rt") as src:
-                assert "0" == src.read().strip(), \
-                       "SELinux is enforcing, but needs to be permissive"
-
+        check_selinux()
         debug("Strating new VM %s" % name)
 
         ssh_port = 22000 + int(magicnumber)
@@ -85,9 +88,12 @@ class MachineTestCase(unittest.TestCase):
         dom = VM.create(name, img, ssh_port=ssh_port, memory_gb=memory_gb)
         dom._ssh_identity_file = gen_ssh_identity_file()
 
-        if "+1" in dom._fish("run", ":", "list-filesystems"):
+        _fss = dom._fish("run", ":", "list-filesystems")
+        if "+1" in _fss:
             # Redefine fish with a layout capable one
             dom.fish = dom.layout_fish
+        else:
+            raise RuntimeError("No layout found!? %s" % _fss)
 
         cc = CloudConfig()
         cc.instanceid = name + "-ci"
@@ -103,7 +109,18 @@ class MachineTestCase(unittest.TestCase):
                       "-i '/hosts:/ s/$/ myhostname/' /etc/nsswitch.conf")
         with open(dom._ssh_identity_file + ".pub", "rt") as src:
             cc.ssh_authorized_keys = [src.read().strip()]
-        dom.set_cloud_config(cc)
+#        dom.set_cloud_config(cc)
+
+        dom.upload(agent.__file__, "/agent.py")
+        dom.post("/etc/systemd/system/multi-user.target.wants/test-agent.service", """
+[Unit]
+Description=Test Agent
+After=local-fs.target
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/python /agent.py /dev/virtio-ports/local.test.0
+""")
 
         return dom
 
@@ -125,17 +142,14 @@ class NodeTestCase(MachineTestCase):
 
         try:
             n = "%s-node" % cls.__name__
-            cls.node = cls._start_vm(n, cls._img, n + ".qcow2", 77)
-
-            debug("Install cloud-init")
-            cls.node.fish("sh", "yum --enablerepo=* "
-                          "--setopt=*.skip_if_unavailable=true "
-                          "-y "
-                          "install sos cloud-init")
-            cls.node.fish("sh", "rpm -q cloud-init")
+            cls.node = cls._start_vm(n,
+                                     cls._img,
+                                     "/tmp/" + n + ".qcow2",
+                                     77)
 
             cls.node.start()
-            cls.node.wait_cloud_init_finished()
+            time.sleep(5)
+            cls.snapshot = cls.node.snapshot(remove=False)
         except:
             if cls.node:
                 cls.node.undefine()
@@ -153,7 +167,6 @@ class NodeTestCase(MachineTestCase):
 
     def setUp(self):
         debug("Setting up %s" % self)
-        self.snapshot = self.node.snapshot()
 
     def tearDown(self):
         if self._resultForDoCleanups.failures:
@@ -172,210 +185,14 @@ class TestNodeTestcase(NodeTestCase):
 
     To prevent regressions in the lower layer.
     """
-    def test_snapshots_work(self):
-        """Check if snapshots are working correct
-        """
-        has_kernel = lambda: "kernel" in self.node.ssh("rpm -q kernel")
-
-        self.assertTrue(has_kernel())
-
-        with self.node.snapshot().context():
-            self.node.ssh("rpm -e --nodeps kernel")
-            with self.assertRaises(sh.ErrorReturnCode_1):
-                has_kernel()
-
-        self.assertTrue(has_kernel())
-
-    def test_ssh_works(self):
-        """Check if basic SSH is working correct
-        """
-        self.node.ssh("pwd")
-
-    def test_shutdown_works(self):
-        """Check if host can be shutdown gracefully
-        """
-        self.node.ssh("echo We could log in, the host is up")
-        self.node.shutdown()
+    def test_agent_works(self):
+        self.node.run("pwd")
 
     def test_reboot_works(self):
-        """Check that a host can be rebooted and comes back
-        """
-        self.node.ssh("echo We could log in, the host is up")
+        self.node.run("echo", "We could log in, the host is up")
         self.node.reboot()
-        self.node.ssh("pwd")
+        self.node.run("pwd")
 
-
-@unittest.skipUnless(os.path.exists(NODE_IMG), "Node image is missing")
-@unittest.skipUnless(os.path.exists(ENGINE_IMG), "Engine image is missing")
-class IntegrationTestCase(MachineTestCase):
-    node = None
-    engine = None
-
-    # FIXME reduce the number of answers to the minimum
-    ENGINE_ANSWERS = """
-# For master
-[environment:default]
-OVESETUP_CONFIG/adminPassword=str:password
-OVESETUP_CONFIG/fqdn=str:engine.example.com
-OVESETUP_ENGINE_CONFIG/fqdn=str:engine.example.com
-OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyHost=str:engine.example.com
-
-OVESETUP_AIO/configure=none:None
-OVESETUP_AIO/storageDomainName=none:None
-OVESETUP_AIO/storageDomainDir=none:None
-
-OVESETUP_APACHE/configureRootRedirection=bool:True
-OVESETUP_APACHE/configureSsl=bool:True
-
-OVESETUP_CONFIG/applicationMode=str:both
-OVESETUP_CONFIG/remoteEngineSetupStyle=none:None
-OVESETUP_CONFIG/storageIsLocal=bool:False
-OVESETUP_CONFIG/firewallManager=str:firewalld
-OVESETUP_CONFIG/remoteEngineHostRootPassword=none:None
-OVESETUP_CONFIG/firewallChangesReview=bool:False
-OVESETUP_CONFIG/updateFirewall=bool:True
-OVESETUP_CONFIG/remoteEngineHostSshPort=none:None
-OVESETUP_CONFIG/storageType=none:None
-OVESETUP_CONFIG/engineHeapMax=str:3987M
-OVESETUP_CONFIG/isoDomainName=str:ISO_DOMAIN
-OVESETUP_CONFIG/isoDomainMountPoint=str:/var/lib/exports/iso
-OVESETUP_CONFIG/isoDomainACL=str:*(rw)
-OVESETUP_CONFIG/engineHeapMin=str:100M
-OVESETUP_CONFIG/websocketProxyConfig=bool:True
-OVESETUP_CONFIG/sanWipeAfterDelete=bool:True
-
-OVESETUP_CORE/engineStop=none:None
-
-OVESETUP_DB/database=str:engine
-OVESETUP_DB/fixDbViolations=none:None
-OVESETUP_DB/secured=bool:False
-OVESETUP_DB/host=str:localhost
-OVESETUP_DB/user=str:engine
-OVESETUP_DB/securedHostValidation=bool:False
-OVESETUP_DB/port=int:5432
-
-OVESETUP_DIALOG/confirmSettings=bool:True
-
-OVESETUP_DWH_CORE/enable=bool:False
-
-OVESETUP_ENGINE_CORE/enable=bool:True
-
-OVESETUP_PKI/organization=str:Test
-
-OVESETUP_PROVISIONING/postgresProvisioningEnabled=bool:True
-
-OVESETUP_RHEVM_SUPPORT/configureRedhatSupportPlugin=bool:False
-
-OVESETUP_SYSTEM/memCheckEnabled=bool:False
-OVESETUP_SYSTEM/nfsConfigEnabled=bool:False
-
-OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyConfig=bool:True
-OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyPort=int:2222
-
-OSETUP_RPMDISTRO/requireRollback=none:None
-OSETUP_RPMDISTRO/enableUpgrade=none:None
-"""
-
-    @classmethod
-    def setUpClass(cls):
-        try:
-            n = "%s-" % cls.__name__
-
-            cls._node_setup(n)
-            cls._engine_setup(n)
-        except:
-            if cls.node:
-                cls.node.undefine()
-
-            if cls.engine:
-                cls.engine.undefine()
-
-            raise
-
-    @classmethod
-    def tearDownClass(cls):
-        if KEEP_TEST_ENV:
-            return
-
-        debug("Tearing down %s" % cls)
-        if cls.node:
-            cls.node.undefine()
-
-        if cls.engine:
-            cls.engine.undefine()
-
-    @classmethod
-    def _node_setup(cls, n):
-        cls.node = cls._start_vm(n + "node", NODE_IMG,
-                                 n + "node.qcow2", 77)
-
-        debug("Install cloud-init")
-        print(cls.node.fish("sh", "yum --enablerepo=* -y "
-                          "--setopt=*.skip_if_unavailable=true "
-                      "install sos cloud-init"))
-
-        cls.node.start()
-        cls.node.wait_cloud_init_finished()
-
-        debug("Enable fake qemu support")
-        cls.node.ssh("yum --enablerepo=ovirt* -y install vdsm-hook-faqemu")
-        cls.node.ssh("sed -i '/vars/ a fake_kvm_support = true' "
-                     "/etc/vdsm/vdsm.conf")
-
-        # Bug-Url: https://bugzilla.redhat.com/show_bug.cgi?id=1279555
-        cls.node.ssh("sed -i '/fake_kvm_support/ s/false/true/' " +
-                     "/usr/lib/python2.7/site-packages/vdsm/config.py")
-
-        cls.node_snapshot = cls.node.snapshot()
-
-    @classmethod
-    def _engine_setup(cls, n):
-        cls.engine = cls._start_vm(n + "engine", ENGINE_IMG,
-                                   n + "engine.qcow2", 88,
-                                   memory_gb=4)
-
-        debug("Installing engine")
-
-        cls.engine.post("/root/ovirt-engine-answers",
-                        cls.ENGINE_ANSWERS)
-
-        # To reduce engines mem requirements
-        # cls.engine.post("/etc/ovirt-engine/engine.conf.d/90-mem.conf",
-        #                 "ENGINE_PERM_MIN=128m\nENGINE_HEAP_MIN=1g\n")
-
-        cls.engine.start()
-        time.sleep(30)
-        cls.engine.wait_cloud_init_finished()
-
-        debug("Add static hostname for name resolution")
-        cls.engine.ssh("sed -i '/^127.0.0.1/ s/$/ engine.example.com/' "
-                       "/etc/hosts")
-
-        #
-        # Do the engine setup
-        # This assumes that the engine was tested already and
-        # this could probably be pulled in a separate testcase
-        #
-        debug("Run engine setup")
-        cls.engine.ssh("engine-setup --offline "
-                       "--config-append=/root/ovirt-engine-answers")
-
-        debug("Install sos for log collection")
-        cls.engine.ssh("yum install -y sos")
-        cls.engine.ssh("yum install -y python-ovirt-engine-sdk4")
-
-        debug("Installation completed")
-        cls.engine_snapshot = cls.engine.snapshot()
-
-    def setUp(self):
-        debug("Node and Engine are up")
-
-    def tearDown(self):
-        if KEEP_TEST_ENV:
-            return
-
-        self.node_snapshot.revert()
-        self.engine_snapshot.revert()
 
 if __name__ == "__main__":
     unittest.main()

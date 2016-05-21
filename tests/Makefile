@@ -1,23 +1,16 @@
 
-#
-## A (probably incomplete) list of packages which need to be installed on the host
-#
-
 # Direct for virt-sparsify: http://libguestfs.org/guestfs.3.html#backend
 export LIBGUESTFS_BACKEND=direct
-# Workaround nest problem: https://bugzilla.redhat.com/show_bug.cgi?id=1195278
-# export LIBGUESTFS_BACKEND_SETTINGS=force_tcg
 
 TEST_DIR= $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 export TEST_ENGINE_ROOTFS_IMG=$(TEST_DIR)/ovirt-engine-appliance.qcow2
-export TEST_NODE_SQUASHFS_IMG=$(TEST_DIR)/../ovirt-node-ng-image.squashfs.img
 export TEST_NODE_INSTALLED_IMG=$(TEST_DIR)/../ovirt-node-ng-image.installed.qcow2
 
 export PYTHONPATH=$(PWD)
 
 check-code:
-	@pyflakes *.py
-	@pep8 *.py
+	pyflakes $(wildcard *.py)
+	pep8 $(wildcard *.py)
 
 pre-check:
 	@grep -q 0 /sys/fs/selinux/enforce || ( echo ERROR: Enable permissive mode: seteneforce 0 ; exit 1 )
@@ -27,11 +20,12 @@ PYTEST=nosetests --with-xunit -v --no-byte-compile --stop
 check: pre-check check-code check-sanity
 	@echo PASSED
 
-check-sanity:
+check-sanity: check-code
 	$(PYTEST) testVirt.py testSanity.py
 	-xsltproc nosetests.xslt nosetests.xml
 
 check-integration: #check-sanity ovirt-engine-appliance.qcow2
+	@echo FIXME This is WIP and probably not working
 	$(PYTEST) testIntegration.py
 	-xsltproc nosetests.xslt nosetests.xml
 

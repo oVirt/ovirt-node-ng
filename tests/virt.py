@@ -35,6 +35,7 @@ import random
 import time
 from contextlib import contextmanager
 import xml.etree.ElementTree as ET
+import agent
 
 
 # Increase the capture length of python-sh to show complete errors
@@ -206,7 +207,7 @@ class VM():
                   "filesystem": "%s,HOST,mode=squash" % os.getcwd(),
                   "memballoon": "virtio",  # To save some host-ram
                   "rng": "/dev/random",  # For entropy
-                  "channel": "unix,target_type=virtio,name=org.libguestfs.channel.0",
+                  "channel": "unix,target_type=virtio,name=local.test.0",
                   }
 
         # FIXME Remove the conditiong once there are F22+ builders
@@ -229,60 +230,19 @@ class VM():
 
         return vm
 
+    def run(self, *args):
+        xml = str(sh.virsh.dumpxml(self.name))
+        p = ET.fromstring(xml)\
+            .find("devices/channel/*[@name='local.test.0']/../source")\
+            .attrib["path"]
+        return agent.Client(p).run(*args)
+
     def wait_cloud_init_finished(self):
-        self.wait_ssh()
-        self.ssh("while [ ! -e /var/lib/cloud/instance/boot-finished ]; "
+        self.run("bash", "-c",
+                 "while [ ! -e /var/lib/cloud/instance/boot-finished ]; "
                  "do sleep 5; done")
 
-    def wait_ssh(self, timeout=300):
-        debug("Waiting for ssh")
-        while timeout > 0:
-            try:
-                if sh.ssh_keyscan("-p%s" % self._ssh_port,
-                                  "127.0.0.1"):
-                    return
-            except:
-                debug("Experienced an exception during ssh wait",
-                      exc_info=True)
-            timeout -= 1
-            time.sleep(1)
-        assert False, "SSH not reachable"
-
-    def ssh(self, *args, **kwargs):
-        """SSH into the host
-        """
-        assert self._ssh_port
-        assert (len(args) + len(kwargs)) > 0
-
-        # FIXME we might want to start the VM and wait for
-        # ssh before taking the snapshot to improve speed
-        self.wait_ssh()
-
-        args = ("root@127.0.0.1",
-                "-oPort=%s" % self._ssh_port,
-                "-oConnectTimeout=30",
-                "-oConnectionAttempts=3",
-                "-oStrictHostKeyChecking=no",
-                "-oUserKnownHostsFile=/dev/null",
-                "-oBatchMode=yes",
-                "-oRequestTTY=force",
-                "-oIdentityFile=" + self._ssh_identity_file,
-                ) + args
-        debug("SSHing: %s %s" % (args, kwargs))
-        data = sh.ssh(*args, **kwargs)
-        debug("stdout: %s" % data)
-        return data
-
-    def assertSsh(self, cmd, msg, *args, **kwargs):
-        try:
-            args = (cmd,) + args
-            return self.ssh(*args, **kwargs)
-        except sh.ErrorReturnCode as e:
-            msg = msg + " / " if msg else ""
-            msg += "SSH failed with: %s" % e
-            assert False, msg
-
-    def snapshot(self):
+    def snapshot(self, remove=False):
         """Create a snapshot to revert to
 
         snap = vm.snapshot()
@@ -290,6 +250,7 @@ class VM():
         snap.revert()
         """
         dom = self
+        remove = None
 
         class VMSnapshot():
             def __init__(self):
@@ -307,7 +268,8 @@ class VM():
                 sh.virsh("snapshot-revert", dom.name,
                          "--snapshotname", self.sname,
                          "--force")
-                sh.virsh("snapshot-delete", dom.name, self.sname)
+                if self.remove:
+                    sh.virsh("snapshot-delete", dom.name, self.sname)
                 debug("Deleted snap %r of dom %r" % (self.sname, dom.name))
 
             @contextmanager
@@ -317,6 +279,7 @@ class VM():
 
         snap = VMSnapshot()
         snap.dom = dom
+        snap.remove = remove
 
         return snap
 
@@ -335,6 +298,10 @@ class VM():
         """Start the VM
         """
         sh.virsh("start", self.name)
+        try:
+            self.wait_event(timeout=5)
+        except:
+            pass
 
     @logcall
     def destroy(self):
@@ -348,7 +315,7 @@ class VM():
 
         Also block until the VM is shutdown
         """
-        self.ssh("systemctl poweroff &")
+        self.run("systemctl", "poweroff", "&")
         sh.virsh("shutdown", "--mode=acpi", self.name)
         if wait:
             self.wait_event("lifecycle", timeout=timeout)
@@ -357,7 +324,7 @@ class VM():
     def reboot(self, wait=True, timeout=300):
         """Ask the VM to reboot (via ACPI)
         """
-        self.ssh("systemctl reboot &")
+        self.run("systemctl", "reboot", "&")
         sh.virsh("reboot", "--mode=acpi", self.name)
         if wait:
             self.wait_event("reboot", timeout=timeout)
@@ -437,7 +404,8 @@ class VM():
     def download_sosreport(self):
         """Generate and download an sosreport
         """
-        self.ssh("sosreport --all-logs --batch")
+        self.run("sosreport", "--all-logs", "--batch")
         self.fish("--live", "glob", "download", "/var/tmp/sosreport-*", ".")
+
 
 # vim: et ts=4 sw=4 sts=4

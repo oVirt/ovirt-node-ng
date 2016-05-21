@@ -25,58 +25,85 @@ import unittest
 from testVirt import NodeTestCase
 
 
-class TestBasicNode(NodeTestCase):
+class TestNode(NodeTestCase):
     """Test functionality around imgbase on Node appliance (post-installation)
-
-    Any testcase related to imgbase specific to Node should go here.
-    Including plain upgrades.
-
-    FIXME
-    These tests need to be run against the installed Node appliance image.
     """
-    def test_installed(self):
-        """Check if imgbase is installed
-        """
-        debug("%s" % self.node.ssh("imgbase --version"))
+    #
+    # SELinux
+    #
+    def test_selinux(self):
+        assert "Permissive" in self.node.run("getenforce")
 
-    def test_has_vgs(self):
-        """Check if there are any LVM VGs
-        """
-        vgs = self.node.ssh("vgs --noheadings").strip().splitlines()
+        # data = self.node.run("cat", "/var/log/audit/audit.log")
+        # assert "denied" not in data, \
+        #     "Denials were found"
+
+    #
+    # LVM / Block layer
+    #
+    def test_lvm(self):
+        def lvm(*args):
+            return self.node.run("lvm", *args)
+
+        print("Checking if a VG got created")
+        vgs = lvm("vgs", "--noheadings").strip().splitlines()
         debug("VGs: %s" % vgs)
         self.assertGreater(len(vgs), 0, "No VGs found")
 
-    @unittest.skip("FIXME Track down denials")
-    def test_selinux_denials(self):
-        """Ensure that there are no denials after boot
-        """
-        data = self.node.ssh("grep denied /var/log/audit/audit.log")
-        denials = data.splitlines()
-        assert len(denials) == 0, \
-            "To many denials: %s\n%s" % (len(denials), denials)
+        print("Checking if LVs with imgbased tags exist")
+        tags = ["pool", "init", "base", "layer"]
+        for tag in tags:
+            lvs = lvm("lvs",
+                      "@imgbased:" + tag).strip().splitlines()
+            self.assertGreater(len(lvs), 0,
+                               "No LV with tag 'imgbased:%s' found." + tag)
 
+    #
+    # Bootloader
+    #
+    def test_bootloader(self):
+        print("Checking if boot entries for the layers exist")
+        # FIXME this is a pretty rough guess
+        assert "+1" in self.node.run("grubby", "--info=ALL")
+
+        print("Checking if directories fr the layers exist")
+        # FIXME this is a pretty rough guess
+        assert "+1" in self.node.run("find", "/boot")
+
+    #
+    # Filesystem, Packages, Mounts
+    #
     def test_packages(self):
-        """Ensure the main packages are installed
-        """
-        req_pkgs = ["vdsm", "cockpit"]
+        req_pkgs = ["vdsm",
+                    "cockpit",
+                    "imgbased",
+                    "cockpit-ovirt-dashboard",
+                    "sos"
+                    ]
 
-        pkgs = self.node.ssh("rpm -q %s" % " ".join(req_pkgs))
+        pkgs = self.node.run("rpm", "-q", *req_pkgs)
 
         assert len(pkgs) != len(req_pkgs), \
             "Some packages are missing, there are: %s" % pkgs
 
+    def test_mounts(self):
+        # Will raise an error if /var is not a mount
+        self.node.run("findmnt", "/var")
 
-class TestImgbaseNode(NodeTestCase):
-    def test_has_layout(self):
-        """Check if there is a valid imgbase layout
+    #
+    # imgbased
+    #
+    def test_imgbase(self):
+        def imgbase(*args):
+            return self.node.run("imgbase", *args)
 
-        The layout should have been created as part of the install process.
-        """
-        self.node.assertSsh("imgbase layout", "No layout available")
+        debug("%s" % imgbase("--version"))
 
-    def test_has_w(self):
-        self.node.assertSsh("imgbase w",
-                            "Failed to get current layer")
+        print("Fix imgbase layout utf-8 output")
+        # imgbase("layout")
+
+        print("Checking if w works")
+        imgbase("w")
 
 
 if __name__ == "__main__":
