@@ -37,7 +37,10 @@ liveimg --url=file:///run/install/repo/$DST
 autopart --type=thinp
 %post --erroronfail
 imgbase layout --init
-imgbase --experimental volume --create /var 4G
+
+# FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
+# Only create /var if it's not already separate
+findmnt /var || imgbase --experimental volume --create /var 15G
 %end
 EOK
   # Add branding
