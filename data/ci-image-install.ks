@@ -17,7 +17,16 @@ poweroff
 
 clearpart --all --initlabel --disklabel=gpt
 bootloader --timeout=1
-autopart --type=thinp --fstype=ext4
+
+# FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
+# At best we could use: autopart --type=thinp
+reqpart --add-boot
+part pv.01 --size=50000 --grow
+volgroup HostVG pv.01
+logvol swap --vgname=HostVG --name=swap --fstype=swap --recommended
+logvol none --vgname=HostVG --name=HostPool --thinpool --size=30000 --grow
+logvol /    --vgname=HostVG --name=root --thin --poolname=HostPool --fsoptions="discard" --size=5000
+logvol /var --vgname=HostVG --name=var --thin --poolname=HostPool --fsoptions="discard" --size=15000
 
 #
 # The trick is to loop in the squashfs image as a device
@@ -37,5 +46,4 @@ mount /dev/disk/by-id/virtio-livesrc /mnt/livesrc
 # in future into i.e. "nodectl init"
 set -x
 imgbase --debug layout --init
-imgbase --debug --experimental volume --create /var 4G
 %end

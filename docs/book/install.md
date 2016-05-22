@@ -28,17 +28,13 @@ The Anaconda kickstart is an automated installation method to install operating 
 System administrator and/or developers can create a single file (.ks) containing the answers
 to all the questions that would normally be asked during a typical installation.
 
-The minimal requirement kickstart options are `liveimg` and `autopart`. Anaconda then
-will use that kickstart to proceed with the installation.
+The minimal requirement kickstart options are `liveimg` and the correct partitioning.
+Anaconda then will use that kickstart to proceed with the installation.
 
 In the `liveimg` option it can be the `squashfs.img` from a Live iso,
 or any filesystem mountable by the install media (eg. ext4).
 
-`autopart` automatically create partitions -- a root (/) partition, a swap partition,
-and an appropriate boot partition for the architecture. On large enough drives,
-this will also create a /home partition.
-
-**NOTE**: Using only minimal kickstart requirement options (`liveimg` and `autopart`)
+**NOTE**: Using only minimal kickstart requirement options (`liveimg` and partitioning)
 will trigger the manual installation. For more detailed information about kickstart
 options or automatic installations, please see official kickstart documentation.
 
@@ -71,7 +67,16 @@ in the httpd server.
 Create the minimal-ngn.ks in the httpd public dir
 
     $ cat minimal-ngn.ks
-    autopart --type=thinp --fstype=ext4
+    # FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
+    # At best we could use: autopart --type=thinp
+    reqpart --add-boot
+    part pv.01 --size=50000 --grow
+    volgroup HostVG pv.01
+    logvol swap --vgname=HostVG --name=swap --fstype=swap --recommended
+    logvol none --vgname=HostVG --name=HostPool --thinpool --size=30000 --grow
+    logvol /    --vgname=HostVG --name=root --thin --poolname=HostPool --fsoptions="discard" --size=5000
+    logvol /var --vgname=HostVG --name=var --thin --poolname=HostPool --fsoptions="discard" --size=15000
+    
     liveimg --url=http://server/ovirt-node-ng-image.squashfs.img
 
 ## Start the installation
