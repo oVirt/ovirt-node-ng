@@ -5,10 +5,17 @@
 
 liveimg --url=URL_TO_SQUASHFS
 
-autopart --type=thinp
+# FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
+# At best we could use: autopart --type=thinp
+reqpart --add-boot
+part pv.01 --size=50000 --grow
+volgroup HostVG pv.01
+logvol swap --vgname=HostVG --name=swap --fstype=swap --recommended
+logvol none --vgname=HostVG --name=HostPool --thinpool --size=30000 --grow
+logvol /    --vgname=HostVG --name=root --thin --poolname=HostPool --fsoptions="discard" --size=5000
+logvol /var --vgname=HostVG --name=var --thin --poolname=HostPool --fsoptions="discard" --size=15000
 
 %post --erroronfail
 imgbase layout --init
-imgbase --experimental volume --create /var 4G
 %end
 

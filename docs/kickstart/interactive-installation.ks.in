@@ -10,15 +10,21 @@ bootloader --timeout=1
 #
 # Two important defaults are set here:
 #
-# 1. autopart with LVM Thin
+# 1. part with LVM Thin and separate /var
 #    Ensures that the disk setup will use LVM Thin by default
 # 2. liveimg
 #    Ensures that anaconda is using the liveimg for installation
 #
 
-autopart --type=thinp --fstype=ext4 
-# --fsoptions=discard  # Not yet supported on CentOS 7
-# https://bugzilla.redhat.com/show_bug.cgi?id=1285684
+# FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
+# At best we could use: autopart --type=thinp
+reqpart --add-boot
+part pv.01 --size=50000 --grow
+volgroup HostVG pv.01
+logvol swap --vgname=HostVG --name=swap --fstype=swap --recommended
+logvol none --vgname=HostVG --name=HostPool --thinpool --size=30000 --grow
+logvol /    --vgname=HostVG --name=root --thin --poolname=HostPool --fsoptions="discard" --size=5000
+logvol /var --vgname=HostVG --name=var --thin --poolname=HostPool --fsoptions="discard" --size=15000
 
 liveimg --url=@SQUASHFS_URL@
 
