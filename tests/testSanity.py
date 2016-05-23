@@ -105,6 +105,9 @@ class TestNode(NodeTestCase):
         print("Checking if w works")
         imgbase("w")
 
+        print("Checking if check passes")
+        imgbase("check")
+
 
 if __name__ == "__main__":
     unittest.main()
