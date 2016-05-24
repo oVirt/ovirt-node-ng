@@ -12,6 +12,7 @@ export LIBGUESTFS_BACKEND=direct
 export BRANCH=master
 
 prepare() {
+  mknod /dev/kvm c 10 232
   virt-host-validate || :
 
   mkdir "$TMPDIR"
