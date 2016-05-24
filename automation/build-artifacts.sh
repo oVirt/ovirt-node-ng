@@ -56,7 +56,7 @@ EOF
 }
 
 check() {
-  sudo -E make check
+  sudo -E make installed-squashfs check
   ln -fv \
     *.img \
     tests/*.xml \
