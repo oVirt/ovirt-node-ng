@@ -67,6 +67,7 @@ yum install -y --nogpgcheck \
 imgbase --debug --experimental \
   image-build \
   --postprocess \
+  --yum-includepkgs=/etc/yum.repos.d/ovirt-master-snapshot.repo:ovirt-node-ng-image-update,ovirt-engine-appliance
   --set-nvr=$(rpm -q --qf "ovirt-node-ng-%{version}-0.$(date +%Y%m%d).0" ovirt-release-host-node)
 
 %end
