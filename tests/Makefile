@@ -13,7 +13,7 @@ check-code:
 	pep8 $(wildcard *.py)
 
 pre-check:
-	@( [[ -e /sys/fs/selinux/enforce ]] && grep -q 0 /sys/fs/selinux/enforce ) || ( echo ERROR: Enable permissive mode: seteneforce 0 ; exit 1 )
+	@( [[ ! -e /sys/fs/selinux/enforce ]] || grep -q 0 /sys/fs/selinux/enforce ) || ( echo ERROR: Enable permissive mode: seteneforce 0 ; exit 1 )
 #	@firewall-cmd -q --query-port 1234/udp || ( echo ERROR: Open port 1234/udp for multicaset for testing: firewall-cmd --add-port 1234/udp ; exit 1 )
 
 PYTEST=nosetests --with-xunit -v --no-byte-compile --stop
