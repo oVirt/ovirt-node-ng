@@ -44,7 +44,7 @@ EOF
   sudo -E make product.img rpm
   sudo -E make offline-installation-iso
 
-  mv -fv \
+  ln -fv \
     *manifest* \
     tmp.repos/RPMS/noarch/*.rpm \
     ovirt-node*.squashfs.img \
