@@ -48,7 +48,7 @@ EOF
   sudo -E make product.img rpm
   sudo -E make offline-installation-iso
 
-  ln -fv \
+  sudo ln -fv \
     *manifest* \
     tmp.repos/RPMS/noarch/*.rpm \
     ovirt-node*.squashfs.img \
@@ -61,7 +61,7 @@ EOF
 
 check() {
   sudo -E make installed-squashfs check
-  ln -fv \
+  sudo ln -fv \
     *.img \
     tests/*.xml \
     "$ARTIFACTSDIR/"
