@@ -80,7 +80,7 @@ repofy_and_checksum() {
 
   # Helper to redirect to latest installation iso
   INSTALLATIONISO=$(ls *.iso)
-  echo "<html><head><meta http-equiv='refresh' content='0; url=$INSTALLATIONISO' /></head></html>" > latest-installation-iso.html
+  echo "<html><head><meta http-equiv='refresh' content='0; url=\"$INSTALLATIONISO\"' /></head></html>" > latest-installation-iso.html
   popd
 }
 
