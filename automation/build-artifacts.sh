@@ -5,14 +5,18 @@ set -ex
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
 export PATH=$PATH:/sbin:/usr/sbin
-export CURLOPTS="-x http://proxy.phx.ovirt.org:3128"
 export TMPDIR=$PWD/tmp
 export LIBGUESTFS_BACKEND=direct
 
 export BRANCH=master
 
+# Only set a proxy if we can reach it
+if curl -m 1 --fail http://proxy.phx.ovirt.org:3128; then
+  export CURLOPTS="-x http://proxy.phx.ovirt.org:3128"
+fi
+
 prepare() {
-  mknod /dev/kvm c 10 232
+  mknod /dev/kvm c 10 232 || :
   virt-host-validate || :
 
   mkdir "$TMPDIR"
