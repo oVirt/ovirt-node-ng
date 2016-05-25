@@ -77,10 +77,10 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 		--memballoon virtio \
 		--noreboot \
 		--location @BOOTISO@ \
-		--extra-args "inst.ks=file:///ci-image-install.ks console=ttyS0" \
+		--extra-args "inst.ks=file:///ci-image-install.ks" \
 		--initrd-inject data/ci-image-install.ks \
 		--check disk_size=off \
-		--graphics none \
+		--graphics vnc \
 		--disk path=$(INSTALLEDIMAGEFILE),size=62,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=qcow2 \
 		--disk path=$(SQUASHFSFILENAME),readonly=on,device=disk,bus=virtio,serial=livesrc
 	virsh dumpxml $(DOMNAME) > installed-squashfs-domain.xml
