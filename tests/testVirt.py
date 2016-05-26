@@ -38,7 +38,7 @@ import sh
 import os
 import tempfile
 import time
-from virt import DiskImage, VM, CloudConfig
+from virt import DiskImage, VM
 import agent
 
 
@@ -82,7 +82,7 @@ class MachineTestCase(unittest.TestCase):
         debug("Strating new VM %s" % name)
 
         ssh_port = 22000 + int(magicnumber)
-        ipaddr = "10.11.12.%s" % magicnumber
+#        ipaddr = "10.11.12.%s" % magicnumber
 
         img = DiskImage(srcimg).reflink(tmpimg)
         dom = VM.create(name, img, ssh_port=ssh_port, memory_gb=memory_gb)
