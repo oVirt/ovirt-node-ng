@@ -2,13 +2,18 @@
 
 set -ex
 
+export BRANCH=ovirt-4.0
+
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
 export PATH=$PATH:/sbin:/usr/sbin
 export TMPDIR=$PWD/tmp
-export LIBGUESTFS_BACKEND=direct
 
-export BRANCH=ovirt-4.0
+export LIBGUESTFS_BACKEND=direct
+# Short TMPDIR otherwise we run into trouble with guestfish < 1.33.27-1.fc24
+# # -x -v to be more verbose
+export LIBGUESTFS_TMPDIR=/var/tmp
+export LIBGUESTFS_CACHEDIR=$LIBGUESTFS_TMPDIR
 
 # Only set a proxy if we can reach it
 export http_proxy=http://proxy.phx.ovirt.org:3128
@@ -66,7 +71,8 @@ check() {
   # script is used, because virt-install requires a tty
   # (which ain't available in Jenkins)
   sudo -E script -efqc "make installed-squashfs"
-  sudo -E make check
+  ln -sf ovirt-node-ng-image.installed.qcow2 "$LIBGUESTFS_TMPDIR"/ovirt-node-ng-image.installed.qcow2
+  sudo -E make check TEST_NODE_INSTALLED_IMG="$LIBGUESTFS_TMPDIR"/ovirt-node-ng-image.installed.qcow2
 }
 
 repofy_and_checksum() {
