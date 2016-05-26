@@ -79,10 +79,10 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 		--rng random \
 		--noreboot \
 		--location @BOOTISO@ \
-		--extra-args "inst.ks=file:///ci-image-install.ks" \
+		--extra-args "inst.ks=file:///ci-image-install.ks console=ttyS0" \
 		--initrd-inject data/ci-image-install.ks \
 		--check disk_size=off,path_in_use=off \
-		--graphics vnc \
+		--graphics none \
 		--wait 20 \
 		--disk path=$(INSTALLEDIMAGEFILE),bus=virtio,cache=unsafe,discard=unmap,format=qcow2 \
 		--disk path=$(SQUASHFSFILENAME),readonly=on,device=disk,bus=virtio,serial=livesrc
