@@ -66,13 +66,7 @@ check() {
   # script is used, because virt-install requires a tty
   # (which ain't available in Jenkins)
   sudo -E script -efqc "make installed-squashfs"
-  sudo -E script check
-  sudo ln -fv \
-    *.img \
-    tests/*.xml \
-    "$ARTIFACTSDIR/"
-
-  ls -shal "$ARTIFACTSDIR/" || :
+  sudo -E make check
 }
 
 repofy_and_checksum() {
