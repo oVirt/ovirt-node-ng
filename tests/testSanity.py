@@ -103,8 +103,13 @@ class TestNode(NodeTestCase):
                              "imgbase-motd.service"
                              ]
 
-        self.node.run("systemctl", "is-enabled",
-                      *req_enabled_units)
+        # systemctl is-enabled always returns 0
+        # Even if a unit is only present but not enabled
+        out = self.node.run("systemctl", "is-enabled",
+                            *req_enabled_units)
+
+        self.assertTrue(all(l == "enabled" for l in
+                            out.splitlines()))
 
     #
     # imgbased
