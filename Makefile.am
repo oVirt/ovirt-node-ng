@@ -81,7 +81,7 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 		--location @BOOTISO@ \
 		--extra-args "inst.ks=file:///ci-image-install.ks" \
 		--initrd-inject data/ci-image-install.ks \
-		--check disk_size=off \
+		--check disk_size=off,path_in_use=off \
 		--graphics vnc \
 		--wait 20 \
 		--disk path=$(INSTALLEDIMAGEFILE),bus=virtio,cache=unsafe,discard=unmap,format=qcow2 \
