@@ -194,7 +194,8 @@ class VM():
                 )
 
         kwargs = {"name": name,
-                  "disk": ("path=%s,bus=virtio,"
+                  "disk": ("path=%s,bus=virtio,format=qcow2,"
+                           "driver_type=qcow2,"
                            "discard=unmap,cache=unsafe") % disk,
                   "memory": int(1024 * int(memory_gb)),
                   "vcpus": 4,
