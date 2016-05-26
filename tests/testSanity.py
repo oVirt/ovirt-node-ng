@@ -71,7 +71,7 @@ class TestNode(NodeTestCase):
         assert "+1" in self.node.run("find", "/boot")
 
     #
-    # Filesystem, Packages, Mounts
+    # Filesystem, Packages, Mounts, Services
     #
     def test_packages(self):
         req_pkgs = ["vdsm",
@@ -89,6 +89,15 @@ class TestNode(NodeTestCase):
     def test_mounts(self):
         # Will raise an error if /var is not a mount
         self.node.run("findmnt", "/var")
+
+    def test_services(self):
+        req_enabled_units = ["cockpit.socket",
+                             "sshd.service",
+                             # "imgbase-motd.service"
+                             ]
+
+        self.node.run("systemctl", "is-enabled",
+                      *req_enabled_units)
 
     #
     # imgbased
