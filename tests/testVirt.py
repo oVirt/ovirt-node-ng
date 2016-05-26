@@ -95,20 +95,21 @@ class MachineTestCase(unittest.TestCase):
         else:
             raise RuntimeError("No layout found!? %s" % _fss)
 
-        cc = CloudConfig()
-        cc.instanceid = name + "-ci"
-        cc.password = str(magicnumber)
-
-        # Bring up the second NIC for inter-VM networking
-        # cc.runcmd = "ip link set dev eth1 up ; ip addr add {ipaddr}/24 dev
-        # eth1".format(ipaddr=ipaddr)
-        cc.runcmd = ("nmcli con add con-name bus0 ifname eth1 " +
-                     "autoconnect yes type ethernet ip4 {ipaddr}/24 ; " +
-                     "nmcli con up id bus0").format(ipaddr=ipaddr)
-        cc.runcmd += (" ; grep myhostname /etc/nsswitch.conf || sed " +
-                      "-i '/hosts:/ s/$/ myhostname/' /etc/nsswitch.conf")
-        with open(dom._ssh_identity_file + ".pub", "rt") as src:
-            cc.ssh_authorized_keys = [src.read().strip()]
+# DISABLE CLOUD CONFIG
+#        cc = CloudConfig()
+#        cc.instanceid = name + "-ci"
+#        cc.password = str(magicnumber)
+#
+#        # Bring up the second NIC for inter-VM networking
+#        # cc.runcmd = "ip link set dev eth1 up ; ip addr add {ipaddr}/24 dev
+#        # eth1".format(ipaddr=ipaddr)
+#        cc.runcmd = ("nmcli con add con-name bus0 ifname eth1 " +
+#                     "autoconnect yes type ethernet ip4 {ipaddr}/24 ; " +
+#                     "nmcli con up id bus0").format(ipaddr=ipaddr)
+#        cc.runcmd += (" ; grep myhostname /etc/nsswitch.conf || sed " +
+#                      "-i '/hosts:/ s/$/ myhostname/' /etc/nsswitch.conf")
+#        with open(dom._ssh_identity_file + ".pub", "rt") as src:
+#            cc.ssh_authorized_keys = [src.read().strip()]
 #        dom.set_cloud_config(cc)
 
         dom.upload(agent.__file__, "/agent.py")
