@@ -145,7 +145,7 @@ class NodeTestCase(MachineTestCase):
             n = "%s-node" % cls.__name__
             cls.node = cls._start_vm(n,
                                      cls._img,
-                                     "/tmp/" + n + ".qcow2",
+                                     "/var/tmp/" + n + ".qcow2",
                                      77)
 
             cls.node.start()

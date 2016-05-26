@@ -149,7 +149,7 @@ OSETUP_RPMDISTRO/enableUpgrade=none:None
     def _node_setup(cls, n):
         cls.node = cls._start_vm(n + "node",
                                  NODE_IMG,
-                                 "/tmp/" + n + "node.qcow2",
+                                 "/var/tmp/" + n + "node.qcow2",
                                  77)
 
         debug("Install cloud-init")
@@ -175,7 +175,7 @@ OSETUP_RPMDISTRO/enableUpgrade=none:None
     @classmethod
     def _engine_setup(cls, n):
         cls.engine = cls._start_vm(n + "engine", ENGINE_IMG,
-                                   "/tmp/" + n + "engine.qcow2", 88,
+                                   "/var/tmp/" + n + "engine.qcow2", 88,
                                    memory_gb=4)
 
         debug("Installing engine")
