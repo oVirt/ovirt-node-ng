@@ -72,7 +72,7 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 	virt-install \
 		--name $(DOMNAME) \
 		--boot menu=off \
-		--network = none \
+		--network none \
 		--memory 4096 \
 		--vcpus 4 \
 		--os-variant rhel7 \
@@ -83,7 +83,7 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 		--initrd-inject data/ci-image-install.ks \
 		--check disk_size=off \
 		--graphics vnc \
-		--disk path=$(INSTALLEDIMAGEFILE),bus=virtio,cache=unsafe,discard=unmap,format=qcow2,io=native \
+		--disk path=$(INSTALLEDIMAGEFILE),bus=virtio,cache=unsafe,discard=unmap,format=qcow2 \
 		--disk path=$(SQUASHFSFILENAME),readonly=on,device=disk,bus=virtio,serial=livesrc
 	virsh dumpxml $(DOMNAME) > installed-squashfs-domain.xml
 	virsh undefine $(DOMNAME)
