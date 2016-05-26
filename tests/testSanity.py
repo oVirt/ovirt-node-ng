@@ -93,7 +93,7 @@ class TestNode(NodeTestCase):
     def test_services(self):
         req_enabled_units = ["cockpit.socket",
                              "sshd.service",
-                             # "imgbase-motd.service"
+                             "imgbase-motd.service"
                              ]
 
         self.node.run("systemctl", "is-enabled",
