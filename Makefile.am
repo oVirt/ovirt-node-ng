@@ -71,18 +71,19 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 	qemu-img create -f qcow2 $(INSTALLEDIMAGEFILE) 63G
 	virt-install \
 		--name $(DOMNAME) \
+		--boot menu=off \
+		--network = none \
 		--memory 4096 \
 		--vcpus 4 \
 		--os-variant rhel7 \
 		--rng random \
-		--memballoon virtio \
 		--noreboot \
 		--location @BOOTISO@ \
 		--extra-args "inst.ks=file:///ci-image-install.ks" \
 		--initrd-inject data/ci-image-install.ks \
 		--check disk_size=off \
 		--graphics vnc \
-		--disk path=$(INSTALLEDIMAGEFILE),bus=virtio,sparse=no,cache=unsafe,discard=unmap,format=qcow2 \
+		--disk path=$(INSTALLEDIMAGEFILE),bus=virtio,cache=unsafe,discard=unmap,format=qcow2,io=native \
 		--disk path=$(SQUASHFSFILENAME),readonly=on,device=disk,bus=virtio,serial=livesrc
 	virsh dumpxml $(DOMNAME) > installed-squashfs-domain.xml
 	virsh undefine $(DOMNAME)
