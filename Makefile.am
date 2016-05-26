@@ -68,6 +68,7 @@ squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
 
 installed-squashfs: DOMNAME=node-$(shell date +%F-%H%M)
 installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
+	qemu-img create -f qcow2 $(INSTALLEDIMAGEFILE) 63G
 	virt-install \
 		--name $(DOMNAME) \
 		--memory 4096 \
@@ -81,7 +82,7 @@ installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
 		--initrd-inject data/ci-image-install.ks \
 		--check disk_size=off \
 		--graphics vnc \
-		--disk path=$(INSTALLEDIMAGEFILE),size=62,bus=virtio,sparse=yes,cache=unsafe,discard=unmap,format=qcow2 \
+		--disk path=$(INSTALLEDIMAGEFILE),bus=virtio,sparse=no,cache=unsafe,discard=unmap,format=qcow2 \
 		--disk path=$(SQUASHFSFILENAME),readonly=on,device=disk,bus=virtio,serial=livesrc
 	virsh dumpxml $(DOMNAME) > installed-squashfs-domain.xml
 	virsh undefine $(DOMNAME)
