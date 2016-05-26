@@ -11,8 +11,10 @@ export LIBGUESTFS_BACKEND=direct
 export BRANCH=master
 
 # Only set a proxy if we can reach it
-if curl -m 1 -o /dev/null --fail --proxy "http://proxy.phx.ovirt.org:3128" "http://www.ovirt.org"; then
-  export CURLOPTS="-x http://proxy.phx.ovirt.org:3128"
+export http_proxy=http://proxy.phx.ovirt.org:3128
+if curl -m 1 -o /dev/null --fail --proxy $http_proxy "http://www.ovirt.org"; then
+  export CURLOPTS="-x $http_proxy"
+  export LMCOPTS="--proxy $http_proxy"
 fi
 
 prepare() {
