@@ -74,8 +74,8 @@ Create the minimal-ngn.ks in the httpd public dir
     volgroup HostVG pv.01
     logvol swap --vgname=HostVG --name=swap --fstype=swap --recommended
     logvol none --vgname=HostVG --name=HostPool --thinpool --size=40000 --grow
-    logvol /    --vgname=HostVG --name=root --thin --poolname=HostPool --fsoptions="discard" --size=6000
-    logvol /var --vgname=HostVG --name=var --thin --poolname=HostPool --fsoptions="discard" --size=15000
+    logvol /    --vgname=HostVG --name=root --thin --poolname=HostPool --fsoptions="defaults,discard" --size=6000
+    logvol /var --vgname=HostVG --name=var --thin --poolname=HostPool --fsoptions="defaults,discard" --size=15000
     
     liveimg --url=http://server/ovirt-node-ng-image.squashfs.img
 

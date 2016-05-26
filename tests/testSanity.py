@@ -90,6 +90,13 @@ class TestNode(NodeTestCase):
         # Will raise an error if /var is not a mount
         self.node.run("findmnt", "/var")
 
+        self.assertIn("discard",
+                      self.node.run("findmnt", "/var"))
+
+        # FIXME it's in fstab but not in mounts options
+        # self.assertIn("discard",
+        #               self.node.run("findmnt", "/"))
+
     def test_services(self):
         req_enabled_units = ["cockpit.socket",
                              "sshd.service",
