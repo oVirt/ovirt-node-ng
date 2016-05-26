@@ -24,6 +24,7 @@ python-pep8
 python-requests
 python-sh
 qemu-system-x86
+qemu-img
 squashfs-tools
 sudo
 virt-install
