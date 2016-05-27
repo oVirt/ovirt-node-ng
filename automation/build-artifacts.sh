@@ -87,5 +87,5 @@ repofy_and_checksum() {
 
 prepare
 build
-check
+#check
 repofy_and_checksum
