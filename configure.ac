@@ -56,7 +56,7 @@ AC_ARG_WITH([ovirt-release-rpm-url],
     [AS_HELP_STRING([--with-ovirt-release-rpm-url=URL],
         [URL to the ovirt-release rpm])],
     [OVIRTRELEASERPMURL="$withval"],
-    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.0_beta1/rpm/el7/noarch/ovirt-release40.rpm"])
+    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.0-snapshot/rpm/el7/noarch/ovirt-release40-snapshot.rpm"])
 AC_SUBST([OVIRTRELEASERPMURL])
 
 AC_ARG_ENABLE(
