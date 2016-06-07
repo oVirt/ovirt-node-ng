@@ -114,7 +114,6 @@ $(RPMMANIFESTNAME): $(SQUASHFSFILENAME)
 	$(IN_ROOTFS) "rpm -qa" > $@
 
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM=ovirt-node-ng-image-update-placeholder
-packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_EPOCH=$(shell $(IN_ROOTFS) "rpm -q --qf %{?epoch} $(PLACEHOLDER_RPM)")
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_VERSION=$(shell $(IN_ROOTFS) "rpm -q --qf %{version} $(PLACEHOLDER_RPM)")
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_RELEASE=$(shell $(IN_ROOTFS) "rpm -q --qf %{release} $(PLACEHOLDER_RPM)")
 packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in $(RPMMANIFESTNAME)
@@ -124,7 +123,6 @@ packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in $(RPMMANIFESTNAME)
 		-e "s/\@PACKAGE_VERSION\@/$(PACKAGE_VERSION)/" \
 		-e "s/\@PACKAGE_RPM_VERSION\@/$(PACKAGE_RPM_VERSION)/" \
 		-e "s/\@PACKAGE_RPM_RELEASE\@/$(PACKAGE_RPM_RELEASE)/" \
-		-e "s/\@PLACEHOLDER_RPM_EPOCH\@/$(PLACEHOLDER_RPM_EPOCH)/" \
 		-e "s/\@PLACEHOLDER_RPM_VERSION\@/$(PLACEHOLDER_RPM_VERSION)/" \
 		-e "s/\@PLACEHOLDER_RPM_RELEASE\@/$(PLACEHOLDER_RPM_RELEASE)/" \
 		$< > $@
