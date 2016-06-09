@@ -28,7 +28,7 @@ import socket
 
 
 class Client():
-    timeout = 30
+    timeout = 60
 
     def __init__(self, path):
         self.path = path
