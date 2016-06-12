@@ -54,8 +54,7 @@ check() {
   # script is used, because virt-install requires a tty
   # (which ain't available in Jenkins)
   sudo -E script -efqc "make installed-squashfs"
-  #ln -sf ovirt-node-ng-image.installed.qcow2 "$LIBGUESTFS_TMPDIR"/ovirt-node-ng-image.installed.qcow2
-  sudo -E make check #TEST_NODE_INSTALLED_IMG="$LIBGUESTFS_TMPDIR"/ovirt-node-ng-image.installed.qcow2
+  sudo -E make check
 }
 
 checksum() {
