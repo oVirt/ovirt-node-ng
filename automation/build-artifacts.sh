@@ -35,7 +35,7 @@ build() {
   ./autogen.sh --with-tmpdir=/var/tmp
 
   sudo -E make squashfs
-  sudo -E make product.img rpm
+  sudo -E make updates.img product.img rpm
   sudo -E make offline-installation-iso
 
   sudo ln -fv \
