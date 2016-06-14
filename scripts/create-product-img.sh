@@ -4,7 +4,7 @@
 
 DST=$(realpath ${1:-$PWD/product.img})
 ISFINAL=${ISFINAL:-False}
-SRCDIR=$(dirname $0)
+SRCDIR=$(dirname $0)/../data/pixmaps
 PRDDIR=product/
 PIXMAPDIR=$PRDDIR/usr/share/anaconda/pixmaps/
 KSDIR=$PRDDIR/usr/share/anaconda/
