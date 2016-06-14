@@ -2,7 +2,7 @@
 
 set -ex
 
-export BRANCH=master
+export BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
