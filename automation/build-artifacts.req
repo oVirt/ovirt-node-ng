@@ -32,3 +32,8 @@ rpm-devel
 libarchive-devel
 glade-devel
 libxklavier-devel
+gettext-devel
+libtool
+intltool
+python-devel
+gobject-introspection-devel
