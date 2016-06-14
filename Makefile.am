@@ -96,10 +96,8 @@ debug-installed: installed-squashfs
 product.img:
 	bash scripts/create-product-img.sh $@
 
-updates.img: ANACONDAREPO=https://github.com/evol262/anaconda.git
-updates.img: ANACONDABRANCH=rhevh-4.0
 updates.img:
-	test -d tmp-anaconda ||	( git clone $(ANACONDAREPO) tmp-anaconda )
+	test -d tmp-anaconda ||	( git clone $(ANACONDAURL) tmp-anaconda )
 	touch ltmain.sh config.rpath
 	cd tmp-anaconda && git clean -fdx && git checkout $(ANACONDABRANCH) && git pull && git describe --always && ./autogen.sh ; ./configure ; make updates ; mv -v updates.img ../$@
 
