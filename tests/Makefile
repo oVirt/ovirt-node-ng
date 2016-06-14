@@ -22,12 +22,10 @@ check: pre-check check-code check-sanity
 
 check-sanity: check-code
 	$(PYTEST) testVirt.py testSanity.py
-	-xsltproc nosetests.xslt nosetests.xml
 
 check-integration: #check-sanity ovirt-engine-appliance.qcow2
 	@echo FIXME This is WIP and probably not working
 	$(PYTEST) testIntegration.py
-	-xsltproc nosetests.xslt nosetests.xml
 
 ovirt-engine-appliance.qcow2:
 	curl -O http://jenkins.ovirt.org/job/ovirt-appliance_master_build-artifacts-el7-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-engine-appliance.qcow2

@@ -28,3 +28,12 @@ qemu-img
 squashfs-tools
 sudo
 virt-install
+rpm-devel
+libarchive-devel
+glade-devel
+libxklavier-devel
+gettext-devel
+libtool
+intltool
+python-devel
+gobject-introspection-devel
