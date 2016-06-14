@@ -101,7 +101,7 @@ updates.img: ANACONDABRANCH=rhevh-4.0
 updates.img:
 	test -d tmp-anaconda ||	( git clone $(ANACONDAREPO) tmp-anaconda )
 	touch ltmain.sh config.rpath
-	cd tmp-anaconda && git clean -fdx && git checkout $(ANACONDABRANCH) && git pull && ./autogen.sh ; ./configure ; make updates ; mv -v updates.img ../$@
+	cd tmp-anaconda && git clean -fdx && git checkout $(ANACONDABRANCH) && git pull && git describe --always && ./autogen.sh ; ./configure ; make updates ; mv -v updates.img ../$@
 
 offline-installation-iso: product.img
 	PRODUCTIMG=$(PWD)/product.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
