@@ -2,6 +2,8 @@
 # https://fedoraproject.org/wiki/Anaconda/ProductImage#Product_image
 # https://git.fedorahosted.org/cgit/fedora-logos.git/tree/anaconda
 
+set -e
+
 isfinal() { [[ ! "$1" =~ (-pre|-snapshot|master) ]] ; }
 
 BRANCH=${BRANCH:-master}
@@ -23,7 +25,7 @@ cp "$SRCDIR"/sidebar-logo.png "$PIXMAPDIR/"
 # ks: kargs
 #cp "$KSFILE" "$KSDIR"/interactive-defaults.ks
 
-cat "$PRDDIR/.buildstamp" <<EOF
+cat > "$PRDDIR/.buildstamp" <<EOF
 [Main]
 Product=oVirt Node Next
 Version=${BRANCH}
