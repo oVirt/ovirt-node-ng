@@ -56,8 +56,22 @@ AC_ARG_WITH([ovirt-release-rpm-url],
     [AS_HELP_STRING([--with-ovirt-release-rpm-url=URL],
         [URL to the ovirt-release rpm])],
     [OVIRTRELEASERPMURL="$withval"],
-    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.0_beta1/rpm/el7/noarch/ovirt-release40.rpm"])
+    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.0-pre/rpm/el7/noarch/ovirt-release40-pre.rpm"])
 AC_SUBST([OVIRTRELEASERPMURL])
+
+AC_ARG_WITH([anaconda-url],
+    [AS_HELP_STRING([--with-anaconda-url=URL],
+        [URL to the anaconda source])],
+    [ANACONDAURL="$withval"],
+    [ANACONDAURL="https://github.com/evol262/anaconda.git"])
+AC_SUBST([ANACONDAURL])
+
+AC_ARG_WITH([anaconda-branch],
+    [AS_HELP_STRING([--with-anaconda-branch=BRANCH],
+        [The branch to use])],
+    [ANACONDABRANCH="$withval"],
+    [ANACONDABRANCH="rhevh-4.0"])
+AC_SUBST([ANACONDABRANCH])
 
 AC_ARG_ENABLE(
     [image],

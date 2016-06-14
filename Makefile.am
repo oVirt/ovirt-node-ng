@@ -96,6 +96,11 @@ debug-installed: installed-squashfs
 product.img:
 	bash scripts/create-product-img.sh $@
 
+updates.img:
+	test -d tmp-anaconda ||	( git clone $(ANACONDAURL) tmp-anaconda )
+	touch ltmain.sh config.rpath
+	cd tmp-anaconda && git clean -fdx && git checkout $(ANACONDABRANCH) && git pull && git describe --always && ./autogen.sh ; ./configure ; make updates ; mv -v updates.img ../$@
+
 offline-installation-iso: product.img
 	PRODUCTIMG=$(PWD)/product.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
 
@@ -131,7 +136,7 @@ RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
 
 if WITH_IMAGE
-rpm srpm: packaging/ovirt-node-ng.spec $(SQUASHFSFILENAME) product.img
+rpm srpm: packaging/ovirt-node-ng.spec $(SQUASHFSFILENAME) product.img updates.img
 else
 rpm srpm: packaging/ovirt-node-ng.spec
 endif
