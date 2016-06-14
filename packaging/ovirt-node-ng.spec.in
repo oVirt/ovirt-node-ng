@@ -43,9 +43,6 @@ Currently the main package is empty.
 # There is a lot of fu to support this.
 %package image
 Summary: %{_product_name} Image
-%if 0@PLACEHOLDER_RPM_EPOCH@
-Epoch:      @PLACEHOLDER_RPM_EPOCH@
-%endif
 Version:    @PLACEHOLDER_RPM_VERSION@
 Release:    @PLACEHOLDER_RPM_RELEASE@
 
@@ -55,16 +52,13 @@ It can be used to create the %{_product_name} installer.
 
 %package image-update
 Summary:    %{_product_name} Image Update
-%if 0@PLACEHOLDER_RPM_EPOCH@
-Epoch:      @PLACEHOLDER_RPM_EPOCH@
-%endif
 Version:    @PLACEHOLDER_RPM_VERSION@
 Release:    @PLACEHOLDER_RPM_RELEASE@
-Requires:   %{_product_id}-image = %{epoch}:%{version}-%{release}
+Requires:   %{_product_id}-image = %{version}-%{release}
 Requires:   imgbased
 
-Obsoletes:  %{_product_id}-image-update-placeholder < %{epoch}:%{version}-%{release}
-Provides:  %{_product_id}-image-update-placeholder = %{epoch}:%{version}-%{release}
+Obsoletes:  %{_product_id}-image-update-placeholder < %{version}-%{release}
+Provides:  %{_product_id}-image-update-placeholder = %{version}-%{release}
 
 %description image-update
 This package will update an %{_product_name} host with the new image.

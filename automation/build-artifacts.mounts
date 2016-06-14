@@ -2,3 +2,4 @@
 /var/lib/libvirt
 /boot
 /lib/modules
+/var/tmp

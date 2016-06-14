@@ -8,6 +8,7 @@ BOOTISO=$(realpath $1)
 SQUASHFS=$(realpath $2)
 NEWBOOTISO=$(realpath ${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)})
 PRODUCTIMG=$(realpath ./product.img)
+UPDATESIMG=$(realpath ./updates.img)
 
 TMPDIR=$(realpath bootiso.d)
 
@@ -36,14 +37,7 @@ add_payload() {
 liveimg --url=file:///run/install/repo/$DST
 
 # FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
-# At best we could use: autopart --type=thinp
-reqpart --add-boot
-part pv.01 --size=42000 --grow
-volgroup HostVG pv.01
-logvol swap --vgname=HostVG --name=swap --fstype=swap --recommended
-logvol none --vgname=HostVG --name=HostPool --thinpool --size=40000 --grow
-logvol /    --vgname=HostVG --name=root --thin --poolname=HostPool --fsoptions="defaults,discard" --size=6000
-logvol /var --vgname=HostVG --name=var --thin --poolname=HostPool --fsoptions="defaults,discard" --size=15000
+autopart --type=thinp
 
 %post --erroronfail
 imgbase layout --init
@@ -53,6 +47,9 @@ EOK
   # and the kickstart
   if [[ -e "$PRODUCTIMG" ]]; then
     cp "$PRODUCTIMG" images/product.img
+  fi
+  if [[ -e "$UPDATESIMG" ]]; then
+    cp "$UPDATESIMG" images/updates.img
   fi
 }
 
