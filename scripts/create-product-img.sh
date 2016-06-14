@@ -2,8 +2,13 @@
 # https://fedoraproject.org/wiki/Anaconda/ProductImage#Product_image
 # https://git.fedorahosted.org/cgit/fedora-logos.git/tree/anaconda
 
+isfinal() { [[ ! "$1" =~ (-pre|-snapshot|master) ]] ; }
+
+BRANCH=${BRANCH:-master}
+GUESSED_ISFINAL=$(isfinal ${BRANCH} && echo True || echo False )
+ISFINAL=${ISFINAL:-${GUESSED_ISFINAL}}
+
 DST=$(realpath ${1:-$PWD/product.img})
-ISFINAL=${ISFINAL:-False}
 SRCDIR=$(dirname $0)/../data/pixmaps
 PRDDIR=product/
 PIXMAPDIR=$PRDDIR/usr/share/anaconda/pixmaps/
@@ -18,10 +23,10 @@ cp "$SRCDIR"/sidebar-logo.png "$PIXMAPDIR/"
 # ks: kargs
 #cp "$KSFILE" "$KSDIR"/interactive-defaults.ks
 
-cat <<EOF > "$PRDDIR/.buildstamp"
+cat "$PRDDIR/.buildstamp" <<EOF
 [Main]
 Product=oVirt Node Next
-Version=master
+Version=${BRANCH}
 BugURL=https://bugzilla.redhat.com
 IsFinal=${ISFINAL}
 UUID=$(date +%Y%m%d).x86_64
