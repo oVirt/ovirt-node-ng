@@ -44,6 +44,7 @@ build() {
     tmp.repos/RPMS/noarch/*.rpm \
     ovirt-node*.squashfs.img \
     product.img \
+    updates.img \
     ovirt-node*.iso \
     data/ovirt-node*.ks \
     *.log \
@@ -55,6 +56,10 @@ check() {
   # (which ain't available in Jenkins)
   sudo -E script -efqc "make installed-squashfs"
   sudo -E make check
+
+  sudo ln -fv \
+    ovirt-node-ng-image.installed.qcow2 \
+    "$ARTIFACTSDIR/"
 }
 
 checksum() {
