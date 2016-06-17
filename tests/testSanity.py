@@ -129,6 +129,17 @@ class TestNode(NodeTestCase):
         print("Checking if check passes")
         imgbase("check")
 
+    #
+    # cockpit
+    #
+    def test_cockpit(self):
+        debug("Checking if cockpit is reachable")
+        html = self.node.run("curl", "--fail", "--insecure",
+                             "127.0.0.1:9090")
+
+        debug("Check if the first page is retrieved")
+        assert "Cockpit starting" in html
+
 
 if __name__ == "__main__":
     unittest.main()
