@@ -97,6 +97,7 @@ class TestNode(NodeTestCase):
         # self.assertIn("discard",
         #               self.node.run("findmnt", "/"))
 
+    @unittest.skip("FIXME needs a better check")
     def test_services(self):
         req_enabled_units = ["cockpit.socket",
                              "sshd.service",
