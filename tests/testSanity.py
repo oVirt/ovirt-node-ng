@@ -100,7 +100,7 @@ class TestNode(NodeTestCase):
     def test_services(self):
         req_enabled_units = ["cockpit.socket",
                              "sshd.service",
-                             # "imgbase-motd.service"
+                             "imgbase-motd.service"
                              ]
 
         # systemctl is-enabled always returns 0
