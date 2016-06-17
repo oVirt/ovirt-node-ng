@@ -36,7 +36,8 @@ add_payload() {
   cat > interactive-defaults.ks <<EOK
 liveimg --url=file:///run/install/repo/$DST
 
-# FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
+# FIXME This should be fixed more elegantly with
+# https://bugzilla.redhat.com/663099#c14
 autopart --type=thinp
 
 %post --erroronfail

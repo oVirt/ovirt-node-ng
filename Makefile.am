@@ -101,8 +101,8 @@ updates.img:
 	touch ltmain.sh config.rpath
 	cd tmp-anaconda && git clean -fdx && git checkout $(ANACONDABRANCH) && git pull && git describe --always && ./autogen.sh ; ./configure ; make updates ; mv -v updates.img ../$@
 
-offline-installation-iso: product.img
-	PRODUCTIMG=$(PWD)/product.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
+offline-installation-iso: product.img updates.img
+	PRODUCTIMG=$(PWD)/product.img UPDATESIMG=$(PWD)/updates.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
 
 @BOOTISO@:
 	curl $(CURLOPTS) -O @BOOTISOURL@
