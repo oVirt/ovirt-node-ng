@@ -21,6 +21,7 @@
 #
 
 from logging import debug
+import time
 import unittest
 from testVirt import NodeTestCase
 
@@ -93,7 +94,7 @@ class TestNode(NodeTestCase):
         self.assertIn("discard",
                       self.node.run("findmnt", "/var"))
 
-        # FIXME it's in fstab but not in mounts options
+        # FIXME
         # self.assertIn("discard",
         #               self.node.run("findmnt", "/"))
 
@@ -103,13 +104,11 @@ class TestNode(NodeTestCase):
                              "imgbase-motd.service"
                              ]
 
-        # systemctl is-enabled always returns 0
-        # Even if a unit is only present but not enabled
-        out = self.node.run("systemctl", "is-enabled",
-                            *req_enabled_units)
-
-        self.assertTrue(all(l == "enabled" for l in
-                            out.splitlines()))
+        # Give services some time to come up
+        # FIXME better to loop
+        time.sleep(30)
+        self.node.run("systemctl", "is-active",
+                      *req_enabled_units)
 
     #
     # imgbased
