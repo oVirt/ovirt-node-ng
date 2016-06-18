@@ -5,8 +5,13 @@
 
 liveimg --url=URL_TO_SQUASHFS
 
-# FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
-# At best we could use: autopart --type=thinp
+#
+# The manual partitioning gives the complete flexibility
+# Important:
+# - Use thin LVs
+# - Separate volumes for / and /var
+# - Partition for /boot
+
 reqpart --add-boot
 part pv.01 --size=42000 --grow
 volgroup HostVG pv.01

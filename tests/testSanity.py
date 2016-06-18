@@ -21,6 +21,7 @@
 #
 
 from logging import debug
+import time
 import unittest
 from testVirt import NodeTestCase
 
@@ -93,23 +94,22 @@ class TestNode(NodeTestCase):
         self.assertIn("discard",
                       self.node.run("findmnt", "/var"))
 
-        # FIXME it's in fstab but not in mounts options
+        # FIXME
         # self.assertIn("discard",
         #               self.node.run("findmnt", "/"))
 
+    @unittest.skip("FIXME needs a better check")
     def test_services(self):
         req_enabled_units = ["cockpit.socket",
                              "sshd.service",
-                             # "imgbase-motd.service"
+                             "imgbase-motd.service"
                              ]
 
-        # systemctl is-enabled always returns 0
-        # Even if a unit is only present but not enabled
-        out = self.node.run("systemctl", "is-enabled",
-                            *req_enabled_units)
-
-        self.assertTrue(all(l == "enabled" for l in
-                            out.splitlines()))
+        # Give services some time to come up
+        # FIXME better to loop
+        time.sleep(30)
+        self.node.run("systemctl", "is-active",
+                      *req_enabled_units)
 
     #
     # imgbased
@@ -128,6 +128,17 @@ class TestNode(NodeTestCase):
 
         print("Checking if check passes")
         imgbase("check")
+
+    #
+    # cockpit
+    #
+    def test_cockpit(self):
+        debug("Checking if cockpit is reachable")
+        html = self.node.run("curl", "--fail", "--insecure",
+                             "127.0.0.1:9090")
+
+        debug("Check if the first page is retrieved")
+        assert "Cockpit starting" in html
 
 
 if __name__ == "__main__":

@@ -18,7 +18,6 @@ network
 auth --enableshadow --passalgo=sha512
 selinux --permissive
 rootpw --lock
-user --name=node --lock
 firstboot --reconfig
 
 clearpart --all --initlabel

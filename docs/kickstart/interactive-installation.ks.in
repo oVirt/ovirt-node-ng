@@ -16,15 +16,9 @@ bootloader --timeout=1
 #    Ensures that anaconda is using the liveimg for installation
 #
 
-# FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
-# At best we could use: autopart --type=thinp
-reqpart --add-boot
-part pv.01 --size=42000 --grow
-volgroup HostVG pv.01
-logvol swap --vgname=HostVG --name=swap --fstype=swap --recommended
-logvol none --vgname=HostVG --name=HostPool --thinpool --size=40000 --grow
-logvol /    --vgname=HostVG --name=root --thin --poolname=HostPool --fsoptions="defaults,discard" --size=6000
-logvol /var --vgname=HostVG --name=var --thin --poolname=HostPool --fsoptions="defaults,discard" --size=15000
+# FIXME This should be fixed more elegantly with
+# https://bugzilla.redhat.com/663099#c14
+autopart --type=thinp
 
 liveimg --url=@SQUASHFS_URL@
 
@@ -32,5 +26,4 @@ liveimg --url=@SQUASHFS_URL@
 # FIXME maybe the folowing lines can be collapsed
 # in future into i.e. "nodectl init"
 imgbase layout --init
-imgbase --experimental volume --create /var 4G
 %end
