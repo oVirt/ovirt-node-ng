@@ -2,6 +2,9 @@
 
 set -ex
 
+# Fix to get all branch informations
+git -c remote.origin.fetch=+refs/heads/*:refs/remotes/origin/* fetch
+
 export BRANCH=${GIT_BRANCH:-$(git describe --all --contains HEAD | egrep -o "[^/]*$")}
 export BRANCH=${BRANCH#*/}
 
