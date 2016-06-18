@@ -2,7 +2,8 @@
 
 set -ex
 
-export BRANCH=$(git describe --all --contains HEAD | egrep -o "[^/]*$")
+export BRANCH=${GIT_BRANCH:-$(git describe --all --contains HEAD | egrep -o "[^/]*$")}
+export BRANCH=${BRANCH#*/}
 
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
