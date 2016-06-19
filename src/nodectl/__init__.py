@@ -23,6 +23,7 @@
 
 import logging
 import argparse
+import sys
 import imgbased
 from .status import Status
 #from . import config
@@ -100,16 +101,20 @@ class CommandMapper():
 def CliApplication(args=None):
     app = Application()
 
-    parser = argparse.ArgumentParser(prog="nodectl",
+    root_parser = argparse.ArgumentParser(prog="nodectl",
+                                          add_help=False)
+
+    root_parser.add_argument("--version", action="version")
+    root_parser.add_argument("--debug", action="store_true")
+    root_parser.add_argument("--machine-readable",
+                             action="store_true",
+                             help="Output in JSON for consumption by other "
+                                  "utilities")
+
+    parser = argparse.ArgumentParser(parents=[root_parser],
                                      description=app.__doc__)
-    parser.add_argument("--version", action="version")
-#                        version=config.version())
 
     subparsers = parser.add_subparsers(title="Sub-commands", dest="command")
-
-    parser.add_argument("--debug", action="store_true")
-    parser.add_argument("--machine-readable", action="store_true")
-
 
     sp_init = subparsers.add_parser("init",
                                     help="Intialize the required layout")
@@ -127,8 +132,13 @@ def CliApplication(args=None):
     sp_info = subparsers.add_parser("check",
                                     help="Show the status of the system")
 
+    (args, remaining_args) = root_parser.parse_known_args()
 
-    args = parser.parse_args(args)
+    if remaining_args:
+        args = parser.parse_args(args=remaining_args, namespace=args)
+    else:
+        parser.print_help()
+        sys.exit(1)
 
     if args.debug:
         log.setLevel(logging.DEBUG)
