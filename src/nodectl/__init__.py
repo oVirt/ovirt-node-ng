@@ -23,6 +23,8 @@
 
 import logging
 import argparse
+import imgbased
+from .status import Status
 #from . import config
 
 log = logging.getLogger()
@@ -40,8 +42,11 @@ class Application(object):
     (rollback).
     """
 
+    imgbased = None
+    machine = False
+
     def __init__(self):
-        pass
+        self.imgbased = imgbased.Application()
 
     def init(self, debug):
         """Perform imgbase init
@@ -66,6 +71,14 @@ class Application(object):
         """Rollback to a previous image
         """
         raise NotImplementedError
+
+    def check(self, debug):
+        """Check the status of the running system
+        """
+        from imgbased.plugins.core import Health
+        status = Health(self.imgbased).status()
+
+        Status(status, self.machine).write()
 
 
 class CommandMapper():
@@ -95,6 +108,8 @@ def CliApplication(args=None):
     subparsers = parser.add_subparsers(title="Sub-commands", dest="command")
 
     parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--machine-readable", action="store_true")
+
 
     sp_init = subparsers.add_parser("init",
                                     help="Intialize the required layout")
@@ -109,16 +124,27 @@ def CliApplication(args=None):
     sp_rollback = subparsers.add_parser("rollback",
                                         help="Rollback to the previous image")
 
+    sp_info = subparsers.add_parser("check",
+                                    help="Show the status of the system")
+
+
     args = parser.parse_args(args)
 
     if args.debug:
         log.setLevel(logging.DEBUG)
+
+    if args.machine_readable:
+        app.machine = True
+
+    # We don't care about passing this to the CommandMapper at all
+    del args.machine_readable
 
     cmdmap = CommandMapper()
     cmdmap.register("init", app.init)
     cmdmap.register("info", app.info)
     cmdmap.register("update", app.update)
     cmdmap.register("rollback", app.rollback)
+    cmdmap.register("check", app.check)
 
     return cmdmap.command(args)
 
