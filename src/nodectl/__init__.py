@@ -26,7 +26,8 @@ import argparse
 import sys
 import imgbased
 from .status import Status
-#from . import config
+from .info import Info
+# from . import config
 
 log = logging.getLogger()
 
@@ -61,7 +62,12 @@ class Application(object):
         - storage status
         - bootloader status
         """
-        raise NotImplementedError
+        # FIXME: we could actually pull a nice object directly out
+        # of imgbased, but we'd tie ourselves to the API much too
+        # closely. imgbased.naming is directly formatting strings,
+        # but we can't instantiate that nicely directly from
+        # imgbased.imgbase without making assumptions.
+        Info(self.imgbased, self.machine).write()
 
     def update(self, check, debug):
         """Check for and perform updates
@@ -123,7 +129,8 @@ def CliApplication(args=None):
                                     help="Show informations about the image")
 
     sp_update = subparsers.add_parser("update",
-                                      help="Perform an update if updates are available")
+                                      help="Perform an update if updates "
+                                      "are available")
     sp_update.add_argument("--check", action="store_true")
 
     sp_rollback = subparsers.add_parser("rollback",
