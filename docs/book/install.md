@@ -68,7 +68,8 @@ Create the minimal-ngn.ks in the httpd public dir
 
     $ cat minimal-ngn.ks
     # FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
-    # At best we could use: autopart --type=thinp
+    # Just: autopart --type=thinp
+    # Or for a manual layout:
     reqpart --add-boot
     part pv.01 --size=42000 --grow
     volgroup HostVG pv.01

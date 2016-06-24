@@ -20,6 +20,10 @@ bootloader --timeout=1
 
 # FIXME This should be fixed more elegantly with https://bugzilla.redhat.com/663099#c14
 # At best we could use: autopart --type=thinp
+# autopart can not be used in CI currently, because updates.img is not passed to
+# the installation
+
+# Manual layout:
 reqpart --add-boot
 part pv.01 --size=42000 --grow
 volgroup HostVG pv.01

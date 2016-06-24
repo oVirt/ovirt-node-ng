@@ -8,7 +8,9 @@ isfinal() { [[ ! "$1" =~ (-pre|-snapshot|master) ]] ; }
 
 BRANCH=${BRANCH:-master}
 GUESSED_ISFINAL=$(isfinal ${BRANCH} && echo True || echo False )
+
 ISFINAL=${ISFINAL:-${GUESSED_ISFINAL}}
+VERSION=${BRANCH#ovirt-}
 
 DST=$(realpath ${1:-$PWD/product.img})
 SRCDIR=$(dirname $0)/../data/pixmaps
@@ -28,7 +30,7 @@ cp "$SRCDIR"/sidebar-logo.png "$PIXMAPDIR/"
 cat > "$PRDDIR/.buildstamp" <<EOF
 [Main]
 Product=oVirt Node Next
-Version=${BRANCH}
+Version=${VERSION}
 BugURL=https://bugzilla.redhat.com
 IsFinal=${ISFINAL}
 UUID=$(date +%Y%m%d).x86_64
