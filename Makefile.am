@@ -23,6 +23,10 @@ docbookdir = $(prefix)/share/doc/@PACKAGE_NAME@/book
 docbookimgsdir = $(prefix)/share/doc/@PACKAGE_NAME@/book/imgs
 nodetoolsdir = $(prefix)/share/@PACKAGE_NAME@/tools
 
+SUBDIRS = \
+	src \
+	$(NULL)
+
 dist_doc_DATA = \
 	README \
 	$(NULL)
@@ -60,6 +64,10 @@ dist_nodetools_DATA = \
 
 dist_bin_SCRIPTS = \
 	scripts/create-node-installation-iso \
+	$(NULL)
+
+dist_sbin_SCRIPTS = \
+	scripts/nodectl \
 	$(NULL)
 
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
