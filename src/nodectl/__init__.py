@@ -27,6 +27,7 @@ import sys
 import imgbased
 from .status import Status
 from .info import Info
+from .update import Rollback
 # from . import config
 
 log = logging.getLogger()
@@ -74,10 +75,10 @@ class Application(object):
         """
         raise NotImplementedError
 
-    def rollback(self, debug):
+    def rollback(self, debug, nvr):
         """Rollback to a previous image
         """
-        raise NotImplementedError
+        Rollback(self.imgbased, self.machine, nvr).write()
 
     def check(self, debug):
         """Check the status of the running system
@@ -134,7 +135,11 @@ def CliApplication(args=None):
     sp_update.add_argument("--check", action="store_true")
 
     sp_rollback = subparsers.add_parser("rollback",
-                                        help="Rollback to the previous image")
+                                        help="Rollback a previous image. "
+                                        "Defaults to the latest.")
+    sp_rollback.add_argument("--nvr",
+                             nargs="?",
+                             help="A layer nvr to rollback to")
 
     sp_info = subparsers.add_parser("check",
                                     help="Show the status of the system")
