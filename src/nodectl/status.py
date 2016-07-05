@@ -29,6 +29,11 @@ import subprocess
 
 from imgbased.utils import bcolors
 
+try:
+    from subprocess import DEVNUL
+except ImportError:
+    DEVNULL = open(os.devnull, 'wb')
+
 log = logging.getLogger()
 
 
@@ -52,7 +57,7 @@ class Status(object):
             output.update(StatusParser(status.results).parse())
             for service in services:
                 service_status = StatusParser(ServiceStatus(service)).parse()
-                if service_status[service]["status"] is not "ok":
+                if service_status[service]["status"] != "ok":
                     output["status"] = "bad"
                 output.update(service_status)
             self.output = json.dumps(output)
@@ -127,8 +132,8 @@ class ServiceStatus(object):
         tmpl = '{0} ... {1}'
         try:
             subprocess.check_call(["systemctl", "status", "%s.service" %
-                                   service], stdout=os.devnull,
-                                  stderr=subprocess.DEVNULL)
+                                   service], stdout=DEVNULL,
+                                  stderr=DEVNULL)
             return tmpl.format(service, bcolors.ok("OK"))
-        except:
+        except Exception as e:
             return tmpl.format(service, bcolors.fail("BAD"))
