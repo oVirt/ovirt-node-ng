@@ -108,7 +108,7 @@ class LayoutParser(object):
 
     def parse(self):
         result = dict()
-        layouts = re.split(r'^([^\s]?=\w+)', self.layout)
+        layouts = re.split(r'\n?(?=\w)', self.layout, re.M)
 
         for l in layouts:
             lines = l.splitlines()
