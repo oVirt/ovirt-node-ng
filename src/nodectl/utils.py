@@ -66,6 +66,6 @@ class LogCapture(ContextDecorator):
         self.logHandler.flush()
         self.buf.flush()
 
-        output = re.sub(r'^\[\w+\]\s+', '', self.buf.getvalue())
+        output = re.sub(r'^\[\w+\]\s+', '', self.buf.getvalue(), flags=re.M)
 
         return output
