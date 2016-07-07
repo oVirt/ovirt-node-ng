@@ -16,7 +16,7 @@ keyboard us
 timezone --utc Etc/UTC
 network
 auth --enableshadow --passalgo=sha512
-selinux --permissive
+selinux --enforcing
 rootpw --lock
 firstboot --reconfig
 

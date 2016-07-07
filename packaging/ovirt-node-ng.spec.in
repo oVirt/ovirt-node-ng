@@ -25,8 +25,10 @@ Summary:    %{_product_name}
 
 URL:        http://www.ovirt.org/node/
 Source0:    %{name}-@PACKAGE_VERSION@.tar.gz
+%if 0%{?with_image}
 Source1:    @IMAGENAME@.squashfs.img
 Source2:    product.img
+%endif
 BuildArch:  noarch
 
 BuildRequires: autoconf
@@ -76,6 +78,13 @@ Summary:     Tools for %{_product_name}
 %description tools
 Subpackage for tools related to %{_product_name}
 
+%package -n nodectl
+Summary:     nodectl for %{name}
+Requires:    imgbased
+
+%description -n nodectl
+Subpackage for nodectl for %{name}
+
 %prep
 %setup -q -n %{name}-@PACKAGE_VERSION@
 
@@ -108,6 +117,10 @@ imgbase --debug update --format liveimg %{_node_image_file}
 %dir %{_node_tools_dir}
 %{_node_tools_dir}/*
 %{_bindir}/create-node-installation-iso
+
+%files -n nodectl
+%{_sbindir}/nodectl
+%{python_sitelib}/nodectl
 
 %files docs
 %{_docdir}/%{name}/*
