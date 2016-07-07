@@ -25,8 +25,10 @@ Summary:    %{_product_name}
 
 URL:        http://www.ovirt.org/node/
 Source0:    %{name}-@PACKAGE_VERSION@.tar.gz
+%if 0%{?with_image}
 Source1:    @IMAGENAME@.squashfs.img
 Source2:    product.img
+%endif
 BuildArch:  noarch
 
 BuildRequires: autoconf

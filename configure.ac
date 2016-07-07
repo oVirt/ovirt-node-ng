@@ -83,6 +83,7 @@ AC_ARG_ENABLE(
     [enable_image="yes"]
 )
 AM_CONDITIONAL([WITH_IMAGE], [test "${enable_image}" = "yes"])
+AM_CONDITIONAL([PACKAGE_IMAGE], [test "${enable_image}" = "yes"])
 AS_IF([test "${enable_image}" = "yes"],
       AC_SUBST([WITH_IMAGE], ['1']),
       AC_SUBST([WITH_IMAGE], ['0']))
