@@ -1,6 +1,4 @@
-livemedia.log
-program.log
-virt-install.log
+*.log
 boot.iso
 logs/
 mocker-*
@@ -19,3 +17,8 @@ install-sh
 missing
 build/
 installed-squashfs-domain.xml
+*.gz
+py-compile
+*.pyc
+data/ovirt-node-ng-image.ks
+release

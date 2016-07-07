@@ -89,6 +89,10 @@ AS_IF([test "${enable_image}" = "yes"],
 
 AC_CONFIG_FILES([
 	Makefile
+	src/Makefile
 	data/ovirt-node-ng-image.ks
 ])
+
+AM_PATH_PYTHON
+
 AC_OUTPUT
