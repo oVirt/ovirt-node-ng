@@ -23,8 +23,15 @@ docbookdir = $(prefix)/share/doc/@PACKAGE_NAME@/book
 docbookimgsdir = $(prefix)/share/doc/@PACKAGE_NAME@/book/imgs
 nodetoolsdir = $(prefix)/share/@PACKAGE_NAME@/tools
 
+EXTRA_DIST = \
+	docs/man/nodectl.8
+
 SUBDIRS = \
 	src \
+	$(NULL)
+
+man_MANS = \
+	docs/man/nodectl.8 \
 	$(NULL)
 
 dist_doc_DATA = \

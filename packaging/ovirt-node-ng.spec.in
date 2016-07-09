@@ -119,6 +119,7 @@ imgbase --debug update --format liveimg %{_node_image_file}
 %{_bindir}/create-node-installation-iso
 
 %files -n nodectl
+%{_mandir}/man8/nodectl.8.gz
 %{_sbindir}/nodectl
 %{python_sitelib}/nodectl
 
