@@ -127,5 +127,7 @@ imgbase --debug update --format liveimg %{_node_image_file}
 %{_docdir}/%{name}/*
 
 %changelog
+* Sat Jul 9 2016 Ryan Barry <rbarry@redhat.com>
+- Add nodectl
 * Mon Jan 25 2016 Douglas Schilling Landgraf <dougsland@redhat.com>
 - Initial build
