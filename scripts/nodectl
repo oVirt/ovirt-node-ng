@@ -21,6 +21,11 @@ if [[ -n "$(which python3 2>&-)" ]]; then
   PYTHON=python3
 fi
 
+if [[ $EUID -ne 0 ]]; then
+    echo "nodectl must be run as root!"
+    exit 1
+fi
+
 [[ -d "src/nodectl" ]] && { echo "Enabling in-tree mode ($PYTHON)" >&2 ; export PYTHONPATH="$PWD/src" ;}
 
 $PYTHON -m nodectl.__main__ $@
