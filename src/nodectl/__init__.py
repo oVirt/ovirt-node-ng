@@ -108,8 +108,7 @@ class CommandMapper():
 def CliApplication(args=None):
     app = Application()
 
-    root_parser = argparse.ArgumentParser(prog="nodectl",
-                                          add_help=False)
+    root_parser = argparse.ArgumentParser(add_help=False)
 
     root_parser.add_argument("--version", action="version")
     root_parser.add_argument("--debug", action="store_true")
@@ -118,16 +117,17 @@ def CliApplication(args=None):
                              help="Output in JSON for consumption by other "
                                   "utilities")
 
-    parser = argparse.ArgumentParser(parents=[root_parser],
+    parser = argparse.ArgumentParser(prog="nodectl",
+                                     parents=[root_parser],
                                      description=app.__doc__)
 
     subparsers = parser.add_subparsers(title="Sub-commands", dest="command")
 
-    sp_init = subparsers.add_parser("init",
-                                    help="Intialize the required layout")
+    subparsers.add_parser("init",
+                          help="Intialize the required layout")
 
-    sp_info = subparsers.add_parser("info",
-                                    help="Show informations about the image")
+    subparsers.add_parser("info",
+                          help="Show informations about the image")
 
     sp_update = subparsers.add_parser("update",
                                       help="Perform an update if updates "
@@ -141,8 +141,8 @@ def CliApplication(args=None):
                              nargs="?",
                              help="A layer nvr to rollback to")
 
-    sp_info = subparsers.add_parser("check",
-                                    help="Show the status of the system")
+    subparsers.add_parser("check",
+                          help="Show the status of the system")
 
     (args, remaining_args) = root_parser.parse_known_args()
 
