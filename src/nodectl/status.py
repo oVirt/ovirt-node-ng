@@ -30,7 +30,7 @@ import subprocess
 from imgbased.utils import bcolors
 
 try:
-    from subprocess import DEVNUL
+    from subprocess import DEVNULL
 except ImportError:
     DEVNULL = open(os.devnull, 'wb')
 
@@ -51,20 +51,43 @@ class Status(object):
 
     def _update_info(self, status):
         services = ["vdsmd"]
+        statuses = {}
+
+        for service in services:
+            srv_status = ServiceStatus(service)
+            srv_machine = StatusParser(srv_status).parse()
+            vals = {"human": srv_status,
+                    "machine": srv_machine,
+                    "status": srv_machine[service]["status"]
+                    }
+
+            statuses[service] = vals
+
         if self.machine_readable:
             output = dict()
 
             output.update(StatusParser(status.results).parse())
-            for service in services:
-                service_status = StatusParser(ServiceStatus(service)).parse()
-                if service_status[service]["status"] != "ok":
+            for k, v in statuses.items():
+                service_status = v["machine"]
+                if v["status"] != "ok":
                     output["status"] = "bad"
                 output.update(service_status)
             self.output = json.dumps(output)
 
         else:
-            output = status.details()
-            output += '\n{0}'.format(ServiceStatus("vdsmd"))
+            output = status.details().splitlines()
+
+            overall_status = output.pop(0)
+
+            for k, v in statuses.items():
+                print v
+                if v["status"] != "ok":
+                    fields = overall_status.split()
+                    overall_status = "%s %s\n" % (fields[0],
+                                                  bcolors.fail("BAD"))
+                output.append(v["human"])
+
+            output = overall_status + '\n'.join(output)
             self.output = output
 
     def write(self):
@@ -135,5 +158,5 @@ class ServiceStatus(object):
                                    service], stdout=DEVNULL,
                                   stderr=DEVNULL)
             return tmpl.format(service, bcolors.ok("OK"))
-        except Exception as e:
+        except Exception:
             return tmpl.format(service, bcolors.fail("BAD"))
