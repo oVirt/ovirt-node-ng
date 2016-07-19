@@ -6,7 +6,7 @@ nodectl \- manage a virtualization host running imgbased
 .SH SYNOPSIS
 nodectl [OPTIONS] [COMMAND]
 .SH DESCRIPTION
-nodectl is capable of managing imgbased layers, checking the validity of the
+nodectl is capable of managing imgbased layouts, checking the validity of the
 system configuration, and displaying information about the bootloader|available
 layers|current layer
 .SH OPTIONS
@@ -23,5 +23,9 @@ Show the running layer, imgbased layout, and information about the bootloader
 .IP "\fBrollback\fR [\fI--nvr\fR]"
 Roll back to an earlier imgbased layer. If \fB--nvr\fR is specified, roll back
 to a specific layer
+.IP "\fBinit\fR [\fI--nvr\fR] [\fI--source\fR]"
+Initialize an imgbased layout. If \fB--nvr\fR is specified, this will be used
+instead of the NVR in /usr/share/imgbase/build/meta/nvr. Defaults to "/" as
+the volume to initialize from, unless \fB--source\fR is specified.
 .SH COPYRIGHT
 Copyright (C) 2016, Red Hat, Inc.
