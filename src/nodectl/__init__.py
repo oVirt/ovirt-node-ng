@@ -27,6 +27,7 @@ import sys
 import imgbased
 from .status import Status
 from .info import Info
+from .initialize import Initialize
 from .update import Rollback
 # from . import config
 
@@ -51,10 +52,10 @@ class Application(object):
     def __init__(self):
         self.imgbased = imgbased.Application()
 
-    def init(self, debug):
+    def init(self, debug, source, nvr):
         """Perform imgbase init
         """
-        raise NotImplementedError
+        Initialize(self.imgbased, self.machine, source, nvr).write()
 
     def info(self, debug):
         """Dump metadata and runtime informations
@@ -143,6 +144,17 @@ def CliApplication(args=None):
 
     subparsers.add_parser("check",
                           help="Show the status of the system")
+
+    sp_init = subparsers.add_parser("init",
+                                    help="Initialize an imgbased layout ")
+
+    sp_init.add_argument("--nvr",
+                         nargs="?",
+                         help="The nvr to initialize as")
+
+    sp_init.add_argument("--source",
+                         nargs="?", default="/", metavar="VG/LV",
+                         help="An existing thin LV to tag for initialization")
 
     (args, remaining_args) = root_parser.parse_known_args()
 

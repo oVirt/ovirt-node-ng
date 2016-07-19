@@ -19,6 +19,8 @@ pynodectl_PYTHON = \
 	nodectl/__init__.py \
 	nodectl/__main__.py \
 	nodectl/info.py \
+	nodectl/initialize.py \
 	nodectl/status.py \
 	nodectl/update.py \
-	nodectl/utils.py
+	nodectl/utils.py \
+	$(NULL)
