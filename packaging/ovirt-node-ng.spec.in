@@ -57,7 +57,7 @@ Summary:    %{_product_name} Image Update
 Version:    @PLACEHOLDER_RPM_VERSION@
 Release:    @PLACEHOLDER_RPM_RELEASE@
 Requires:   %{_product_id}-image = %{version}-%{release}
-Requires:   imgbased
+Requires:   imgbased >= 0.7.2
 
 Obsoletes:  %{_product_id}-image-update-placeholder < %{version}-%{release}
 Provides:  %{_product_id}-image-update-placeholder = %{version}-%{release}
