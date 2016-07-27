@@ -33,7 +33,7 @@ class TestNode(NodeTestCase):
     # SELinux
     #
     def test_selinux(self):
-        assert "Permissive" in self.node.run("getenforce")
+        assert "Enforcing" in self.node.run("getenforce")
 
         # data = self.node.run("cat", "/var/log/audit/audit.log")
         # assert "denied" not in data, \

@@ -1,0 +1,31 @@
+.\" Manpage for nodectl.
+.\" Contact rbarry@redhat.com to correct errors or typos.
+.TH man 8 "9 July 2016" "1.0" "nodectl man page"
+.SH NAME
+nodectl \- manage a virtualization host running imgbased
+.SH SYNOPSIS
+nodectl [OPTIONS] [COMMAND]
+.SH DESCRIPTION
+nodectl is capable of managing imgbased layouts, checking the validity of the
+system configuration, and displaying information about the bootloader|available
+layers|current layer
+.SH OPTIONS
+.IP [\fB\-\-machine-readable\fR]
+Give JSON output instead of human-readable
+Name of new LiveOS (don't include .iso, it will be added automatically)
+.SH COMMAND
+.IP \fBcheck\fR
+Check the validity of the filesystem layout, mount options, LVM layout, and
+status of running services
+.IP \fBinfo\fR
+Show the running layer, imgbased layout, and information about the bootloader 
+(default, kargs) for all entries
+.IP "\fBrollback\fR [\fI--nvr\fR]"
+Roll back to an earlier imgbased layer. If \fB--nvr\fR is specified, roll back
+to a specific layer
+.IP "\fBinit\fR [\fI--nvr\fR] [\fI--source\fR]"
+Initialize an imgbased layout. If \fB--nvr\fR is specified, this will be used
+instead of the NVR in /usr/share/imgbase/build/meta/nvr. Defaults to "/" as
+the volume to initialize from, unless \fB--source\fR is specified.
+.SH COPYRIGHT
+Copyright (C) 2016, Red Hat, Inc.

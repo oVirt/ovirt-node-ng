@@ -25,8 +25,10 @@ Summary:    %{_product_name}
 
 URL:        http://www.ovirt.org/node/
 Source0:    %{name}-@PACKAGE_VERSION@.tar.gz
+%if 0%{?with_image}
 Source1:    @IMAGENAME@.squashfs.img
 Source2:    product.img
+%endif
 BuildArch:  noarch
 
 BuildRequires: autoconf
@@ -55,7 +57,7 @@ Summary:    %{_product_name} Image Update
 Version:    @PLACEHOLDER_RPM_VERSION@
 Release:    @PLACEHOLDER_RPM_RELEASE@
 Requires:   %{_product_id}-image = %{version}-%{release}
-Requires:   imgbased
+Requires:   imgbased >= 0.7.2
 
 Obsoletes:  %{_product_id}-image-update-placeholder < %{version}-%{release}
 Provides:  %{_product_id}-image-update-placeholder = %{version}-%{release}
@@ -76,6 +78,13 @@ Summary:     Tools for %{_product_name}
 %description tools
 Subpackage for tools related to %{_product_name}
 
+%package -n nodectl
+Summary:     nodectl for %{name}
+Requires:    imgbased
+
+%description -n nodectl
+Subpackage for nodectl for %{name}
+
 %prep
 %setup -q -n %{name}-@PACKAGE_VERSION@
 
@@ -93,7 +102,7 @@ make %{?_smp_mflags}
 /usr/bin/install -m 644 %{SOURCE2} %{buildroot}/%{_node_image_dir}/product.img
 
 %post image-update
-imgbase --debug update --format liveimg %{_node_image_file}
+imgbase update --format liveimg %{_node_image_file} >/dev/null 2>&1
 
 %files image
 %dir %{_node_image_dir}
@@ -109,9 +118,16 @@ imgbase --debug update --format liveimg %{_node_image_file}
 %{_node_tools_dir}/*
 %{_bindir}/create-node-installation-iso
 
+%files -n nodectl
+%{_mandir}/man8/nodectl.8.gz
+%{_sbindir}/nodectl
+%{python_sitelib}/nodectl
+
 %files docs
 %{_docdir}/%{name}/*
 
 %changelog
+* Sat Jul 9 2016 Ryan Barry <rbarry@redhat.com>
+- Add nodectl
 * Mon Jan 25 2016 Douglas Schilling Landgraf <dougsland@redhat.com>
 - Initial build

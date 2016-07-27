@@ -23,6 +23,17 @@ docbookdir = $(prefix)/share/doc/@PACKAGE_NAME@/book
 docbookimgsdir = $(prefix)/share/doc/@PACKAGE_NAME@/book/imgs
 nodetoolsdir = $(prefix)/share/@PACKAGE_NAME@/tools
 
+EXTRA_DIST = \
+	docs/man/nodectl.8
+
+SUBDIRS = \
+	src \
+	$(NULL)
+
+man_MANS = \
+	docs/man/nodectl.8 \
+	$(NULL)
+
 dist_doc_DATA = \
 	README \
 	$(NULL)
@@ -60,6 +71,10 @@ dist_nodetools_DATA = \
 
 dist_bin_SCRIPTS = \
 	scripts/create-node-installation-iso \
+	$(NULL)
+
+dist_sbin_SCRIPTS = \
+	scripts/nodectl \
 	$(NULL)
 
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
@@ -121,7 +136,7 @@ $(RPMMANIFESTNAME): $(SQUASHFSFILENAME)
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM=ovirt-node-ng-image-update-placeholder
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_VERSION=$(shell $(IN_ROOTFS) "rpm -q --qf %{version} $(PLACEHOLDER_RPM)")
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_RELEASE=$(shell $(IN_ROOTFS) "rpm -q --qf %{release} $(PLACEHOLDER_RPM)")
-packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in $(RPMMANIFESTNAME)
+packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in
 	sed \
 		-e "s/\@WITH_IMAGE\@/$(WITH_IMAGE)/" \
 		-e "s/\@IMAGENAME\@/$(IMAGENAME)/" \
@@ -136,7 +151,7 @@ RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
 
 if WITH_IMAGE
-rpm srpm: packaging/ovirt-node-ng.spec $(SQUASHFSFILENAME) product.img updates.img
+rpm srpm: packaging/ovirt-node-ng.spec $(RPMMANIFESTNAME) $(SQUASHFSFILENAME) product.img updates.img
 else
 rpm srpm: packaging/ovirt-node-ng.spec
 endif
