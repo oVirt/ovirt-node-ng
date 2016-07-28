@@ -124,9 +124,6 @@ def CliApplication(args=None):
 
     subparsers = parser.add_subparsers(title="Sub-commands", dest="command")
 
-    subparsers.add_parser("init",
-                          help="Intialize the required layout")
-
     subparsers.add_parser("info",
                           help="Show informations about the image")
 
