@@ -36,12 +36,12 @@ log = logging.getLogger()
 
 class Application(object):
     """Use this application to manage your Node.
-    The lify-cycle of a Node starts with the initialization (init).
+    The life-cycle of a Node starts with the initialization (init).
     This assumes a thin LVM setup, and will perform some operations
     to allow later updates.
     After initializing you can inform (info) yourself about a few
     important facts (build version, ...).
-    Over time you can retireve updates (update) if they are available.
+    Over time you can retrieve updates (update) if they are available.
     If one update is getting you into a broken state, you can rollback
     (rollback).
     """
@@ -125,7 +125,7 @@ def CliApplication(args=None):
     subparsers = parser.add_subparsers(title="Sub-commands", dest="command")
 
     subparsers.add_parser("info",
-                          help="Show informations about the image")
+                          help="Show information about the image")
 
     sp_update = subparsers.add_parser("update",
                                       help="Perform an update if updates "
