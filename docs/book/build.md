@@ -16,8 +16,8 @@ to `livemedia-creator` which is in turn building the appliance image.
 
 Let's start with the specifics about the kickstart file.
 
-
 ## Kickstart
+
 The _kickstart_ file defines what packages go into the appliance image. In
 addition, a few additional configuration steps can be performed as part of the
 installation.
@@ -35,6 +35,7 @@ See the [getting started section](getting-started.md) for how to clone that
 repository.
 
 ### Unattended installation
+
 The first important note about the Node kickstart is that it needs to contain
 enough directives to perform an [unattended installation](https://github.com/rhinstaller/pykickstart/blob/master/docs/kickstart-docs.rst#creating-the-kickstart-file).
 
@@ -47,11 +48,12 @@ complete will helpfully have `[x]` next to them. Those which do not will show
 `[ ]`.
 
 ### Security
+
 To provide a baseline level of security, the image comes with:
 
-+ SELinux in permissive mode (during development)
-+ A locked _root_ account
-+ A locked _node_ account, which should get unlocked during installation
++   SELinux in permissive mode (during development)
++   A locked _root_ account
++   A locked _node_ account, which should get unlocked during installation
 
 The following directives are used to achieve this:
 
@@ -60,6 +62,7 @@ The following directives are used to achieve this:
     user --name=node --lock
 
 ### Filesystem
+
 It is important to note that the kickstart will only create a disk with a
 single partition, because this partition will be extracted and be wrapped
 in the squashfs.
@@ -77,6 +80,7 @@ with _discard_ support is used:
     part / --size=3072 --fstype=ext4 --fsoptions=discard
 
 ### Packages
+
 The `%packages` section defines what packages get installed inside the
 appliance image.
 The primary goal should be to keep this list small.
@@ -88,30 +92,53 @@ that it is, submit a patch which includes it as a dependency of
 `ovirt-node-node-host` or some upstream package which is already included.
 
 Let's take a look at the important packages:
-    
-    %packages
-    # config -generic == not -hostonly, this is needed
-    # to support make a generic initrd (which does not keep lvm information)
-    dracut-config-generic
-    
-    # EFI support
-    grub2-efi
-    shim
-    efibootmgr
 
-    lvm2
-    imgbased
+    %packages
+    @anaconda-tools
+    dracut-config-generic
+    -dracut-config-rescue
     %end
+
+### Additional software
+
+You may have noticed that this list of packages is far too small to achieve the
+functionality offered by oVirt Node.
+
+The explanation is in the %post section:
+
+    # Adding upstream oVirt vdsm
+    # 1. Install oVirt release file with repositories
+    yum install -y --nogpgcheck http://plain.resources.ovirt.org/pub/ovirt-4.0-pre/rpm/el7/noarch/ovirt-release40-pre.rpm
+
+    # 2. Install oVirt Node release and placeholder
+    # (exclude ovirt-node-ng-image-update to prevent the obsoletes logic)
+    yum install -y --nogpgcheck \
+      --exclude ovirt-node-ng-image-update \
+      ovirt-release-host-node \
+      ovirt-node-ng-image-update-placeholder
+
+First, we install the ovirt-release RPM, which adds all the repositories needed
+to install additional software.
+
+After this, only two packages are installed:
+
++   `ovirt-node-ng-image-update-placeholder` -- This is present to provide a
+target for `yum update`, as it's obsoleted by `ovirt-node-ng-image-update`
+
++   `ovirt-release-host-node` -- All of the dependencies for oVirt Node are
+contained in `ovirt-release-host-node`, including EFI support, `vdsm`, and
+the other required tooling to product a functional system.
 
 The packages are used to achieve the following:
 
-+ Add EFI support
-+ Add generic initramfs support
-+ Add lvm2 and imgbased support
++   Add EFI support
++   Add generic initramfs support
++   Add lvm2 and imgbased support
 
 On normal installs of Fedora or CentOS, these packages don't need to be added
 explicitly, because anaconda will install them automatically if they are
 needed.
+
 `lvm2` will be installed if LVM is used for storage, `grub2-efi` will be
 installed if the OS is installed on EFI hardware, etc.
 
@@ -120,18 +147,6 @@ appliance image contains everything that is needed for every use-case, and we
 want to include support for configurations which differ from the install
 environment, which, as noted above, only has one partition, and
 livemedia-creator does not install in EFI mode.
-
-**FIXME** The package requirements should go to some package dependencies,
-i.e. `ovirt-release-node-host`, see [this bug](https://bugzilla.redhat.com/show_bug.cgi?id=1285024).
-
-### `%post` scriptlets for additional software
-
-You might have noticed that `vdsm` is missing in the package list above.
-
-`vdsm` can not be installed directly, because it needs the `ovirt-release`
-package to be installed to add to the necessary repositories.
-
-That is why `vdsm` is getting installed in a `%post` scriptlet.
 
 ## Installation
 
@@ -166,7 +181,6 @@ you get it working with another distro, though.
 
 **FIXME** koji support should be added
 
-
 ### Image Format: Liveimg
 
 Node is installed (and updated) using a single operating system image.
@@ -174,17 +188,15 @@ Contrary to many other distributions, packages are not used to install the
 operating system. Packages are primarily used to [build the image](build.md),
 and eventually to [customize the image](impl.md).
 
-The liveimg image format is a Fedora-andCentOS-ish format used to deliver
+The liveimg image format is a Fedora-and-CentOS-ish format used to deliver
 LiveCDs. A liveimg is a file-system image wrapped into a squashfs image.
-The reasoning behind this matroska mechanism is that the file-system image
+The reasoning behind this Matryoshka mechanism is that the filesystem image
 can be mounted easily, and the squashfs image -- as it can compress --
 helps reduce the size of the image. Because it has been around for a long time,
 this format has mature support in both dracut and anaconda.
 This effectively enables two use-cases with a single image:
 
-* anaconda can use this image as a source instead of individual rpms
-* dracut can boot into a liveimg
-
++   dracut can boot into a liveimg
 
 ## Delivery Format
 
