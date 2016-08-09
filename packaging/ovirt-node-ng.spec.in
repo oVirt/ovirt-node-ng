@@ -102,7 +102,17 @@ make %{?_smp_mflags}
 /usr/bin/install -m 644 %{SOURCE2} %{buildroot}/%{_node_image_dir}/product.img
 
 %post image-update
-imgbase update --format liveimg %{_node_image_file} >/dev/null 2>&1
+# Some magic to ensure that imgbase from
+# the new image is used for updates
+export TMPDIR="$(mktemp -d)"
+mount "%{_node_image_file}" "$TMPDIR"
+mount "$TMPDIR"/LiveOS/rootfs.img "$TMPDIR"
+export PYTHONPATH="$TMPDIR"/usr/lib/python2.7/site-packages/:$PYTHONPATH
+imgbase --debug update --format liveimg %{_node_image_file} >> /tmp/imgbased.log 2>&1
+unset PYTHONPATH
+umount "$TMPDIR"
+umount "$TMPDIR"
+rmdir "$TMPDIR"
 
 %files image
 %dir %{_node_image_dir}
