@@ -13,6 +13,8 @@
 # on F22 builders. Thus the dist would be wrong.
 %global dist .el7
 
+%global with_docs @DOCS@
+
 # Disable compression, because the image is already compressed
 %define _source_payload w0.gzdio
 %define _binary_payload w0.gzdio
@@ -66,11 +68,13 @@ Provides:  %{_product_id}-image-update-placeholder = %{version}-%{release}
 This package will update an %{_product_name} host with the new image.
 %endif
 
+%if 0%{?with_docs}
 %package docs
 Summary:     Documentation for %{_product_name}
 
 %description docs
 Subpackage for docs related to %{_product_name}
+%endif
 
 %package tools
 Summary:     Tools for %{_product_name}

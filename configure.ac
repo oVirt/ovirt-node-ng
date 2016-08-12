@@ -88,6 +88,19 @@ AS_IF([test "${enable_image}" = "yes"],
       AC_SUBST([WITH_IMAGE], ['1']),
       AC_SUBST([WITH_IMAGE], ['0']))
 
+AC_ARG_ENABLE(
+    [docs],
+    [AS_HELP_STRING(
+        [--enable-docs],
+        [build docs subpackage @<:@default=yes@:>@]
+    )],
+    ,
+    [enable_docs="yes"]
+)
+AS_IF([test "${enable_docs}" = "yes"],
+      AC_SUBST([DOCS], ['1']),
+      AC_SUBST([DOCS], ['0']))
+
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
