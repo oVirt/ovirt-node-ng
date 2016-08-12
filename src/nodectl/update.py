@@ -23,14 +23,13 @@
 
 import json
 import logging
-import sys
 
 from .utils import LogCapture
-from StringIO import StringIO
 from imgbased.plugins.update import rollback
 from imgbased.utils import bcolors
 
 log = logging.getLogger()
+
 
 class Rollback(object):
     """Wraps rolling back imgbased layers. Pretty trivial
@@ -49,7 +48,7 @@ class Rollback(object):
             try:
                 dst_layer = rollback(self.app, nvr)
                 self.results["success"] = True
-                self.results["next_layer"] = str(layer)
+                self.results["next_layer"] = str(dst_layer)
             except:
                 self.results["success"] = False
                 self.results["reason"] = l.getOutput()
