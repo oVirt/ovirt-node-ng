@@ -130,18 +130,23 @@ rmdir "$TMPDIR"
 # Empty, just the post-let is relevant
 %endif
 
+%if 0%{?with_tools}
 %files tools
 %dir %{_node_tools_dir}
 %{_node_tools_dir}/*
 %{_bindir}/create-node-installation-iso
+%endif
 
 %files -n nodectl
 %{_mandir}/man8/nodectl.8.gz
 %{_sbindir}/nodectl
 %{python_sitelib}/nodectl
 
+%if 0%{?with_docs}
 %files docs
 %{_docdir}/%{name}/*
+%endif
+
 
 %changelog
 * Sat Jul 9 2016 Ryan Barry <rbarry@redhat.com>
