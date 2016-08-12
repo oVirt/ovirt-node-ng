@@ -145,6 +145,7 @@ packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in
 		-e "s/\@PACKAGE_RPM_RELEASE\@/$(PACKAGE_RPM_RELEASE)/" \
 		-e "s/\@PLACEHOLDER_RPM_VERSION\@/$(PLACEHOLDER_RPM_VERSION)/" \
 		-e "s/\@PLACEHOLDER_RPM_RELEASE\@/$(PLACEHOLDER_RPM_RELEASE)/" \
+		-e "s/\@DOCS\@/$(DOCS)/" \
 		$< > $@
 
 RPMBUILD = rpmbuild
