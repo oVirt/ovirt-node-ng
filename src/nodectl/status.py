@@ -80,14 +80,13 @@ class Status(object):
             overall_status = output.pop(0)
 
             for k, v in statuses.items():
-                print v
                 if v["status"] != "ok":
                     fields = overall_status.split()
-                    overall_status = "%s %s\n" % (fields[0],
+                    overall_status = "%s %s" % (fields[0],
                                                   bcolors.fail("BAD"))
                 output.append(v["human"])
 
-            output = overall_status + '\n'.join(output)
+            output = "%s\n%s" % (overall_status, '\n'.join(output))
             self.output = output
 
     def write(self):

@@ -22,7 +22,7 @@ firstboot --reconfig
 
 clearpart --all --initlabel
 bootloader --timeout=1
-part / --size=3072 --fstype=ext4 --fsoptions=discard
+part / --size=4096 --fstype=ext4 --fsoptions=discard
 
 poweroff
 
