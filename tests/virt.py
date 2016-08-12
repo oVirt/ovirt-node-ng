@@ -205,7 +205,6 @@ class VM():
                   "serial": "pty",
                   "graphics": "vnc",  # headless
                   "noautoconsole": True,
-                  "filesystem": "%s,HOST,mode=squash" % os.getcwd(),
                   "memballoon": "virtio",  # To save some host-ram
                   "rng": "/dev/random",  # For entropy
                   "channel": "unix,target_type=virtio,name=local.test.0",

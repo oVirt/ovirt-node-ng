@@ -15,9 +15,9 @@ dnl Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 dnl MA  02110-1301, USA.  A copy of the GNU General Public License is
 dnl also available at http://www.gnu.org/copyleft/gpl.html.
 
-define([VERSION_NUMBER], [4.0.3])
+define([VERSION_NUMBER], [4.0.2])
 define([DISTRO], [centos])
-define([RELEASEVER], [7])
+define([RELEASEVER], [1])
 
 AC_INIT([ovirt-node-ng], VERSION_NUMBER, [devel@ovirt.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dependencies])
@@ -56,7 +56,7 @@ AC_ARG_WITH([ovirt-release-rpm-url],
     [AS_HELP_STRING([--with-ovirt-release-rpm-url=URL],
         [URL to the ovirt-release rpm])],
     [OVIRTRELEASERPMURL="$withval"],
-    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.0-pre/rpm/el7/noarch/ovirt-release40-pre.rpm"])
+    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.0-pre/rpm/el7/noarch/ovirt-release40.rpm"])
 AC_SUBST([OVIRTRELEASERPMURL])
 
 AC_ARG_WITH([anaconda-url],
