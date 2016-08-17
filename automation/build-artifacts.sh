@@ -16,6 +16,7 @@ prepare() {
 
   mkdir "$TMPDIR"
   mkdir "$ARTIFACTSDIR"
+  echo "Defaults !requiretty" >> /etc/sudoers
 }
 
 build() {
@@ -55,7 +56,24 @@ EOF
 }
 
 check() {
-  sudo -E make check
+
+  # script is used, because virt-install requires a tty
+  # (which ain't available in Jenkins)
+  touch lock
+  timeout=1200 #in secs
+  sudo -E script -efqc "make check && rm -rf lock"
+  set +x
+  while [ -f lock ]; do
+    if [ $timeout -eq 0 ];
+    then
+      echo "test timeout error"
+      exit 1
+    fi
+    timeout=$(( timeout - 1 ))
+    sleep 1
+  done
+  set -x
+
   ln -fv \
     *.img \
     tests/*.xml \
@@ -74,7 +92,6 @@ repofy_and_checksum() {
   echo "<html><head><meta http-equiv='refresh' content='0; url=$INSTALLATIONISO' /></head></html>" > latest-installation-iso.html
   popd
 }
-
 prepare
 build
 
