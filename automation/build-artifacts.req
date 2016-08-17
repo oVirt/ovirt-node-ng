@@ -36,4 +36,10 @@ gettext-devel
 libtool
 intltool
 python-devel
+gobject-introspection
 gobject-introspection-devel
+libguestfs
+util-linux
+pigz
+glade-devel
+libxklavier-devel

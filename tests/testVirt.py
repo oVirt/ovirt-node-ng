@@ -113,7 +113,8 @@ class MachineTestCase(unittest.TestCase):
 #        dom.set_cloud_config(cc)
 
         dom.upload(agent.__file__, "/agent.py")
-        dom.post("/etc/systemd/system/multi-user.target.wants/test-agent.service", """
+        path = "/etc/systemd/system/multi-user.target.wants/test-agent.service"
+        dom.post(path, """
 [Unit]
 Description=Test Agent
 After=local-fs.target

@@ -109,7 +109,7 @@ offline-installation-iso: product.img updates.img
 
 LMC ?= livemedia-creator
 %.squashfs.img: data/%.ks @BOOTISO@
-	$(LMC) $(LMCOPTS) --timeout 120 --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
+	$(LMC) $(LMCOPTS) --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
 	mv -v build/*squash* "$@"
 
 # Short TMPDIR otherwise we run into trouble with guestfish < 1.33.27-1.fc24
