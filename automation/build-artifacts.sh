@@ -32,6 +32,7 @@ prepare() {
 
   mkdir "$TMPDIR"
   mkdir "$ARTIFACTSDIR"
+  echo "Defaults !requiretty" >> /etc/sudoers
 }
 
 build() {
@@ -58,8 +59,20 @@ build() {
 check() {
   # script is used, because virt-install requires a tty
   # (which ain't available in Jenkins)
-  sudo -E script -efqc "make installed-squashfs"
-  sudo -E make check
+  touch lock
+  timeout=1200 #in secs
+  sudo -E script -efqc "make installed-squashfs && make check && rm -rf lock"
+  set +x
+  while [ -f lock ]; do
+    if [ $timeout -eq 0 ];
+    then
+      echo "test timeout error"
+      exit 1
+    fi
+    timeout=$(( timeout - 1 ))
+    sleep 1
+  done
+  set -x
 
   sudo ln -fv \
     ovirt-node-ng-image.installed.qcow2 \
@@ -75,7 +88,6 @@ checksum() {
   echo "<html><head><meta http-equiv='refresh' content='0; url=\"$INSTALLATIONISO\"' /></head></html>" > latest-installation-iso.html
   popd
 }
-
 prepare
 build
 check
