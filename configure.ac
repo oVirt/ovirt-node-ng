@@ -17,7 +17,7 @@ dnl also available at http://www.gnu.org/copyleft/gpl.html.
 
 define([VERSION_NUMBER], [4.0.3])
 define([DISTRO], [centos])
-define([RELEASEVER], [1])
+define([RELEASEVER], [0])
 
 AC_INIT([ovirt-node-ng], VERSION_NUMBER, [devel@ovirt.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dependencies])
@@ -87,6 +87,32 @@ AM_CONDITIONAL([PACKAGE_IMAGE], [test "${enable_image}" = "yes"])
 AS_IF([test "${enable_image}" = "yes"],
       AC_SUBST([WITH_IMAGE], ['1']),
       AC_SUBST([WITH_IMAGE], ['0']))
+
+AC_ARG_ENABLE(
+    [docs],
+    [AS_HELP_STRING(
+        [--enable-docs],
+        [build docs subpackage @<:@default=yes@:>@]
+    )],
+    ,
+    [enable_docs="yes"]
+)
+AS_IF([test "${enable_docs}" = "yes"],
+      AC_SUBST([DOCS], ['1']),
+      AC_SUBST([DOCS], ['0']))
+
+AC_ARG_ENABLE(
+    [tools],
+    [AS_HELP_STRING(
+        [--enable-tools],
+        [build tools subpackage @<:@default=yes@:>@]
+    )],
+    ,
+    [enable_tools="yes"]
+)
+AS_IF([test "${enable_tools}" = "yes"],
+      AC_SUBST([TOOLS], ['1']),
+      AC_SUBST([TOOLS], ['0']))
 
 AC_CONFIG_FILES([
 	Makefile
