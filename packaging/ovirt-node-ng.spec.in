@@ -13,6 +13,9 @@
 # on F22 builders. Thus the dist would be wrong.
 %global dist .el7
 
+%global with_docs @DOCS@
+%global with_tools @TOOLS@
+
 # Disable compression, because the image is already compressed
 %define _source_payload w0.gzdio
 %define _binary_payload w0.gzdio
@@ -25,8 +28,10 @@ Summary:    %{_product_name}
 
 URL:        http://www.ovirt.org/node/
 Source0:    %{name}-@PACKAGE_VERSION@.tar.gz
+%if 0%{?with_image}
 Source1:    @IMAGENAME@.squashfs.img
 Source2:    product.img
+%endif
 BuildArch:  noarch
 
 BuildRequires: autoconf
@@ -55,7 +60,7 @@ Summary:    %{_product_name} Image Update
 Version:    @PLACEHOLDER_RPM_VERSION@
 Release:    @PLACEHOLDER_RPM_RELEASE@
 Requires:   %{_product_id}-image = %{version}-%{release}
-Requires:   imgbased
+Requires:   imgbased >= 0.7.2
 
 Obsoletes:  %{_product_id}-image-update-placeholder < %{version}-%{release}
 Provides:  %{_product_id}-image-update-placeholder = %{version}-%{release}
@@ -64,17 +69,28 @@ Provides:  %{_product_id}-image-update-placeholder = %{version}-%{release}
 This package will update an %{_product_name} host with the new image.
 %endif
 
+%if 0%{?with_docs}
 %package docs
 Summary:     Documentation for %{_product_name}
 
 %description docs
 Subpackage for docs related to %{_product_name}
+%endif
 
+%if 0%{?with_tools}
 %package tools
 Summary:     Tools for %{_product_name}
 
 %description tools
 Subpackage for tools related to %{_product_name}
+%endif
+
+%package -n nodectl
+Summary:     nodectl for %{name}
+Requires:    imgbased
+
+%description -n nodectl
+Subpackage for nodectl for %{name}
 
 %prep
 %setup -q -n %{name}-@PACKAGE_VERSION@
@@ -93,7 +109,17 @@ make %{?_smp_mflags}
 /usr/bin/install -m 644 %{SOURCE2} %{buildroot}/%{_node_image_dir}/product.img
 
 %post image-update
-imgbase --debug update --format liveimg %{_node_image_file}
+# Some magic to ensure that imgbase from
+# the new image is used for updates
+export TMPDIR="$(mktemp -d)"
+mount "%{_node_image_file}" "$TMPDIR"
+mount "$TMPDIR"/LiveOS/rootfs.img "$TMPDIR"
+export PYTHONPATH="$TMPDIR"/usr/lib/python2.7/site-packages/:$PYTHONPATH
+imgbase --debug update --format liveimg %{_node_image_file} >> /tmp/imgbased.log 2>&1
+unset PYTHONPATH
+umount "$TMPDIR"
+umount "$TMPDIR"
+rmdir "$TMPDIR"
 
 %files image
 %dir %{_node_image_dir}
@@ -104,14 +130,30 @@ imgbase --debug update --format liveimg %{_node_image_file}
 # Empty, just the post-let is relevant
 %endif
 
+%files -n nodectl
+%{_mandir}/man8/nodectl.8.gz
+%{_sbindir}/nodectl
+%{python_sitelib}/nodectl
+
+%if 0%{?with_docs}
+%files docs
+%{_docdir}/%{name}/*
+%else
+%exclude %{_docdir}/%{name}/*
+%endif
+
+%if 0%{?with_tools}
 %files tools
 %dir %{_node_tools_dir}
 %{_node_tools_dir}/*
 %{_bindir}/create-node-installation-iso
-
-%files docs
-%{_docdir}/%{name}/*
+%else
+%exclude %{_node_tools_dir}/*
+%exclude %{_bindir}/create-node-installation-iso
+%endif
 
 %changelog
+* Sat Jul 9 2016 Ryan Barry <rbarry@redhat.com>
+- Add nodectl
 * Mon Jan 25 2016 Douglas Schilling Landgraf <dougsland@redhat.com>
 - Initial build

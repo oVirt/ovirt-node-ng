@@ -16,13 +16,13 @@ keyboard us
 timezone --utc Etc/UTC
 network
 auth --enableshadow --passalgo=sha512
-selinux --permissive
+selinux --enforcing
 rootpw --lock
 firstboot --reconfig
 
 clearpart --all --initlabel
 bootloader --timeout=1
-part / --size=3072 --fstype=ext4 --fsoptions=discard
+part / --size=4096 --fstype=ext4 --fsoptions=discard
 
 poweroff
 
