@@ -17,7 +17,7 @@ dnl also available at http://www.gnu.org/copyleft/gpl.html.
 
 define([VERSION_NUMBER], [4.0.4])
 define([DISTRO], [centos])
-define([RELEASEVER], [1])
+define([RELEASEVER], [0])
 
 AC_INIT([ovirt-node-ng], VERSION_NUMBER, [devel@ovirt.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dependencies])
