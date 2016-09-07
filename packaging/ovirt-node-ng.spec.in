@@ -85,11 +85,11 @@ Summary:     Tools for %{_product_name}
 Subpackage for tools related to %{_product_name}
 %endif
 
-%package -n nodectl
+%package nodectl
 Summary:     nodectl for %{name}
 Requires:    imgbased
 
-%description -n nodectl
+%description nodectl
 Subpackage for nodectl for %{name}
 
 %prep
@@ -130,7 +130,7 @@ rmdir "$TMPDIR"
 # Empty, just the post-let is relevant
 %endif
 
-%files -n nodectl
+%files nodectl
 %{_mandir}/man8/nodectl.8.gz
 %{_sbindir}/nodectl
 %{python_sitelib}/nodectl
@@ -153,6 +153,8 @@ rmdir "$TMPDIR"
 %endif
 
 %changelog
+* Wed Sep 7 2016 Ryan Barry <rbarry@redhat.com>
+- Rename nodectl to ovirt-node-ng-nodectl
 * Sat Jul 9 2016 Ryan Barry <rbarry@redhat.com>
 - Add nodectl
 * Mon Jan 25 2016 Douglas Schilling Landgraf <dougsland@redhat.com>
