@@ -79,7 +79,6 @@ class TestNode(NodeTestCase):
                     "cockpit",
                     "imgbased",
                     "cockpit-ovirt-dashboard",
-                    "nodectl",
                     "sos"
                     ]
 
