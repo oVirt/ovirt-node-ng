@@ -51,11 +51,11 @@ class Status(object):
         self._update_info(status)
 
     def _update_info(self, status):
-        services = ["vdsmd"]
+        services = {"vdsmd": VdsmStatus}
         statuses = {}
 
-        for service in services:
-            srv_status = ServiceStatus(service)
+        for service, checker in services.iteritems():
+            srv_status = checker(service)
             srv_machine = StatusParser(srv_status).parse()
             vals = {"human": srv_status,
                     "machine": srv_machine,
@@ -71,7 +71,7 @@ class Status(object):
             for k, v in statuses.items():
                 service_status = v["machine"]
                 if v["status"] != "ok":
-                    output["status"] = "bad"
+                    output["status"] = "warn"
                 output.update(service_status)
             self.output = json.dumps(output)
 
@@ -84,7 +84,7 @@ class Status(object):
                 if v["status"] != "ok":
                     fields = overall_status.split()
                     overall_status = "%s %s" % (fields[0],
-                                                  bcolors.fail("BAD"))
+                                                bcolors.warn("WARN"))
                 output.append(v["human"])
 
             output = "%s\n%s" % (overall_status, '\n'.join(output))
@@ -167,3 +167,32 @@ class ServiceStatus(object):
             return tmpl.format(service, bcolors.ok("OK"))
         except Exception:
             return tmpl.format(service, bcolors.fail("BAD"))
+
+
+class VdsmStatus(object):
+    """
+    Handle vdsm specially, since it may never have been started
+    after an install, but we don't want to flag it as bad in this
+    case
+    """
+
+    def __new__(self, service):
+        tmpl = '{0} ... {1}'
+        try:
+            subprocess.check_call(["systemctl", "status", "%s.service" %
+                                   service], stdout=DEVNULL,
+                                  stderr=DEVNULL)
+            return tmpl.format(service, bcolors.ok("OK"))
+        except Exception:
+            log = subprocess.check_output(["journalctl", "-u",
+                                           "vdsmd.service"])
+
+            has_run = False
+            for line in log.splitlines():
+                if "Started" in line:
+                    has_run = True
+
+            if has_run:
+                return tmpl.format(service, bcolors.fail("BAD"))
+            else:
+                return tmpl.format(service, bcolors.ok("OK"))
