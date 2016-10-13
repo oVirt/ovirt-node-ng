@@ -20,20 +20,23 @@ import sys
 import guestfs
 
 
-def __execute_cmd_squashfs(squashfs_img, cmd_to_exec):
-    guest_fs = guestfs.GuestFS(python_return_dict=True)
-    guest_fs.add_drive_opts(squashfs_img)
-    guest_fs.launch()
-    guest_fs.mount_ro("/dev/sda", "/")
-    guest_fs.mount_loop("/LiveOS/rootfs.img", "/")
+def __init_guestfs(squashfs_img):
+    guest_fs_instance = guestfs.GuestFS(python_return_dict=True)
+    guest_fs_instance.add_drive_opts(squashfs_img, readonly=1)
+    guest_fs_instance.launch()
+    guest_fs_instance.mount_ro("/dev/sda", "/")
+    guest_fs_instance.mount_loop("/LiveOS/rootfs.img", "/")
+
+    return guest_fs_instance
+
+
+def __execute_cmd_squashfs(guest_fs_instance, cmd_to_exec):
 
     try:
-        ret = guest_fs.command(cmd_to_exec)
+        ret = guest_fs_instance.command(cmd_to_exec)
     except:
-        guest_fs.shutdown()
         return
 
-    guest_fs.shutdown()
     return ret
 
 if __name__ == "__main__":
@@ -54,8 +57,11 @@ if __name__ == "__main__":
     print(kpkgs_header)
     print("=" * len(kpkgs_header))
 
+    older_squashfs = __init_guestfs(sys.argv[1])
+    newer_squashfs = __init_guestfs(sys.argv[2])
+
     for pkg in key_pkgs:
-        ret = __execute_cmd_squashfs(sys.argv[2], ['rpm', '-q', pkg])
+        ret = __execute_cmd_squashfs(newer_squashfs, ['rpm', '-q', pkg])
         if ret:
             print("* {0}".format(ret.strip()))
 
@@ -63,10 +69,12 @@ if __name__ == "__main__":
     print("Diff between images:")
     print("=" * len(kpkgs_header))
 
-    for i in range(1, 3):
-        rpm.append(
-            __execute_cmd_squashfs(sys.argv[i], ['rpm', '-qa'])
-        )
+    rpm.append(
+        __execute_cmd_squashfs(older_squashfs, ['rpm', '-qa'])
+    )
+    rpm.append(
+        __execute_cmd_squashfs(newer_squashfs, ['rpm', '-qa'])
+    )
 
     print(('\n'.join(
           difflib.unified_diff(
