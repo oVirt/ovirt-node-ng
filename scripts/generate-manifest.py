@@ -21,36 +21,52 @@ import guestfs
 
 
 def __execute_cmd_squashfs(squashfs_img, cmd_to_exec):
-    g = guestfs.GuestFS(python_return_dict=True)
-    g.add_drive_opts(squashfs_img)
-    g.launch()
-    g.mount_ro("/dev/sda", "/")
-    g.mount_loop("/LiveOS/rootfs.img", "/")
-    ret = g.command(cmd_to_exec)
-    g.shutdown()
+    guest_fs = guestfs.GuestFS(python_return_dict=True)
+    guest_fs.add_drive_opts(squashfs_img)
+    guest_fs.launch()
+    guest_fs.mount_ro("/dev/sda", "/")
+    guest_fs.mount_loop("/LiveOS/rootfs.img", "/")
+
+    try:
+        ret = guest_fs.command(cmd_to_exec)
+    except:
+        guest_fs.shutdown()
+        return
+
+    guest_fs.shutdown()
     return ret
 
 if __name__ == "__main__":
     rpm = []
-    key_pkgs = ['rpm', '-q',
-                'cockpit-ovirt-dashboard', 'kernel',
+    key_pkgs = ['cockpit-ovirt-dashboard', 'kernel',
                 'redhat-release-virtualization-host', 'vdsm',
-                'ovirt-hosted-engine-setup']
+                'ovirt-hosted-engine-setup', 'ovirt-release-master',
+                'ovirt-release40']
 
     if len(sys.argv) != 3:
         print("Generates the manifest file from different squashfs images\n")
         print(("Usage: %s old.squashfs new.squashfs" % sys.argv[0]))
         sys.exit(0)
 
-    print("Key packages in the new image:")
-    print("=======================================")
-    print("Squashfs: {0}".format(sys.argv[2]))
-    print("{0}".format(__execute_cmd_squashfs(sys.argv[2], key_pkgs)))
+    kpkgs_header = "Key packages from {0}".format(sys.argv[2])
 
+    print("=" * len(kpkgs_header))
+    print(kpkgs_header)
+    print("=" * len(kpkgs_header))
+
+    for pkg in key_pkgs:
+        ret = __execute_cmd_squashfs(sys.argv[2], ['rpm', '-q', pkg])
+        if ret:
+            print("* {0}".format(ret.strip()))
+
+    print("=" * len(kpkgs_header))
     print("Diff between images:")
-    print("=======================================")
+    print("=" * len(kpkgs_header))
+
     for i in range(1, 3):
-        rpm.append(__execute_cmd_squashfs(sys.argv[i], ['rpm', '-qa']))
+        rpm.append(
+            __execute_cmd_squashfs(sys.argv[i], ['rpm', '-qa'])
+        )
 
     print(('\n'.join(
           difflib.unified_diff(
