@@ -134,6 +134,7 @@ class DiskImage():
 
     def unlink(self):
         debug("Unlinking %r" % self.name)
+        debug(sh.rm("-vf", self.name))
 
     def __str__(self):
         return self.name
@@ -142,7 +143,7 @@ class DiskImage():
         # The actual refcounting is done by python for us
         # we just take care that the file is getting removed
         if self.refcount:
-            debug(sh.rm("-vf", self.name))
+            self.unlink()
 
 
 class VM():

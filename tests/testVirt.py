@@ -154,6 +154,7 @@ class NodeTestCase(MachineTestCase):
             cls.snapshot = cls.node.snapshot(remove=False)
         except:
             if cls.node:
+                cls.node.disk.unlink()
                 cls.node.undefine()
 
             raise
@@ -165,6 +166,7 @@ class NodeTestCase(MachineTestCase):
 
         debug("Tearing down %s" % cls)
         if cls.node:
+            cls.node.disk.unlink()
             cls.node.undefine()
 
     def setUp(self):
