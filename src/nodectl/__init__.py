@@ -71,11 +71,6 @@ class Application(object):
         # imgbased.imgbase without making assumptions.
         Info(self.imgbased, self.machine).write()
 
-    def update(self, check, debug):
-        """Check for and perform updates
-        """
-        raise NotImplementedError
-
     def rollback(self, debug, nvr):
         """Rollback to a previous image
         """
@@ -126,11 +121,6 @@ def CliApplication(args=None):
 
     subparsers.add_parser("info",
                           help="Show information about the image")
-
-    sp_update = subparsers.add_parser("update",
-                                      help="Perform an update if updates "
-                                      "are available")
-    sp_update.add_argument("--check", action="store_true")
 
     sp_rollback = subparsers.add_parser("rollback",
                                         help="Rollback a previous image. "
