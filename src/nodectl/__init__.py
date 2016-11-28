@@ -24,13 +24,10 @@
 import logging
 import argparse
 import sys
-
 import imgbased
-
-from .banner import Banner
+from .status import Status
 from .info import Info
 from .initialize import Initialize
-from .status import Status
 from .update import Rollback
 # from . import config
 
@@ -91,12 +88,6 @@ class Application(object):
         status = Health(self.imgbased).status()
 
         Status(status, self.machine).write()
-
-    def banner(self, debug, update_issue):
-        """Generate a motd message which shows the IP addresses so
-        users know how to get to cockpit. Optionally update /etc/issue
-        """
-        Banner(update_issue)
 
 
 class CommandMapper():
@@ -162,13 +153,6 @@ def CliApplication(args=None):
                          nargs="?", default="/", metavar="VG/LV",
                          help="An existing thin LV to tag for initialization")
 
-    sp_banner = subparsers.add_parser("banner",
-                                      help="Show cockpit information motd")
-
-    sp_banner.add_argument("--update-issue",
-                           action="store_true",
-                           help="Update /etc/issue, which can't use a script")
-
     (args, remaining_args) = root_parser.parse_known_args()
 
     if remaining_args:
@@ -192,7 +176,6 @@ def CliApplication(args=None):
     cmdmap.register("update", app.update)
     cmdmap.register("rollback", app.rollback)
     cmdmap.register("check", app.check)
-    cmdmap.register("banner", app.banner)
 
     return cmdmap.command(args)
 
