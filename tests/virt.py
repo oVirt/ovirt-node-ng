@@ -44,7 +44,7 @@ sh.ErrorReturnCode.truncate_cap = 999999
 
 def logcall(func):
     def logged(*args, **kwargs):
-        debug("%s(%s, %s)" % (func, args, kwargs))
+        # debug("%s(%s, %s)" % (func, args, kwargs))
         r = func(*args, **kwargs)
         return r
     return logged
