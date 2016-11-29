@@ -139,7 +139,8 @@ class TestNode(NodeTestCase):
                              "127.0.0.1:9090")
 
         debug("Check if the first page is retrieved")
-        assert "Cockpit starting" in html
+        cockpit_up = ("Cockpit starting" in html) or ("Loading..." in html)
+        assert cockpit_up
 
 
 if __name__ == "__main__":
