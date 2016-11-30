@@ -27,7 +27,7 @@ Main features of tehse classes:
 - cloud-init integration to do IP configuration
 """
 
-from logging import debug
+from logging import debug, error
 import sh
 import os
 import tempfile
@@ -217,6 +217,16 @@ class VM():
         dom = sh.virt_install(*args, **kwargs)
 
         dom = __hack_dom_pre_creation(str(dom))
+
+        try:
+            sh.virsh.undefine("--remove-all-storage",
+                              "--storage", "vda",
+                              "--delete-snapshots",
+                              "--snapshots-metadata",
+                              name)
+        except Exception as e:
+            error("Failed to undefine %r" % name)
+            debug("Undefine error: %s" % e)
 
         with tempfile.NamedTemporaryFile() as tmpfile:
             tmpfile.write(str(dom))
