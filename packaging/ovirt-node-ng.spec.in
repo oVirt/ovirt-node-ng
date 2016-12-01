@@ -113,15 +113,33 @@ install -Dm 0755 scripts/nodectl-run-banner.sh %{buildroot}%{_sysconfdir}/profil
 %post image-update
 # Some magic to ensure that imgbase from
 # the new image is used for updates
-export TMPDIR="$(mktemp -d)"
-mount "%{_node_image_file}" "$TMPDIR"
-mount "$TMPDIR"/LiveOS/rootfs.img "$TMPDIR"
-export PYTHONPATH="$TMPDIR"/usr/lib/python2.7/site-packages/:$PYTHONPATH
+export MNTDIR="$(mktemp -d)"
+mount "%{_node_image_file}" "$MNTDIR"
+mount "$MNTDIR"/LiveOS/rootfs.img "$MNTDIR"
+export PYTHONPATH="$MNTDIR"/usr/lib/python2.7/site-packages/:$PYTHONPATH
 imgbase --debug update --format liveimg %{_node_image_file} >> /tmp/imgbased.log 2>&1
-unset PYTHONPATH
-umount "$TMPDIR"
-umount "$TMPDIR"
-rmdir "$TMPDIR"
+VOL=$(imgbase layer --volume-path $(imgbase layer --latest))
+umount "$MNTDIR"
+umount "$MNTDIR"
+
+UPDATERPM="/tmp/updaterpm.path"
+lsof | grep image-update | awk '{print $9}' > $UPDATERPM
+
+UPDATELOG="/tmp/image-update.log"
+echo "List of open files:" > $UPDATELOG
+lsof > $UPDATELOG
+
+mount "$VOL" "$MNTDIR"
+cp $(cat ${UPDATERPM}) ${MNTDIR}/usr/share/imgbased/
+chroot "${MNTDIR}" rpm -Uvh --quiet --justdb /usr/share/imgbased/*image-update*.rpm > /dev/null 2>&1
+RC=$?
+rm ${MNTDIR}/usr/share/imgbased/*image-update*.rpm
+umount "${MNTDIR}"
+
+rm "${UPDATERPM}"
+[ $RC = 0 ] && rm "${UPDATELOG}"
+rmdir "${MNTDIR}"
+
 
 %files image
 %dir %{_node_image_dir}
