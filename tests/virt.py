@@ -215,10 +215,6 @@ class VM():
         if "--check" in sh.virt_install("--help"):
             kwargs["check"] = "all=off"
 
-        dom = sh.virt_install(*args, **kwargs)
-
-        dom = __hack_dom_pre_creation(str(dom))
-
         try:
             sh.virsh.undefine("--remove-all-storage",
                               "--storage", "vda",
@@ -228,6 +224,10 @@ class VM():
         except Exception as e:
             error("Failed to undefine %r" % name)
             debug("Undefine error: %s" % e)
+
+        dom = sh.virt_install(*args, **kwargs)
+
+        dom = __hack_dom_pre_creation(str(dom))
 
         with tempfile.NamedTemporaryFile() as tmpfile:
             tmpfile.write(str(dom))
