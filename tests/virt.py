@@ -217,7 +217,6 @@ class VM():
 
         try:
             sh.virsh.undefine("--remove-all-storage",
-                              "--storage", "vda",
                               "--delete-snapshots",
                               "--snapshots-metadata",
                               name)
