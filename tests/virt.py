@@ -364,8 +364,9 @@ class VM():
         def runcmd(*a, **k):
             return self.wait_event(evnt, timeout)
         thr = Thread(target=runcmd)
+        thr.start()
         yield self
-        thr.join()
+        thr.join(timeout)
 
     def wait_reboot(self, timeout=300):
         """Wait for the VM to reboot
