@@ -34,6 +34,7 @@ import tempfile
 import random
 import time
 from contextlib import contextmanager
+from threading import Thread
 import xml.etree.ElementTree as ET
 import agent
 
@@ -325,19 +326,17 @@ class VM():
 
         Also block until the VM is shutdown
         """
-        self.run("systemctl", "poweroff", "&")
-        sh.virsh("shutdown", "--mode=acpi", self.name)
-        if wait:
-            self.wait_event("lifecycle", timeout=timeout)
+        with self.wait_event_ctx("lifecycle", timeout=timeout):
+            self.run("systemctl", "poweroff", "&")
+            sh.virsh("shutdown", "--mode=acpi", self.name)
 
     @logcall
     def reboot(self, wait=True, timeout=300):
         """Ask the VM to reboot (via ACPI)
         """
-        self.run("systemctl", "reboot", "&")
-        sh.virsh("reboot", "--mode=acpi", self.name)
-        if wait:
-            self.wait_event("reboot", timeout=timeout)
+        with self.wait_event_ctx("reboot", timeout=timeout):
+            self.run("systemctl", "reboot", "&")
+            sh.virsh("reboot", "--mode=acpi", self.name)
 
     @logcall
     def undefine(self):
@@ -359,6 +358,14 @@ class VM():
         if timeout:
             args += ["--timeout", timeout]
         sh.virsh("event", "--domain", self.name, *args)
+
+    @contextmanager
+    def wait_event_ctx(self, evnt, timeout=None):
+        def runcmd(*a, **k):
+            return self.wait_event(evnt, timeout)
+        thr = Thread(target=runcmd)
+        yield self
+        thr.join()
 
     def wait_reboot(self, timeout=300):
         """Wait for the VM to reboot
