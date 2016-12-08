@@ -242,6 +242,7 @@ class VM():
         return vm
 
     def run(self, *args):
+        time.sleep(2.0)
         xml = str(sh.virsh.dumpxml(self.name))
         p = ET.fromstring(xml)\
             .find("devices/channel/*[@name='local.test.0']/../source")\
