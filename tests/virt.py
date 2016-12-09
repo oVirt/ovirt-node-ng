@@ -332,7 +332,7 @@ class VM():
             sh.virsh("shutdown", "--mode=acpi", self.name)
 
     @logcall
-    def reboot(self, wait=True, timeout=300):
+    def reboot(self, wait=True, timeout=600):
         """Ask the VM to reboot (via ACPI)
         """
         with self.wait_event_ctx("reboot", timeout=timeout):
