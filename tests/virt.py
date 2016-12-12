@@ -361,18 +361,13 @@ class VM():
         sh.virsh("event", "--domain", self.name, *args)
 
     @contextmanager
-    def wait_event_ctx(self, evnt, timeout=None):
+    def wait_event_ctx(self, evnt=None, timeout=None):
         def runcmd(*a, **k):
             return self.wait_event(evnt, timeout)
         thr = Thread(target=runcmd)
         thr.start()
         yield self
         thr.join(timeout)
-
-    def wait_reboot(self, timeout=300):
-        """Wait for the VM to reboot
-        """
-        return self.wait_event("reboot", timeout=timeout)
 
     def console(self):
         """Attach to the VM serial console
