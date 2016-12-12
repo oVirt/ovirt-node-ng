@@ -149,8 +149,6 @@ class NodeTestCase(MachineTestCase):
                                      "/var/tmp/" + n + ".qcow2",
                                      77)
 
-            cls.node.start()
-            time.sleep(5)
             cls.snapshot = cls.node.snapshot(remove=False)
         except:
             if cls.node:
@@ -171,6 +169,7 @@ class NodeTestCase(MachineTestCase):
 
     def setUp(self):
         debug("Setting up %s" % self)
+        self.node.start()
 
     def tearDown(self):
         if self._resultForDoCleanups.failures:
