@@ -163,7 +163,6 @@ def CliApplication(args=None):
     cmdmap = CommandMapper()
     cmdmap.register("init", app.init)
     cmdmap.register("info", app.info)
-    cmdmap.register("update", app.update)
     cmdmap.register("rollback", app.rollback)
     cmdmap.register("check", app.check)
 
