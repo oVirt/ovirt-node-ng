@@ -18,6 +18,7 @@ pynodectldir = $(pythondir)/nodectl
 pynodectl_PYTHON = \
 	nodectl/__init__.py \
 	nodectl/__main__.py \
+	nodectl/banner.py \
 	nodectl/info.py \
 	nodectl/initialize.py \
 	nodectl/motd.py \
