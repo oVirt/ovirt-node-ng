@@ -24,7 +24,8 @@ docbookimgsdir = $(prefix)/share/doc/@PACKAGE_NAME@/book/imgs
 nodetoolsdir = $(prefix)/share/@PACKAGE_NAME@/tools
 
 EXTRA_DIST = \
-	docs/man/nodectl.8
+	docs/man/nodectl.8 \
+	scripts/nodectl-motd.sh
 
 SUBDIRS = \
 	src \

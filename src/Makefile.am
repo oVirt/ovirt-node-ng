@@ -20,6 +20,7 @@ pynodectl_PYTHON = \
 	nodectl/__main__.py \
 	nodectl/info.py \
 	nodectl/initialize.py \
+	nodectl/motd.py \
 	nodectl/status.py \
 	nodectl/update.py \
 	nodectl/utils.py \
