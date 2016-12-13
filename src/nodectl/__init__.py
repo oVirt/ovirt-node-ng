@@ -27,6 +27,7 @@ import sys
 import imgbased
 from .status import Status
 from .info import Info
+from .motd import Motd
 from .initialize import Initialize
 from .update import Rollback
 # from . import config
@@ -84,6 +85,13 @@ class Application(object):
 
         Status(status, self.machine).write()
 
+    def motd(self, debug):
+        """Check the status of the running system
+        """
+        from imgbased.plugins.core import Health
+        Motd(Status(Health(self.imgbased).status(),
+            machine_readable=True).output).write()
+
 
 class CommandMapper():
     commands = dict()
@@ -131,6 +139,9 @@ def CliApplication(args=None):
 
     subparsers.add_parser("check",
                           help="Show the status of the system")
+ 
+    subparsers.add_parser("motd",
+                          help="Generate a message to be seen at login")
 
     sp_init = subparsers.add_parser("init",
                                     help="Initialize an imgbased layout ")
@@ -165,6 +176,7 @@ def CliApplication(args=None):
     cmdmap.register("info", app.info)
     cmdmap.register("rollback", app.rollback)
     cmdmap.register("check", app.check)
+    cmdmap.register("motd", app.motd)
 
     return cmdmap.command(args)
 

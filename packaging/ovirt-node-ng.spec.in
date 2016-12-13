@@ -100,6 +100,7 @@ Subpackage for nodectl for %{name}
 make %{?_smp_mflags}
 
 %install
+install -Dm 0755 scripts/nodectl-motd.sh %{buildroot}%{_sysconfdir}/profile.d/nodectl-motd.sh
 %make_install
 
 %if 0%{?with_image}
@@ -132,6 +133,7 @@ rmdir "$TMPDIR"
 
 %files nodectl
 %{_mandir}/man8/nodectl.8.gz
+%{_sysconfdir}/profile.d/nodectl-motd.sh
 %{_sbindir}/nodectl
 %{python_sitelib}/nodectl
 

@@ -44,8 +44,9 @@ class Status(object):
     machine = None
     output = None
 
-    def __init__(self, status, machine_readable=False):
+    def __init__(self, status, machine_readable=False, oneline=False):
         self.machine_readable = machine_readable
+        self.oneline = oneline
 
         self._update_info(status)
 
@@ -90,7 +91,14 @@ class Status(object):
             self.output = output
 
     def write(self):
-        print self.output
+        if self.oneline:
+            self.write_motd()
+        else:
+            print self.output
+
+    def write_motd(self):
+        print "\n  Node {0}\n".format(
+                re.sub(r'\033\[1m', '', self.output.split('\n')[0]))
 
 
 class StatusParser(object):
