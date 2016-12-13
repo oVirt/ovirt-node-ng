@@ -24,12 +24,15 @@
 import logging
 import argparse
 import sys
+
 import imgbased
-from .status import Status
-from .info import Info
+
+from .banner import Banner
 from .motd import Motd
+from .info import Info
 from .initialize import Initialize
 from .update import Rollback
+from .status import Status
 # from . import config
 
 log = logging.getLogger()
@@ -76,6 +79,12 @@ class Application(object):
         """Rollback to a previous image
         """
         Rollback(self.imgbased, self.machine, nvr).write()
+
+    def banner(self, debug, update_issue):
+        """Generate a motd message which shows the IP addresses so
+        users know how to get to cockpit. Optionally update /etc/issue
+        """
+        Banner(update_issue)
 
     def check(self, debug):
         """Check the status of the running system
@@ -154,6 +163,13 @@ def CliApplication(args=None):
                          nargs="?", default="/", metavar="VG/LV",
                          help="An existing thin LV to tag for initialization")
 
+    sp_banner = subparsers.add_parser("generate-banner",
+                                      help="Print URLs for system management")
+
+    sp_banner.add_argument("--update-issue",
+                           action="store_true",
+                           help="Update /etc/issue, which can't use a script")
+
     (args, remaining_args) = root_parser.parse_known_args()
 
     if remaining_args:
@@ -177,6 +193,7 @@ def CliApplication(args=None):
     cmdmap.register("rollback", app.rollback)
     cmdmap.register("check", app.check)
     cmdmap.register("motd", app.motd)
+    cmdmap.register("generate-banner", app.banner)
 
     return cmdmap.command(args)
 
