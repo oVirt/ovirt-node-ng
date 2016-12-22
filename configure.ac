@@ -54,9 +54,9 @@ AC_SUBST([TMPDIR])
 
 AC_ARG_WITH([ovirt-release-rpm-url],
     [AS_HELP_STRING([--with-ovirt-release-rpm-url=URL],
-        [URL to the ovirt-release rpm (default: http://plain.resources.ovirt.org/pub/ovirt-4.1-snapshot/rpm/el7/noarch/ovirt-release41-snapshot.rpm)])],
+        [URL to the ovirt-release rpm (default: http://plain.resources.ovirt.org/pub/ovirt-4.1/rpm/el7/noarch/ovirt-release41.rpm)])],
     [OVIRTRELEASERPMURL="$withval"],
-    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.1-snapshot/rpm/el7/noarch/ovirt-release41-snapshot.rpm"])
+    [OVIRTRELEASERPMURL="http://plain.resources.ovirt.org/pub/ovirt-4.1/rpm/el7/noarch/ovirt-release41.rpm"])
 AC_SUBST([OVIRTRELEASERPMURL])
 
 AC_ARG_WITH([anaconda-url],

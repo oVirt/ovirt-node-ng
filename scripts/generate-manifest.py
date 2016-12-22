@@ -43,7 +43,7 @@ if __name__ == "__main__":
     rpm = []
     key_pkgs = ['cockpit-ovirt-dashboard', 'kernel',
                 'redhat-release-virtualization-host', 'vdsm',
-                'ovirt-hosted-engine-setup', 'ovirt-release41-snapshot']
+                'ovirt-hosted-engine-setup', 'ovirt-release41']
 
     if len(sys.argv) != 3:
         print("Generates the manifest file from different squashfs images\n")
