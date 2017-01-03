@@ -86,20 +86,20 @@ class Application(object):
         """
         Banner(update_issue)
 
-    def check(self, debug):
+    def check(self, debug, oneline):
         """Check the status of the running system
         """
         from imgbased.plugins.core import Health
         status = Health(self.imgbased).status()
 
-        Status(status, self.machine).write()
+        Status(status, self.machine, oneline=oneline).write()
 
     def motd(self, debug):
         """Check the status of the running system
         """
         from imgbased.plugins.core import Health
         Motd(Status(Health(self.imgbased).status(),
-            machine_readable=True).output).write()
+             machine_readable=True).output).write()
 
 
 class CommandMapper():
@@ -146,9 +146,11 @@ def CliApplication(args=None):
                              nargs="?",
                              help="A layer nvr to rollback to")
 
-    subparsers.add_parser("check",
-                          help="Show the status of the system")
- 
+    sp_check = subparsers.add_parser("check",
+                                     help="Show the status of the system")
+
+    sp_check.add_argument("--oneline", action="store_true")
+
     subparsers.add_parser("motd",
                           help="Generate a message to be seen at login")
 
