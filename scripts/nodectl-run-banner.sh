@@ -1,0 +1,1 @@
+nodectl generate-banner
