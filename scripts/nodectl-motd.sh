@@ -1,1 +1,1 @@
-nodectl check --oneline
+nodectl motd

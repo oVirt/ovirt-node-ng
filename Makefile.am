@@ -25,7 +25,8 @@ nodetoolsdir = $(prefix)/share/@PACKAGE_NAME@/tools
 
 EXTRA_DIST = \
 	docs/man/nodectl.8 \
-	scripts/nodectl-motd.sh
+	scripts/nodectl-motd.sh \
+	scripts/nodectl-run-banner.sh \
 
 SUBDIRS = \
 	src \
