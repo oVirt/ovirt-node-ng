@@ -44,7 +44,7 @@ build() {
   ./autogen.sh --with-tmpdir=/var/tmp
 
   sudo -E make squashfs
-  sudo -E make updates.img product.img rpm
+  sudo -E make product.img rpm
   sudo -E make offline-installation-iso
 
   sudo ln -fv \
@@ -53,7 +53,6 @@ build() {
     tmp.repos/RPMS/noarch/*.rpm \
     ovirt-node*.squashfs.img \
     product.img \
-    updates.img \
     ovirt-node*.iso \
     data/ovirt-node*.ks \
     *.log \
