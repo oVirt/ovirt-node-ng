@@ -8,7 +8,6 @@ BOOTISO=$(realpath $1)
 SQUASHFS=$(realpath $2)
 NEWBOOTISO=$(realpath ${3:-$(dirname $BOOTISO)/new-$(basename $BOOTISO)})
 PRODUCTIMG=$(realpath ./product.img)
-UPDATESIMG=$(realpath ./updates.img)
 
 TMPDIR=$(realpath bootiso.d)
 
@@ -48,9 +47,6 @@ EOK
   # and the kickstart
   if [[ -e "$PRODUCTIMG" ]]; then
     cp "$PRODUCTIMG" images/product.img
-  fi
-  if [[ -e "$UPDATESIMG" ]]; then
-    cp "$UPDATESIMG" images/updates.img
   fi
 }
 

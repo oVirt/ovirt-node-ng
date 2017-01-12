@@ -111,8 +111,8 @@ debug-installed: installed-squashfs
 product.img:
 	bash scripts/create-product-img.sh $@
 
-offline-installation-iso: product.img updates.img
-	PRODUCTIMG=$(PWD)/product.img UPDATESIMG=$(PWD)/updates.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
+offline-installation-iso: product.img
+	PRODUCTIMG=$(PWD)/product.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
 
 @BOOTISO@:
 	curl $(CURLOPTS) -O @BOOTISOURL@
@@ -148,7 +148,7 @@ RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
 
 if WITH_IMAGE
-rpm srpm: packaging/ovirt-node-ng.spec $(RPMMANIFESTNAME) $(SQUASHFSFILENAME) product.img updates.img
+rpm srpm: packaging/ovirt-node-ng.spec $(RPMMANIFESTNAME) $(SQUASHFSFILENAME) product.img
 else
 rpm srpm: packaging/ovirt-node-ng.spec
 endif
