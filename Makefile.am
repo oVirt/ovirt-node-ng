@@ -113,11 +113,6 @@ debug-installed: installed-squashfs
 product.img:
 	bash scripts/create-product-img.sh $@
 
-updates.img:
-	test -d tmp-anaconda ||	( git clone $(ANACONDAURL) tmp-anaconda )
-	touch ltmain.sh config.rpath
-	cd tmp-anaconda && git clean -fdx && git checkout $(ANACONDABRANCH) && git pull && git describe --always && ./autogen.sh ; ./configure ; make updates ; mv -v updates.img ../$@
-
 offline-installation-iso: product.img updates.img
 	PRODUCTIMG=$(PWD)/product.img UPDATESIMG=$(PWD)/updates.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
 
