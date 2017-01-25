@@ -33,7 +33,7 @@ from .info import Info
 from .initialize import Initialize
 from .update import Rollback
 from .status import Status
-# from . import config
+from .config import version
 
 log = logging.getLogger()
 
@@ -123,7 +123,7 @@ def CliApplication(args=None):
 
     root_parser = argparse.ArgumentParser(add_help=False)
 
-    root_parser.add_argument("--version", action="version")
+    root_parser.add_argument("--version", action="version", version=version())
     root_parser.add_argument("--debug", action="store_true")
     root_parser.add_argument("--machine-readable",
                              action="store_true",
