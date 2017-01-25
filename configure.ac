@@ -118,6 +118,7 @@ AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 	data/ovirt-node-ng-image.ks
+	src/nodectl/config.py
 ])
 
 AM_PATH_PYTHON

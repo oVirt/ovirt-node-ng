@@ -25,4 +25,5 @@ pynodectl_PYTHON = \
 	nodectl/status.py \
 	nodectl/update.py \
 	nodectl/utils.py \
+	nodectl/config.py \
 	$(NULL)
