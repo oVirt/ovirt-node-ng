@@ -27,6 +27,15 @@ export LIBGUESTFS_CACHEDIR=$LIBGUESTFS_TMPDIR
 #  export LMCOPTS="--proxy $http_proxy"
 #fi
 
+save_logs() {
+  sudo ln -fv \
+    data/ovirt-node*.ks \
+    *.log \
+    "$ARTIFACTSDIR/"
+}
+
+trap save_logs EXIT
+
 prepare() {
   mknod /dev/kvm c 10 232 || :
   virt-host-validate || :
@@ -54,8 +63,6 @@ build() {
     ovirt-node*.squashfs.img \
     product.img \
     ovirt-node*.iso \
-    data/ovirt-node*.ks \
-    *.log \
     "$ARTIFACTSDIR/"
 }
 
