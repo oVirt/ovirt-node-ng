@@ -79,6 +79,14 @@ dist_sbin_SCRIPTS = \
 	scripts/nodectl \
 	$(NULL)
 
+debug-ks: data/@IMAGENAME@.ks
+	sed -i 's/^poweroff/#poweroff/' $<
+
+# Building a "LiveOS" vm for debugging ks issues
+debug-squashfs: LMCOPTS=--vnc vnc
+debug-squashfs: | debug-ks $(SQUASHFSFILENAME)
+	@echo debug-squashfs $(SQUASHFSFILENAME)
+
 squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
 	@echo squashfs: $(SQUASHFSFILENAME)
 	@echo squashfs rpm-manifest: $(RPMMANIFESTNAME)
