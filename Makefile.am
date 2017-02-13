@@ -17,6 +17,7 @@
 
 SQUASHFSFILENAME = @IMAGENAME@.squashfs.img
 RPMMANIFESTNAME = @IMAGENAME@.manifest-rpm
+RPMUNSIGNEDNAME = @IMAGENAME@.unsigned-rpms
 INSTALLEDIMAGEFILE = @IMAGENAME@.installed.qcow2
 
 docbookdir = $(prefix)/share/doc/@PACKAGE_NAME@/book
@@ -87,9 +88,10 @@ debug-squashfs: LMCOPTS=--vnc vnc
 debug-squashfs: | debug-ks $(SQUASHFSFILENAME)
 	@echo debug-squashfs $(SQUASHFSFILENAME)
 
-squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME)
+squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(RPMUNSIGNEDNAME)
 	@echo squashfs: $(SQUASHFSFILENAME)
 	@echo squashfs rpm-manifest: $(RPMMANIFESTNAME)
+	@echo squashfs rpm-unsigned: $(RPMUNSIGNEDNAME)
 
 installed-squashfs: DOMNAME=node-$(shell date +%F-%H%M)
 installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
@@ -138,6 +140,9 @@ IN_ROOTFS=export LIBGUESTFS_TMPDIR=/var/tmp ; guestfish --ro -a $(SQUASHFSFILENA
 $(RPMMANIFESTNAME): $(SQUASHFSFILENAME)
 	$(IN_ROOTFS) "rpm -qa" > $@
 
+$(RPMUNSIGNEDNAME): $(SQUASHFSFILENAME)
+	$(IN_ROOTFS) "rpm -qa --qf '%{name}-%{version}-%{release}.%{arch} (%{SIGPGP:pgpsig})\n'" | grep -v "Key ID" > $@
+
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM=ovirt-node-ng-image-update-placeholder
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_VERSION=$(shell $(IN_ROOTFS) "rpm -q --qf %{version} $(PLACEHOLDER_RPM)")
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_RELEASE=$(shell $(IN_ROOTFS) "rpm -q --qf %{release} $(PLACEHOLDER_RPM)")
@@ -158,7 +163,7 @@ RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
 
 if WITH_IMAGE
-rpm srpm: packaging/ovirt-node-ng.spec $(RPMMANIFESTNAME) $(SQUASHFSFILENAME) product.img
+rpm srpm: packaging/ovirt-node-ng.spec $(RPMMANIFESTNAME) $(RPMUNSIGNEDNAME) $(SQUASHFSFILENAME) product.img
 else
 rpm srpm: packaging/ovirt-node-ng.spec
 endif
@@ -174,7 +179,7 @@ endif
 	@echo
 
 clean-local:
-	-rm -vrf $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(INSTALLEDIMAGEFILE) packaging/ovirt-node-ng.spec build
+	-rm -vrf $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(RPMUNSIGNEDNAME) $(INSTALLEDIMAGEFILE) packaging/ovirt-node-ng.spec build
 
 # If you wonder, check does not depend on installed-squashfs, because we do not
 # # want to enforce a rebuild if check is called
