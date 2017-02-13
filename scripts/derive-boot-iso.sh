@@ -58,7 +58,7 @@ modify_bootloader() {
   local INNER_PRETTY_NAME=$(in_squashfs "grep PRETTY_NAME /etc/os-release" | cut -d "=" -f2 | tr -d \")
   sed -i \
 	-e "/stage2/ s%$% inst.ks=${LABEL//\\/\\\\}:/interactive-defaults.ks%" \
-	-e "/^\s*\(append\|initrd\|linux\|search\)/! s%CentOS .%${INNER_PRETTY_NAME}%g" \
+	-e "/^\s*\(append\|initrd\|linux\|search\)/! s%CentOS .*%${INNER_PRETTY_NAME}%g" \
 	$CFGS
 }
 
