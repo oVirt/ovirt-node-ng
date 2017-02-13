@@ -49,6 +49,7 @@ build() {
 
   sudo ln -fv \
     *manifest* \
+    *unsigned* \
     tmp.repos/SRPMS/*.rpm \
     tmp.repos/RPMS/noarch/*.rpm \
     ovirt-node*.squashfs.img \
