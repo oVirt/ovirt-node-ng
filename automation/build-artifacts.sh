@@ -88,7 +88,16 @@ checksum() {
 
   # Helper to redirect to latest installation iso
   INSTALLATIONISO=$(ls *.iso)
-  echo "<html><head><meta http-equiv='refresh' content='0; url=\"$INSTALLATIONISO\"' /></head></html>" > latest-installation-iso.html
+  cat << EOF > latest-installation-iso.html
+<html>
+  <head>
+    <meta http-equiv='refresh' content='0; url="$INSTALLATIONISO"'/>
+  </head>
+  <body>
+    If the download doesn't start, <a href="$INSTALLATIONISO">click here</a>
+  </body>
+</html>
+EOF
   popd
 }
 prepare
