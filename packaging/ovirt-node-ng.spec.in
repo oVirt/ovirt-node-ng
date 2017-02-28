@@ -111,6 +111,7 @@ install -Dm 0755 scripts/nodectl-run-banner.sh %{buildroot}%{_sysconfdir}/profil
 /usr/bin/install -m 644 %{SOURCE2} %{buildroot}/%{_node_image_dir}/product.img
 
 %post image-update
+set -e
 # Some magic to ensure that imgbase from
 # the new image is used for updates
 export MNTDIR="$(mktemp -d)"
