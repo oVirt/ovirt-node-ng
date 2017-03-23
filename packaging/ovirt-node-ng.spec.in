@@ -131,7 +131,7 @@ echo "List of open files:" > $UPDATELOG
 lsof > $UPDATELOG
 
 mount "$VOL" "$MNTDIR"
-cp $(cat ${UPDATERPM}) ${MNTDIR}/usr/share/imgbased/
+cp $(cat ${UPDATERPM}) ${MNTDIR}/usr/share/imgbased/ 2>/dev/null
 chroot "${MNTDIR}" rpm -Uvh --quiet --justdb /usr/share/imgbased/*image-update*.rpm > /dev/null 2>&1
 RC=$?
 rm ${MNTDIR}/usr/share/imgbased/*image-update*.rpm
