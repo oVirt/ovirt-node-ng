@@ -18,6 +18,8 @@ prepare() {
 }
 
 build() {
+  ./autogen.sh --with-tmpdir=/var/tmp
+
   sudo -E make squashfs
 
   ln -v \
