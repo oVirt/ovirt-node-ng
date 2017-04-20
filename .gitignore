@@ -22,3 +22,4 @@ py-compile
 *.pyc
 data/ovirt-node-ng-image.ks
 release
+src/nodectl/config.py
