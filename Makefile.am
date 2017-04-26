@@ -70,6 +70,7 @@ dist_nodetools_DATA = \
 	scripts/create-nightly-boot-iso.sh \
 	scripts/derive-boot-iso.sh \
 	scripts/liveimg-comparison.sh \
+	scripts/node-inject.sh \
 	$(NULL)
 
 dist_bin_SCRIPTS = \
