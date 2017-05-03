@@ -46,24 +46,16 @@ Currently the main package is empty.
 # The image and image-updat version and release are inherited
 # from the ovirt-node-ng-image-update-placeholder package
 # There is a lot of fu to support this.
-%package image
-Summary: %{_product_name} Image
-Version:    @PLACEHOLDER_RPM_VERSION@
-Release:    @PLACEHOLDER_RPM_RELEASE@
-
-%description image
-This package contains the prebuild %{_product_name} image.
-It can be used to create the %{_product_name} installer.
-
 %package image-update
 Summary:    %{_product_name} Image Update
 Version:    @PLACEHOLDER_RPM_VERSION@
 Release:    @PLACEHOLDER_RPM_RELEASE@
-Requires:   %{_product_id}-image = %{version}-%{release}
 Requires:   imgbased >= 0.7.2
 
 Obsoletes:  %{_product_id}-image-update-placeholder < %{version}-%{release}
 Provides:  %{_product_id}-image-update-placeholder = %{version}-%{release}
+Obsoletes:  %{_product_id}-image < %{version}-%{release}
+Provides:   %{_product_id}-image = %{version}-%{release}
 
 %description image-update
 This package will update an %{_product_name} host with the new image.
@@ -131,10 +123,8 @@ echo "List of open files:" > $UPDATELOG
 lsof > $UPDATELOG
 
 mount "$VOL" "$MNTDIR"
-cp $(cat ${UPDATERPM}) ${MNTDIR}/usr/share/imgbased/ 2>/dev/null
-chroot "${MNTDIR}" rpm -Uvh --quiet --justdb /usr/share/imgbased/*image-update*.rpm > /dev/null 2>&1
+rpm -Uvh --quiet --justdb --root "${MNTDIR}" $(cat ${UPDATERPM}) > /dev/null 2>&1
 RC=$?
-rm ${MNTDIR}/usr/share/imgbased/*image-update*.rpm
 umount "${MNTDIR}"
 
 rm "${UPDATERPM}"
@@ -142,13 +132,10 @@ rm "${UPDATERPM}"
 rmdir "${MNTDIR}"
 
 
-%files image
+%files image-update
 %dir %{_node_image_dir}
 %{_node_image_file}
 %{_node_image_dir}/product.img
-
-%files image-update
-# Empty, just the post-let is relevant
 %endif
 
 %files nodectl
