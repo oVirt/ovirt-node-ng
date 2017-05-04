@@ -121,10 +121,11 @@ class StatusParser(object):
             cat, result = self.parse_line(self.status)
             return {cat: result}
         else:
-            results = dict()
+            results = {"status": "ok"}
 
             for s in self.status:
-                results["status"] = "ok" if s.is_ok() else "bad"
+                if s.is_failed():
+                    results["status"] = "bad"
                 d = [self.strip_ansi(l) for l in s.details().splitlines()]
                 cat, result = self.parse_line(d.pop(0))
 
