@@ -42,7 +42,7 @@ for f in $mntdir/$dst/*
 do
     [[ $f == *.rpm ]] && rpms="$rpms $f"
 done
-rpm -Uhv --noscripts --root=$mntdir $rpms
+[[ -n $rpms ]] && rpm -Uhv --noscripts --root=$mntdir $rpms
 umount $mntdir
 rmdir $mntdir
 
