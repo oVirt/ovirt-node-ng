@@ -25,7 +25,7 @@ build() {
   ln -v \
     *.squashfs.img \
     *.log \
-    *-manifest-rpm \
+    *manifest* \
     "$ARTIFACTSDIR/"
 
   ls -shal "$ARTIFACTSDIR/" || :
