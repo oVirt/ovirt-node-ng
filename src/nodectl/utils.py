@@ -29,6 +29,7 @@ from StringIO import StringIO
 
 log = logging.getLogger()
 
+
 class ContextDecorator(object):
     def __call__(self, f):
         @functools.wraps(f)
@@ -36,6 +37,7 @@ class ContextDecorator(object):
             with self:
                 return f(*args, **kwds)
         return decorated
+
 
 class LogCapture(ContextDecorator):
     def __enter__(self):
