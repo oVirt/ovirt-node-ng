@@ -39,17 +39,26 @@ class Motd(object):
     """A basic wrapper to parse and deal with 'imgbase check'
     """
 
-    def __init__(self, status):
+    def __init__(self, status, machine_readable):
         self.status = json.loads(status)
+        self.machine_readable = machine_readable
 
     def write(self):
-        txts = [""]
-        if not self.status["status"] == "ok":
-            txts += ["  node status: " + bcolors.fail("DEGRADED")]
-            txts += ["  Please check the status manually using"
-                     " `nodectl check`"]
+        if self.machine_readable:
+            output = dict()
+            output["node_status"] = self.status["status"]
+            output["additional_info"] = "Please check the status manually " \
+                "using `nodectl check`"
+
+            print(json.dumps(output))
         else:
-            txts += ["  node status: " + bcolors.ok("OK")]
-            txts += ["  See `nodectl check` for more information"]
-        txts += [""]
-        print "\n".join(txts)
+            txts = [""]
+            if not self.status["status"] == "ok":
+                txts += ["  node status: " + bcolors.fail("DEGRADED")]
+                txts += ["  Please check the status manually using"
+                         " `nodectl check`"]
+            else:
+                txts += ["  node status: " + bcolors.ok("OK")]
+                txts += ["  See `nodectl check` for more information"]
+            txts += [""]
+            print("\n".join(txts))

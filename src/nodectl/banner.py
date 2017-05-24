@@ -21,6 +21,7 @@
 # Author(s): Ryan Barry <rbarry@redhat.com>
 #
 
+import json
 import re
 import subprocess
 
@@ -36,7 +37,8 @@ class Banner(object):
     Also called on a timer to update /etc/issue
     """
 
-    def __init__(self, update_issue=False):
+    def __init__(self, machine_readable, update_issue=False):
+        self.machine_readable = machine_readable
         self._get_ips()
         self._generate_message()
 
@@ -63,7 +65,12 @@ class Banner(object):
         self._msg = pre + urls
 
     def gen_motd(self):
-        print "%s\n" % self._msg
+        if self.machine_readable:
+            msg = dict()
+            msg["admin_console"] = self.addresses
+            print(json.dumps(msg))
+        else:
+            print("%s\n" % self._msg)
 
     def update_issue(self):
         with open('/etc/issue', 'w') as f:
