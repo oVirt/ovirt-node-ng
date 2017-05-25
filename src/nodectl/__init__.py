@@ -84,7 +84,7 @@ class Application(object):
         """Generate a motd message which shows the IP addresses so
         users know how to get to cockpit. Optionally update /etc/issue
         """
-        Banner(update_issue)
+        Banner(self.machine, update_issue)
 
     def check(self, debug, oneline):
         """Check the status of the running system
@@ -99,7 +99,7 @@ class Application(object):
         """
         from imgbased.plugins.core import Health
         Motd(Status(Health(self.imgbased).status(),
-             machine_readable=True).output).write()
+             machine_readable=True).output, self.machine).write()
 
 
 class CommandMapper():
