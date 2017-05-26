@@ -176,6 +176,8 @@ rmdir "${MNTDIR}"
 
 %changelog
 * Wed Sep 7 2016 Ryan Barry <rbarry@redhat.com>
+- Add machine readable output to nodectl banner/generate-motd
+* Wed Sep 7 2016 Ryan Barry <rbarry@redhat.com>
 - Rename nodectl to ovirt-node-ng-nodectl
 * Sat Jul 9 2016 Ryan Barry <rbarry@redhat.com>
 - Add nodectl
