@@ -55,10 +55,12 @@ modify_bootloader() {
   # grep -rn stage2 *
   local CFGS="EFI/BOOT/grub.cfg isolinux/isolinux.cfg isolinux/grub.conf"
   local LABEL=$(egrep -h -o "hd:LABEL[^ :]*" $CFGS  | sort -u)
+  local ORIG_NAME=$(grep -Po "(?<=^menu title ).*" isolinux/isolinux.cfg)
   local INNER_PRETTY_NAME=$(in_squashfs "grep PRETTY_NAME /etc/os-release" | cut -d "=" -f2 | tr -d \")
   sed -i \
 	-e "/stage2/ s%$% inst.ks=${LABEL//\\/\\\\}:/interactive-defaults.ks%" \
-	-e "/^\s*\(append\|initrd\|linux\|search\)/! s%CentOS .*%${INNER_PRETTY_NAME}%g" \
+	-e "/^\s*\(append\|initrd\|linux\|search\)/! s%${ORIG_NAME}%${INNER_PRETTY_NAME}%g" \
+	-e "s/Rescue a .* system/Rescue a ${INNER_PRETTY_NAME} system/g" \
 	$CFGS
 }
 
