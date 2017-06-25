@@ -47,6 +47,9 @@ build() {
   sudo -E make product.img rpm
   sudo -E make offline-installation-iso
 
+  sudo mv -fv ovirt-node-ng-image.squashfs.img \
+              ovirt-node-ng-image-$(date +%Y%m%d).squashfs.img
+
   sudo ln -fv \
     *manifest* \
     *unsigned* \
