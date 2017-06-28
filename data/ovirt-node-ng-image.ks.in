@@ -57,7 +57,7 @@ yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 
 # 1.a Ensure that we use baseurls to ensure we always pick
 #     the mist recent content (right after repo composes/releases)
-sed -i "/^mirrorlist/ d ; s/^#baseurl/baseurl/" /etc/yum.repos.d/*ovirt*.repo
+sed -i "/^mirrorlist/ d ; s/^#baseurl/baseurl/" $(find /etc/yum.repos.d/*ovirt*.repo -type f ! -name "*dep*")
 
 # 2. Install oVirt Node release and placeholder
 # (exclude ovirt-node-ng-image-update to prevent the obsoletes logic)
