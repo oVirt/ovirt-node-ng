@@ -38,6 +38,7 @@ prepare() {
 
   virsh list --name | xargs -rn1 virsh destroy || true
   virsh list --all --name | xargs -rn1 virsh undefine --remove-all-storage || true
+  losetup -O BACK-FILE | grep iso$ | xargs -r umount -vf
 }
 
 build() {
