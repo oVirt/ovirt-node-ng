@@ -73,6 +73,11 @@ class Status(object):
                 if v["status"] != "ok":
                     output["status"] = "warn"
                 output.update(service_status)
+
+            overall_status = str(status)
+            if "ok" not in status.lower():
+                output.update({"status": "bad"})
+
             self.output = json.dumps(output)
 
         else:
