@@ -75,7 +75,7 @@ class Status(object):
                 output.update(service_status)
 
             overall_status = str(status)
-            if "ok" not in status.lower():
+            if "ok" not in overall_status.lower():
                 output.update({"status": "bad"})
 
             self.output = json.dumps(output)
