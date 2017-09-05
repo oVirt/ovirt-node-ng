@@ -46,6 +46,17 @@ imgbase layout --init
 %end
 EOK
   # Add branding
+  local IMGMNT=$(mktemp -d)
+  local SQMNT=$(mktemp -d)
+  mount $DST $IMGMNT
+  mount $IMGMNT/LiveOS/rootfs.img $IMGMNT
+  unsquashfs LiveOS/squashfs.img
+  mount squashfs-root/LiveOS/rootfs.img $SQMNT
+  cp -f $IMGMNT/etc/os-release $SQMNT/etc
+  umount $IMGMNT $IMGMNT $SQMNT
+  rmdir $SQMNT $IMGMNT
+  mksquashfs squashfs-root LiveOS/squashfs.img -noappend -comp xz
+  rm -rf squashfs-root
   # and the kickstart
   if [[ -e "$PRODUCTIMG" ]]; then
     cp "$PRODUCTIMG" images/product.img
