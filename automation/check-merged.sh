@@ -11,6 +11,8 @@ export TMPDIR=$PWD/tmp
 export LIBGUESTFS_BACKEND=direct
 
 prepare() {
+  seq 0 9 | xargs -I {} mknod /dev/loop{} b 7 {} || :
+
   virt-host-validate || :
 
   mkdir "$TMPDIR"
