@@ -31,6 +31,7 @@ trap save_logs EXIT
 prepare() {
   mknod /dev/kvm c 10 232 || :
   virt-host-validate || :
+  seq 0 9 | xargs -I {} mknod /dev/loop{} b 7 {} || :
 
   mkdir "$TMPDIR"
   mkdir "$ARTIFACTSDIR"
