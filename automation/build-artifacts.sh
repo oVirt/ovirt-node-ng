@@ -55,6 +55,18 @@ build() {
   ./autogen.sh --with-tmpdir=/var/tmp
 
   sudo -E make squashfs
+
+  # move out anaconda build logs and export them for debugging
+  tmpdir=$(mktemp -d)
+  mkdir $ARTIFACTSDIR/image-logs
+  mv ovirt-node-ng-image.squashfs.img{,.orig}
+  unsquashfs ovirt-node-ng-image.squashfs.img.orig
+  mount squashfs-root/LiveOS/rootfs.img $tmpdir
+  mv $tmpdir/var/log/anaconda $ARTIFACTSDIR/image-logs/var_log_anaconda || :
+  mv $tmpdir/root/*ks* $ARTIFACTSDIR/image-logs || :
+  umount $tmpdir
+  mksquashfs squashfs-root ovirt-node-ng-image.squashfs.img -noappend -comp xz
+
   sudo -E make product.img rpm
   sudo -E make offline-installation-iso
 
