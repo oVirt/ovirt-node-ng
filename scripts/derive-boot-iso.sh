@@ -33,6 +33,8 @@ add_payload() {
   # Add squashfs
   cp $SQUASHFS $DST
   cat > interactive-defaults.ks <<EOK
+timezone --utc
+
 liveimg --url=file:///run/install/repo/$DST
 
 # FIXME This should be fixed more elegantly with
