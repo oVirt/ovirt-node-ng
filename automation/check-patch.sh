@@ -30,6 +30,11 @@ trap save_logs EXIT
 
 prepare() {
   mknod /dev/kvm c 10 232 || :
+  mkdir /dev/net || :
+  mknod /dev/net/tun c 10 200 || :
+  chmod 0666 /dev/net/tun || :
+  mknod /dev/vhost-net c 10 238 || :
+  modprobe tun vhost_net
   virt-host-validate || :
   seq 0 9 | xargs -I {} mknod /dev/loop{} b 7 {} || :
 
