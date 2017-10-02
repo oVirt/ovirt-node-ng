@@ -54,7 +54,8 @@ build() {
   # Build the squashfs for a later export
   ./autogen.sh --with-tmpdir=/var/tmp
 
-  sudo -E make squashfs
+  sudo -E make squashfs &
+  sudo -E tail -f virt-install.log --pid=$! --retry ||:
 
   # move out anaconda build logs and export them for debugging
   tmpdir=$(mktemp -d)
