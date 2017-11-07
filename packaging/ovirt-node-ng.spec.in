@@ -3,7 +3,7 @@
 %global _product_id ovirt-node-ng
 
 %global	_node_image_dir /usr/share/%{name}/image/
-%global	_node_image_file %{_node_image_dir}/%{name}-%{version}-%{release}.squashfs.img
+%global	_node_image_file %{_node_image_dir}/%{name}-@PLACEHOLDER_RPM_VERSION@-@PLACEHOLDER_RPM_RELEASE@.squashfs.img
 %global	_node_tools_dir /usr/share/%{name}/tools/
 
 %global with_image @WITH_IMAGE@
