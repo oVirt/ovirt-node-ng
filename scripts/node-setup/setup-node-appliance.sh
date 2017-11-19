@@ -5,9 +5,9 @@ set -eo pipefail
 ####### defs #######
 
 NODE_SETUP_PATH=$(dirname $(realpath $0))
-MAX_VM_MEM=4096
+MAX_VM_MEM=2048
 MAX_VM_CPUS=2
-WORKDIR="$PWD/workdir"
+WORKDIR="/var/lib/virtual-machines"
 APPLIANCE_DOMAIN="appliance.net"
 
 BOOTISO_URL="http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso"
@@ -59,6 +59,19 @@ get_vm_ip() {
     done
 
     die "get_vm_ip failed"
+}
+
+wait_for_vm_shutdown() {
+    local name=$1
+    local state="running"
+
+    echo "$name: waiting for vm to shut down"
+
+    while [[ "$state" == "running" ]]
+    do
+        sleep 10
+        state=$(virsh domstate "$name")
+    done
 }
 
 prepare_appliance() {
@@ -158,6 +171,67 @@ setup_appliance() {
     rm $cidata
 }
 
+setup_node_iso() {
+    local name=$1
+    local node_iso_path=$2
+    local ssh_key=$3
+    local vmpasswd=$4
+
+    local ksfile="$WORKDIR/node-iso-install.ks"
+    local logfile="$WORKDIR/node-iso-virt-install-$name.log"
+    local ssh=$(cat $ssh_key.pub)
+
+    local tmpdir=$(mktemp -d)
+    mount -o ro $node_iso_path $tmpdir
+    cat << EOF > $ksfile
+timezone --utc Etc/UTC
+lang en_US.UTF-8
+keyboard us
+auth --enableshadow --passalgo=sha512
+selinux --enforcing
+network --bootproto=dhcp --hostname=$name
+firstboot --reconfig
+sshkey --username=root "$ssh"
+rootpw --plaintext $vmpasswd
+poweroff
+clearpart --all --initlabel --disklabel=gpt
+bootloader --timeout=1
+EOF
+    sed 's/^imgbase/imgbase --debug/' $tmpdir/*ks* >> $ksfile
+    umount $tmpdir && rmdir $tmpdir
+
+    virt-install -q \
+        --name "$name" \
+        --boot menu=off \
+        --memory $MAX_VM_MEM \
+        --vcpus $MAX_VM_CPUS \
+        --cpu host \
+        --location "$node_iso_path" \
+        --extra-args "inst.ks=file:///node-iso-install.ks console=ttyS0" \
+        --initrd-inject "$ksfile" \
+        --graphics none \
+        --noreboot \
+        --check all=off \
+        --noautoconsole \
+        --os-variant rhel7 \
+        --disk size=45 > "$logfile" || die "virt-install failed"
+
+    wait_for_vm_shutdown $name
+
+    echo -e "$name: Finished installing, bringing it up..."
+
+    virsh -q start $name || die "virsh start failed"
+    local ip=$(get_vm_ip $name)
+
+    # waiting for ssh to be up...
+    do_ssh $ssh_key $ip "ls" > /dev/null
+    do_ssh $ssh_key $ip "nodectl check" > $name-nodectl-check.log
+
+    echo "$name: node is available at $ip"
+
+    rm $ksfile
+}
+
 setup_node() {
     local name=$1
     local url=$2
@@ -214,6 +288,7 @@ setup_node() {
 
     # waiting for ssh to be up...
     do_ssh $ssh_key $ip "ls" > /dev/null
+    do_ssh $ssh_key $ip "nodectl check" > $name-nodectl-check.log
 
     echo "$name: node is available at $ip"
 
@@ -223,8 +298,10 @@ setup_node() {
 main() {
     local node_url=""
     local appliance_url=""
+    local node_iso_path=""
+    local vmpasswd=""
 
-    while getopts "n:a:" OPTION
+    while getopts "n:a:i:p:" OPTION
     do
         case $OPTION in
             n)
@@ -233,11 +310,18 @@ main() {
             a)
                 appliance_url=$OPTARG
                 ;;
+            i)
+                node_iso_path=$OPTARG
+                ;;
+            p)
+                vmpasswd=$OPTARG
+                ;;
         esac
     done
 
-    [[ -z "$node_url" && -z "$appliance_url" ]] && {
-        echo "Usage: $0 -n <node_rpm_url> -a <appliance_rpm_url>"
+
+    [[ -z "$node_url" && -z "$appliance_url" && -z "$node_iso_path" ]] && {
+        echo "Usage: $0 -n <node_rpm_url> -a <appliance_rpm_url> -i <node_iso>"
         exit 1
     }
 
@@ -246,43 +330,53 @@ main() {
         exit 1
     }
 
-    local vmpasswd=""
-    while [[ -z "$vmpasswd" ]]
-    do
-        echo -n "Set VM password: "
-        read -s vmpasswd
+    [[ -z "$vmpasswd" ]] && {
+        while [[ -z "$vmpasswd" ]]
+        do
+            echo -n "Set VM password: "
+            read -s vmpasswd
+            echo ""
+        done
+
+        echo -n "Reenter password: "
+        read -s vmpasswd2
         echo ""
-    done
 
-    echo -n "Reenter password: "
-    read -s vmpasswd2
-    echo ""
-
-    [[ "$vmpasswd" != "$vmpasswd2" ]] && {
-        echo "Passwords do not match"
-        exit 1
+        [[ "$vmpasswd" != "$vmpasswd2" ]] && {
+            echo "Passwords do not match"
+            exit 1
+        }
     }
 
     [[ ! -d "$WORKDIR" ]] && mkdir -p "$WORKDIR"
 
     [[ ! -z "$node_url" ]] && {
-        rnd=$RANDOM
+        local rnd=$RANDOM
         node="node-$rnd"
         ssh_key="$WORKDIR/sshkey-node-$rnd"
         ssh-keygen -q -f $ssh_key -N ''
         echo "$node: SSH key = $ssh_key"
-        setup_node $node $node_url $ssh_key $vmpasswd
+        setup_node "$node" "$node_url" "$ssh_key" "$vmpasswd"
+    }
+
+    [[ ! -z "$node_iso_path" ]] && {
+        local rnd=$RANDOM
+        node="node-iso-$rnd"
+        ssh_key="$WORKDIR/sshkey-node-iso-$rnd"
+        ssh-keygen -q -f $ssh_key -N ''
+        echo "$node: SSH key = $ssh_key"
+        setup_node_iso "$node" "$node_iso_path" "$ssh_key" "$vmpasswd"
     }
 
     [[ ! -z "$appliance_url" ]] && {
-        rnd=$RANDOM
+        local rnd=$RANDOM
         appliance="engine-$rnd"
         ssh_key="$WORKDIR/sshkey-appliance-$rnd"
         ssh-keygen -q -f $ssh_key -N ''
         echo "$appliance: SSH key = $ssh_key"
-        setup_appliance $appliance $appliance_url $ssh_key $vmpasswd
+        setup_appliance "$appliance" "$appliance_url" "$ssh_key" "$vmpasswd"
         echo "For smoketesting, remember to run engine-setup on $appliance"
-    }
+    } || :
 }
 
 main "$@"
