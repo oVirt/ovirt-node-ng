@@ -88,7 +88,18 @@ check() {
     "$ARTIFACTSDIR/"
 }
 
+check_iso() {
+  sudo ./scripts/node-setup/setup-node-appliance.sh -i ovirt-node*.iso -p ovirt
+  sudo cat *nodectl-check*.log
+  status=$(grep -Po "(?<=Status: ).*" *nodectl-check*.log)
+  [[ "$status" == *OK* ]] || {
+    echo "Invalid node status"
+    exit 1
+  }
+}
+
 prepare
 build
 # DISABLE checks until they are fixed
 #check
+check_iso
