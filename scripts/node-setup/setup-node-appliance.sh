@@ -64,14 +64,22 @@ get_vm_ip() {
 wait_for_vm_shutdown() {
     local name=$1
     local state="running"
+    local timeout=1800
 
     echo "$name: waiting for vm to shut down"
 
     while [[ "$state" == "running" ]]
     do
+        [[ $timeout -eq 0 ]] && {
+            virsh -q destroy "$name" > /dev/null 2>&1
+            return 1
+        }
         sleep 10
+        timeout=$((timeout - 10))
         state=$(virsh domstate "$name")
     done
+
+    return 0
 }
 
 prepare_appliance() {
@@ -216,7 +224,7 @@ EOF
         --os-variant rhel7 \
         --disk size=45 > "$logfile" || die "virt-install failed"
 
-    wait_for_vm_shutdown $name
+    wait_for_vm_shutdown $name || sleep 5 # Force shut down, wait a little
 
     echo -e "$name: Finished installing, bringing it up..."
 
@@ -225,7 +233,7 @@ EOF
 
     # waiting for ssh to be up...
     do_ssh $ssh_key $ip "ls" > /dev/null
-    do_ssh $ssh_key $ip "nodectl check" > $name-nodectl-check.log
+    do_ssh $ssh_key $ip "nodectl check" > $name-nodectl-check.log 2>&1
 
     echo "$name: node is available at $ip"
 
