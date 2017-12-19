@@ -108,7 +108,7 @@ The explanation is in the %post section:
 
     # Adding upstream oVirt vdsm
     # 1. Install oVirt release file with repositories
-    yum install -y --nogpgcheck http://plain.resources.ovirt.org/pub/ovirt-4.0-pre/rpm/el7/noarch/ovirt-release40-pre.rpm
+    yum install -y --nogpgcheck http://resources.ovirt.org/pub/yum-repo/ovirt-release42.rpm
 
     # 2. Install oVirt Node release and placeholder
     # (exclude ovirt-node-ng-image-update to prevent the obsoletes logic)
