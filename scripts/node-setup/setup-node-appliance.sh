@@ -66,7 +66,7 @@ wait_for_vm_shutdown() {
     local state="running"
     local timeout=1800
 
-    echo "$name: waiting for vm to shut down"
+    echo "$name: installing, waiting for vm to shut down"
 
     while [[ "$state" == "running" ]]
     do
@@ -80,6 +80,24 @@ wait_for_vm_shutdown() {
     done
 
     return 0
+}
+
+run_nodectl_check() {
+    local name=$1
+    local ssh_key=$2
+    local ip=$3
+    local timeout=120
+    local check=""
+
+    while [[ -z "$check" ]]
+    do
+        [[ $timeout -eq 0 ]] && break
+        check=$(do_ssh $ssh_key $ip "nodectl check" 2>&1)
+        sleep 10
+        timeout=$((timeout - 10))
+    done
+
+    echo "$check" > $name-nodectl-check.log
 }
 
 prepare_appliance() {
@@ -233,7 +251,7 @@ EOF
 
     # waiting for ssh to be up...
     do_ssh $ssh_key $ip "ls" > /dev/null
-    do_ssh $ssh_key $ip "nodectl check" > $name-nodectl-check.log 2>&1
+    run_nodectl_check $name $ssh_key $ip
 
     echo "$name: node is available at $ip"
 
@@ -296,7 +314,7 @@ setup_node() {
 
     # waiting for ssh to be up...
     do_ssh $ssh_key $ip "ls" > /dev/null
-    do_ssh $ssh_key $ip "nodectl check" > $name-nodectl-check.log
+    run_nodectl_check $name $ssh_key $ip
 
     echo "$name: node is available at $ip"
 
@@ -363,7 +381,6 @@ main() {
         node="node-$rnd"
         ssh_key="$WORKDIR/sshkey-node-$rnd"
         ssh-keygen -q -f $ssh_key -N ''
-        echo "$node: SSH key = $ssh_key"
         setup_node "$node" "$node_url" "$ssh_key" "$vmpasswd"
     }
 
@@ -372,7 +389,6 @@ main() {
         node="node-iso-$rnd"
         ssh_key="$WORKDIR/sshkey-node-iso-$rnd"
         ssh-keygen -q -f $ssh_key -N ''
-        echo "$node: SSH key = $ssh_key"
         setup_node_iso "$node" "$node_iso_path" "$ssh_key" "$vmpasswd"
     }
 
@@ -381,7 +397,6 @@ main() {
         appliance="engine-$rnd"
         ssh_key="$WORKDIR/sshkey-appliance-$rnd"
         ssh-keygen -q -f $ssh_key -N ''
-        echo "$appliance: SSH key = $ssh_key"
         setup_appliance "$appliance" "$appliance_url" "$ssh_key" "$vmpasswd"
         echo "For smoketesting, remember to run engine-setup on $appliance"
     } || :
