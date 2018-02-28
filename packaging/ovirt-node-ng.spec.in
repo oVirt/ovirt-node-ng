@@ -102,6 +102,19 @@ install -Dm 0755 scripts/nodectl-run-banner.sh %{buildroot}%{_sysconfdir}/profil
 /usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_node_image_file}
 /usr/bin/install -m 644 %{SOURCE2} %{buildroot}/%{_node_image_dir}/product.img
 
+%pre image-update
+local_sds=($(find / -xdev -name "__DIRECT_IO_TEST__"))
+
+if [ "$local_sds" ]; then
+    echo "Local storage domains were found on the same filesystem as / ! Please migrate the data to a new LV before upgrading, or you will lose the VMs"
+    echo "See: https://bugzilla.redhat.com/show_bug.cgi?id=1550205#c3"
+    echo "Storage domains were found in:"
+    for sd in "${local_sds[@]}"; do
+        echo -e "\t$(dirname $sd)"
+    done
+    exit 1
+fi
+
 %post image-update
 set -e
 # Some magic to ensure that imgbase from
