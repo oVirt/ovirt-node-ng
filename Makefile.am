@@ -139,7 +139,7 @@ LMC ?= livemedia-creator
 # # -x -v to be more verbose
 IN_ROOTFS=export LIBGUESTFS_TMPDIR=/var/tmp ; guestfish --ro -a $(SQUASHFSFILENAME) run : mount /dev/sda / : mount-loop /LiveOS/rootfs.img / : sh
 $(RPMMANIFESTNAME): $(SQUASHFSFILENAME)
-	$(IN_ROOTFS) "rpm -qa" > $@
+	$(IN_ROOTFS) "rpm -qa|sort" > $@
 
 $(RPMUNSIGNEDNAME): $(SQUASHFSFILENAME)
 	$(IN_ROOTFS) "rpm -qa --qf '%{name}-%{version}-%{release}.%{arch} (%{SIGPGP:pgpsig})\n'" | grep -v "Key ID" > $@
