@@ -327,7 +327,7 @@ main() {
     local node_iso_path=""
     local vmpasswd=""
 
-    while getopts "n:a:i:p:" OPTION
+    while getopts "n:a:i:p:m:" OPTION
     do
         case $OPTION in
             n)
@@ -341,6 +341,9 @@ main() {
                 ;;
             p)
                 vmpasswd=$OPTARG
+                ;;
+            m)
+                machine=$OPTARG
                 ;;
         esac
     done
@@ -377,25 +380,22 @@ main() {
     [[ ! -d "$WORKDIR" ]] && mkdir -p "$WORKDIR"
 
     [[ ! -z "$node_url" ]] && {
-        local rnd=$RANDOM
-        node="node-$rnd"
-        ssh_key="$WORKDIR/sshkey-node-$rnd"
+        node=${machine:-node-$RANDOM}
+        ssh_key="$WORKDIR/sshkey-$node"
         ssh-keygen -q -f $ssh_key -N ''
         setup_node "$node" "$node_url" "$ssh_key" "$vmpasswd"
     }
 
     [[ ! -z "$node_iso_path" ]] && {
-        local rnd=$RANDOM
-        node="node-iso-$rnd"
-        ssh_key="$WORKDIR/sshkey-node-iso-$rnd"
+        node=${machine:-node-iso-$RANDOM}
+        ssh_key="$WORKDIR/sshkey-$node"
         ssh-keygen -q -f $ssh_key -N ''
         setup_node_iso "$node" "$node_iso_path" "$ssh_key" "$vmpasswd"
     }
 
     [[ ! -z "$appliance_url" ]] && {
-        local rnd=$RANDOM
-        appliance="engine-$rnd"
-        ssh_key="$WORKDIR/sshkey-appliance-$rnd"
+        appliance=${machine:-engine-$RANDOM}
+        ssh_key="$WORKDIR/sshkey-$appliance"
         ssh-keygen -q -f $ssh_key -N ''
         setup_appliance "$appliance" "$appliance_url" "$ssh_key" "$vmpasswd"
         echo "For smoketesting, remember to run engine-setup on $appliance"
