@@ -61,27 +61,6 @@ get_vm_ip() {
     die "get_vm_ip failed"
 }
 
-wait_for_vm_shutdown() {
-    local name=$1
-    local state="running"
-    local timeout=1800
-
-    echo "$name: installing, waiting for vm to shut down"
-
-    while [[ "$state" == "running" ]]
-    do
-        [[ $timeout -eq 0 ]] && {
-            virsh -q destroy "$name" > /dev/null 2>&1
-            return 1
-        }
-        sleep 10
-        timeout=$((timeout - 10))
-        state=$(virsh domstate "$name")
-    done
-
-    return 0
-}
-
 run_nodectl_check() {
     local name=$1
     local ssh_key=$2
@@ -226,6 +205,8 @@ EOF
     sed 's/^imgbase/imgbase --debug/' $tmpdir/*ks* >> $ksfile
     umount $tmpdir && rmdir $tmpdir
 
+    echo "$name: Installing iso to vm..."
+
     virt-install -q \
         --name "$name" \
         --boot menu=off \
@@ -238,13 +219,11 @@ EOF
         --graphics none \
         --noreboot \
         --check all=off \
-        --noautoconsole \
+        --wait -1 \
         --os-variant rhel7 \
-        --disk size=45 > "$logfile" || die "virt-install failed"
+        --disk size=60 > "$logfile" || die "virt-install failed"
 
-    wait_for_vm_shutdown $name || sleep 5 # Force shut down, wait a little
-
-    echo -e "$name: Finished installing, bringing it up..."
+    echo -e "$name: Finished installing, starting..."
 
     virsh -q start $name || die "virsh start failed"
     local ip=$(get_vm_ip $name)
@@ -292,7 +271,7 @@ setup_node() {
     echo "$name: Install log file is $logfile"
 
     virt-install -q \
-        --name $name \
+        --name "$name" \
         --boot menu=off \
         --memory $MAX_VM_MEM \
         --vcpus $MAX_VM_CPUS \
@@ -303,6 +282,8 @@ setup_node() {
         --check disk_size=off,path_in_use=off \
         --graphics none \
         --noreboot \
+        --wait -1 \
+        --os-variant rhel7 \
         --disk path=$diskimg,bus=virtio,cache=unsafe,discard=unmap,format=qcow2 \
         --disk path=$squashfs,readonly=on,device=disk,bus=virtio,serial=livesrc \
         > $logfile || die "virt-install failed"
