@@ -45,16 +45,13 @@ dracut-config-generic
 set -x
 mkdir -p /etc/yum.repos.d
 
-# Adds the latest cockpit bits
-curl -L -o /etc/yum.repos.d/cockpit-preview-epel-7.repo "https://copr.fedoraproject.org/coprs/g/cockpit/cockpit-preview/repo/epel-7/msuchy-cockpit-preview-epel-7.repo"
-yum install --nogpgcheck -y cockpit
-
-
-
 # Adding upstream oVirt vdsm
 # 1. Install oVirt release file with repositories
 yum install -y --nogpgcheck @OVIRTRELEASERPMURL@
 yum -y --nogpgcheck update
+
+# Adds the latest cockpit bits
+yum install --nogpgcheck -y cockpit
 
 # 1.a Ensure that we use baseurls to ensure we always pick
 #     the mist recent content (right after repo composes/releases)
