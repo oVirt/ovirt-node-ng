@@ -7,7 +7,7 @@ set -eo pipefail
 NODE_SETUP_PATH=$(dirname $(realpath $0))
 MAX_VM_MEM=2048
 MAX_VM_CPUS=2
-WORKDIR="/var/lib/virtual-machines"
+WORKDIR="${HOME/root/var/lib}/ovirt-node"
 APPLIANCE_DOMAIN="appliance.net"
 
 BOOTISO_URL="http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso"
@@ -27,7 +27,7 @@ download_rpm_and_extract() {
     echo "$name: Downloading rpm from $url"
     curl -L -# -o "$tmpdir/$name.rpm" $url || die "Download failed"
     echo "$name: Extracting rpm..."
-    rpm2cpio "$tmpdir/$name.rpm" | cpio --quiet -diuD $tmpdir || \
+    rpm2cpio "$tmpdir/$name.rpm" | (cd $tmpdir; cpio --quiet -diu) || \
         die "Failed extracting rpm"
     find $tmpdir -name "*.$search" -exec mv -f {} "$WORKDIR/$name.$search" \;
     rm -rf $tmpdir
@@ -181,8 +181,10 @@ setup_node_iso() {
     local node_iso_path=$2
     local ssh_key=$3
     local vmpasswd=$4
+    local shutdown=$5
 
     local ksfile="$WORKDIR/node-iso-install.ks"
+    local diskimg="$WORKDIR/$name.qcow2"
     local logfile="$WORKDIR/node-iso-virt-install-$name.log"
     local ssh=$(cat $ssh_key.pub)
 
@@ -205,7 +207,7 @@ EOF
     sed 's/^imgbase/imgbase --debug/' $tmpdir/*ks* >> $ksfile
     umount $tmpdir && rmdir $tmpdir
 
-    echo "$name: Installing iso to vm..."
+    echo "$name: Installing ISO to VM..."
 
     virt-install -q \
         --name "$name" \
@@ -221,18 +223,24 @@ EOF
         --check all=off \
         --wait -1 \
         --os-variant rhel7 \
-        --disk size=60 > "$logfile" || die "virt-install failed"
+        --noautoconsole \
+        --disk path=$diskimg,size=60 > "$logfile" || die "virt-install failed"
 
-    echo -e "$name: Finished installing, starting..."
+    if [[ -z $shutdown ]]
+    then
+        echo -e "$name: Finished installing, starting VM..."
 
-    virsh -q start $name || die "virsh start failed"
-    local ip=$(get_vm_ip $name)
+        virsh -q start $name || die "virsh start failed"
+        local ip=$(get_vm_ip $name)
 
-    # waiting for ssh to be up...
-    do_ssh $ssh_key $ip "ls" > /dev/null
-    run_nodectl_check $name $ssh_key $ip
+        # waiting for ssh to be up...
+        do_ssh $ssh_key $ip "ls" > /dev/null
+        run_nodectl_check $name $ssh_key $ip
 
-    echo "$name: node is available at $ip"
+        echo "$name: node is available at $ip"
+    else
+        echo "$name: Finished installing, VM is down"
+    fi
 
     rm $ksfile
 }
@@ -242,6 +250,7 @@ setup_node() {
     local url=$2
     local ssh_key=$3
     local vmpasswd=$4
+    local shutdown=$5
 
     download_rpm_and_extract "$url" "$name" "squashfs.img"
 
@@ -284,20 +293,27 @@ setup_node() {
         --noreboot \
         --wait -1 \
         --os-variant rhel7 \
+        --noautoconsole \
         --disk path=$diskimg,bus=virtio,cache=unsafe,discard=unmap,format=qcow2 \
         --disk path=$squashfs,readonly=on,device=disk,bus=virtio,serial=livesrc \
         > $logfile || die "virt-install failed"
 
-    echo "$name: Finished installing, bringing it up..."
 
-    virsh -q start $name || die "virsh start failed"
-    local ip=$(get_vm_ip $name)
+    if [[ -z $shutdown ]]
+    then
+        echo "$name: Finished installing, starting VM..."
 
-    # waiting for ssh to be up...
-    do_ssh $ssh_key $ip "ls" > /dev/null
-    run_nodectl_check $name $ssh_key $ip
+        virsh -q start $name || die "virsh start failed"
+        local ip=$(get_vm_ip $name)
 
-    echo "$name: node is available at $ip"
+        # waiting for ssh to be up...
+        do_ssh $ssh_key $ip "ls" > /dev/null
+        run_nodectl_check $name $ssh_key $ip
+
+        echo "$name: node is available at $ip"
+    else
+        echo "$name: Finished installing, VM is down"
+    fi
 
     rm $ksfile $squashfs
 }
@@ -307,8 +323,10 @@ main() {
     local appliance_url=""
     local node_iso_path=""
     local vmpasswd=""
+    local machine=""
+    local shutdown="" # Supported for nodes only
 
-    while getopts "n:a:i:p:m:" OPTION
+    while getopts "n:a:i:p:m:s" OPTION
     do
         case $OPTION in
             n)
@@ -325,6 +343,9 @@ main() {
                 ;;
             m)
                 machine=$OPTARG
+                ;;
+            s)
+                shutdown=1
                 ;;
         esac
     done
@@ -364,14 +385,14 @@ main() {
         node=${machine:-node-$RANDOM}
         ssh_key="$WORKDIR/sshkey-$node"
         ssh-keygen -q -f $ssh_key -N ''
-        setup_node "$node" "$node_url" "$ssh_key" "$vmpasswd"
+        setup_node "$node" "$node_url" "$ssh_key" "$vmpasswd" "$shutdown"
     }
 
     [[ ! -z "$node_iso_path" ]] && {
         node=${machine:-node-iso-$RANDOM}
         ssh_key="$WORKDIR/sshkey-$node"
         ssh-keygen -q -f $ssh_key -N ''
-        setup_node_iso "$node" "$node_iso_path" "$ssh_key" "$vmpasswd"
+        setup_node_iso "$node" "$node_iso_path" "$ssh_key" "$vmpasswd" "$shutdown"
     }
 
     [[ ! -z "$appliance_url" ]] && {
