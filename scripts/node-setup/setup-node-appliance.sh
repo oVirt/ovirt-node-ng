@@ -10,7 +10,8 @@ MAX_VM_CPUS=2
 WORKDIR="${HOME/root/var/lib}/ovirt-node"
 APPLIANCE_DOMAIN="appliance.net"
 
-BOOTISO_URL="http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso"
+CENTOS_MIRROR="${CENTOS_MIRROR:-http://mirror.centos.org}"
+BOOTISO_URL="${CENTOS_MIRROR}/centos/7/os/x86_64/images/boot.iso"
 RELEASE_RPM=
 
 ####################
@@ -25,7 +26,7 @@ download_rpm_and_extract() {
 
     local tmpdir=$(mktemp -d)
     echo "$name: Downloading rpm from $url"
-    curl -L -# -o "$tmpdir/$name.rpm" $url || die "Download failed"
+    curl -LsSo "$tmpdir/$name.rpm" $url || die "Download failed"
     echo "$name: Extracting rpm..."
     rpm2cpio "$tmpdir/$name.rpm" | (cd $tmpdir; cpio --quiet -diu) || \
         die "Failed extracting rpm"
@@ -269,7 +270,7 @@ setup_node() {
 
     [[ ! -e "$bootiso" ]] && {
         echo "$name: Downloading $BOOTISO_URL..."
-        curl -# -o $bootiso $BOOTISO_URL || die "Failed downloading boot.iso"
+        curl -LsSo $bootiso $BOOTISO_URL || die "Failed downloading boot.iso"
     } || {
         echo "$name: Using $bootiso"
     }
@@ -384,6 +385,7 @@ main() {
     [[ ! -z "$node_url" ]] && {
         node=${machine:-node-$RANDOM}
         ssh_key="$WORKDIR/sshkey-$node"
+        [[ -n $machine && -f $ssh_key ]] && rm -f $ssh_key{,.pub}
         ssh-keygen -q -f $ssh_key -N ''
         setup_node "$node" "$node_url" "$ssh_key" "$vmpasswd" "$shutdown"
     }
@@ -391,6 +393,7 @@ main() {
     [[ ! -z "$node_iso_path" ]] && {
         node=${machine:-node-iso-$RANDOM}
         ssh_key="$WORKDIR/sshkey-$node"
+        [[ -n $machine && -f $ssh_key ]] && rm -f $ssh_key{,.pub}
         ssh-keygen -q -f $ssh_key -N ''
         setup_node_iso "$node" "$node_iso_path" "$ssh_key" "$vmpasswd" "$shutdown"
     }
@@ -398,6 +401,7 @@ main() {
     [[ ! -z "$appliance_url" ]] && {
         appliance=${machine:-engine-$RANDOM}
         ssh_key="$WORKDIR/sshkey-$appliance"
+        [[ -n $machine && -f $ssh_key ]] && rm -f $ssh_key{,.pub}
         ssh-keygen -q -f $ssh_key -N ''
         setup_appliance "$appliance" "$appliance_url" "$ssh_key" "$vmpasswd"
         echo "For smoketesting, remember to run engine-setup on $appliance"
