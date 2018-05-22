@@ -7,7 +7,7 @@ set -eo pipefail
 NODE_SETUP_PATH=$(dirname $(realpath $0))
 MAX_VM_MEM=2048
 MAX_VM_CPUS=2
-WORKDIR="${HOME/root/var/lib}/ovirt-node"
+WORKDIR="${WORKDIR:-${HOME/root/var/lib}/ovirt-node}"
 APPLIANCE_DOMAIN="appliance.net"
 
 CENTOS_MIRROR="${CENTOS_MIRROR:-http://mirror.centos.org}"
@@ -381,6 +381,8 @@ main() {
     }
 
     [[ ! -d "$WORKDIR" ]] && mkdir -p "$WORKDIR"
+
+    echo "Using WORKDIR: $WORKDIR"
 
     [[ ! -z "$node_url" ]] && {
         node=${machine:-node-$RANDOM}
