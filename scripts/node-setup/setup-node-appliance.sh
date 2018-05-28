@@ -5,8 +5,8 @@ set -eo pipefail
 ####### defs #######
 
 NODE_SETUP_PATH=$(dirname $(realpath $0))
-MAX_VM_MEM=2048
-MAX_VM_CPUS=2
+MAX_VM_MEM="${MAX_VM_MEM:-2048}"
+MAX_VM_CPUS="${MAX_VM_CPUS:-2}"
 WORKDIR="${WORKDIR:-${HOME/root/var/lib}/ovirt-node}"
 APPLIANCE_DOMAIN="appliance.net"
 
