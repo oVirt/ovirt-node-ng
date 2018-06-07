@@ -64,6 +64,9 @@ yum install -y --nogpgcheck \
   ovirt-release-host-node \
   ovirt-node-ng-image-update-placeholder
 
+# let VDSM configure itself, but don't have the file owned by any package, so we pass 'rpm -V'
+touch /var/lib/ngn-vdsm-need-configure
+
 # Postprocess (always the last step)
 imgbase --debug --experimental \
   image-build \
