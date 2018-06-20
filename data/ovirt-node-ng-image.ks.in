@@ -4,13 +4,6 @@
 #              NOT FOR INSTALLATION
 #
 
-#
-# Platform repositories
-#
-url --url=http://mirror.centos.org/centos/7/os/x86_64/
-repo --name=updates --mirrorlist=http://mirrorlist.centos.org/?repo=updates&release=$releasever&arch=$basearch
-repo --name=extra --mirrorlist=http://mirrorlist.centos.org/?repo=extras&release=$releasever&arch=$basearch
-
 lang en_US.UTF-8
 keyboard us
 timezone --utc Etc/UTC
@@ -22,23 +15,9 @@ firstboot --reconfig
 
 clearpart --all --initlabel
 bootloader --timeout=1
-part / --size=4096 --fstype=ext4 --fsoptions=discard
+part / --size=5120 --fstype=ext4 --fsoptions=discard
 
 poweroff
-
-
-#
-# Packages
-#
-%packages --excludedocs --ignoremissing
-#
-# Additional packages for EFI support
-# https://www.brianlane.com/creating-live-isos-with-livemedia-creator.html
-# http://lorax.readthedocs.org/en/latest/livemedia-creator.html#kickstarts
-@anaconda-tools
-dracut-config-generic
--dracut-config-rescue
-%end
 
 
 %post --erroronfail

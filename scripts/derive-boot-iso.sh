@@ -33,7 +33,7 @@ add_payload() {
   # Add squashfs
   cp $SQUASHFS $DST
   cat > interactive-defaults.ks <<EOK
-timezone --utc
+timezone --utc Etc/UTC
 
 liveimg --url=file:///run/install/repo/$DST
 
@@ -50,12 +50,18 @@ EOK
   local SQMNT=$(mktemp -d)
   mount $DST $IMGMNT
   mount $IMGMNT/LiveOS/rootfs.img $IMGMNT
-  unsquashfs LiveOS/squashfs.img
+  local install_img="LiveOS/squashfs.img"
+  if [[ ! -f ${install_img} ]]; then
+      install_img="images/install.img" # Fedora-based isos
+  fi
+  unsquashfs ${install_img}
   mount squashfs-root/LiveOS/rootfs.img $SQMNT
   cp -f $IMGMNT/etc/os-release $SQMNT/etc
-  umount $IMGMNT $IMGMNT $SQMNT
-  rmdir $SQMNT $IMGMNT
-  mksquashfs squashfs-root LiveOS/squashfs.img -noappend -comp xz
+  umount -dvf $IMGMNT
+  umount -dvf $IMGMNT
+  umount -dvf $SQMNT
+  rm -rvf $SQMNT $IMGMNT
+  mksquashfs squashfs-root ${install_img} -noappend -comp xz
   rm -rf squashfs-root
   # and the kickstart
   if [[ -e "$PRODUCTIMG" ]]; then
@@ -77,14 +83,15 @@ modify_bootloader() {
 	-e "/^\s*\(append\|initrd\|linux\|search\)/! s%${ORIG_NAME}%${INNER_PRETTY_NAME}%g" \
 	-e "s/Rescue a .* system/Rescue a ${INNER_PRETTY_NAME} system/g" \
 	$CFGS
-  umount $EFIMNT
+  umount -dvf $EFIMNT
   rmdir $EFIMNT
 }
 
 create_iso() {
   echo "[4/4] Creating new ISO"
   local volid=$(isoinfo -d -i $BOOTISO | grep "Volume id" | cut -d ":" -f2 | sed "s/^ //")
-  cond_out mkisofs -J -T -U \
+  rm -rvf $TMPDIR/tmp*
+  mkisofs -J -T -U \
       -joliet-long \
       -o $NEWBOOTISO \
       -b isolinux/isolinux.bin \

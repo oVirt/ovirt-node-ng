@@ -2,11 +2,7 @@
 
 set -ex
 
-# Fix to get all branch informations
-git -c remote.origin.fetch=+refs/heads/*:refs/remotes/origin/* fetch
-
-export BRANCH=${GIT_BRANCH:-$(git describe --all --contains HEAD | egrep -o "[^/]*$")}
-export BRANCH=${BRANCH#*/}
+export BRANCH=${GERRIT_BRANCH#*/}
 
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
@@ -27,14 +23,12 @@ export LIBGUESTFS_CACHEDIR=$LIBGUESTFS_TMPDIR
 #  export LMCOPTS="--proxy $http_proxy"
 #fi
 
-save_logs() {
-  sudo ln -fv \
-    data/ovirt-node*.ks \
-    *.log \
-    "$ARTIFACTSDIR/"
+on_exit() {
+  sudo ln -fv data/ovirt-node*.ks *.log "$ARTIFACTSDIR/"
+  cleanup
 }
 
-trap save_logs EXIT
+trap on_exit EXIT
 
 prepare() {
   mknod /dev/kvm c 10 232 || :
@@ -52,26 +46,37 @@ prepare() {
 
   virsh list --name | xargs -rn1 virsh destroy || true
   virsh list --all --name | xargs -rn1 virsh undefine --remove-all-storage || true
-  losetup -O BACK-FILE | grep iso$ | xargs -r umount -vf
+  losetup -O BACK-FILE | grep -v BACK-FILE | grep iso$ | xargs -r umount -dvf ||:
 }
 
 build() {
   # Build the squashfs for a later export
-  ./autogen.sh --with-tmpdir=/var/tmp
+  dist="$(rpm --eval %{dist})"
+  dist=${dist##.}
+
+  if [[ ${dist} = fc* ]]; then
+    export SHIP_OVIRT_INSTALLCLASS=1
+    ./autogen.sh --with-tmpdir=/var/tmp --with-distro=${dist}
+  else
+    ./autogen.sh --with-tmpdir=/var/tmp
+  fi
 
   sudo -E make squashfs &
   sudo -E tail -f virt-install.log --pid=$! --retry ||:
 
   # move out anaconda build logs and export them for debugging
-  tmpdir=$(mktemp -d)
-  mkdir $ARTIFACTSDIR/image-logs
-  mv ovirt-node-ng-image.squashfs.img{,.orig}
-  unsquashfs ovirt-node-ng-image.squashfs.img.orig
-  mount squashfs-root/LiveOS/rootfs.img $tmpdir
-  mv $tmpdir/var/log/anaconda $ARTIFACTSDIR/image-logs/var_log_anaconda || :
-  mv $tmpdir/root/*ks* $ARTIFACTSDIR/image-logs || :
-  umount $tmpdir
-  mksquashfs squashfs-root ovirt-node-ng-image.squashfs.img -noappend -comp xz
+  [[ $STD_CI_STAGE = "build-artifacts" ]] && {
+    tmpdir=$(mktemp -d)
+    mkdir $ARTIFACTSDIR/image-logs
+    mv ovirt-node-ng-image.squashfs.img{,.orig}
+    unsquashfs ovirt-node-ng-image.squashfs.img.orig
+    mount squashfs-root/LiveOS/rootfs.img $tmpdir
+    mv $tmpdir/var/log/anaconda $ARTIFACTSDIR/image-logs/var_log_anaconda || :
+    mv $tmpdir/root/*ks* $ARTIFACTSDIR/image-logs || :
+    umount $tmpdir
+    rmdir $tmpdir
+    mksquashfs squashfs-root ovirt-node-ng-image.squashfs.img -noappend -comp xz
+  }
 
   sudo -E make product.img rpm
   sudo -E make offline-installation-iso
@@ -90,34 +95,14 @@ build() {
     "$ARTIFACTSDIR/"
 }
 
-check() {
-  # script is used, because virt-install requires a tty
-  # (which ain't available in Jenkins)
-  touch lock
-  timeout=1200 #in secs
-  sudo -E script -efqc "make installed-squashfs && make check && rm -rf lock"
-  set +x
-  while [ -f lock ]; do
-    if [ $timeout -eq 0 ];
-    then
-      echo "test timeout error"
-      exit 1
-    fi
-    timeout=$(( timeout - 1 ))
-    sleep 1
-  done
-  set -x
-
-  sudo ln -fv \
-    ovirt-node-ng-image.installed.qcow2 \
-    "$ARTIFACTSDIR/"
-}
-
 check_iso() {
   ./scripts/node-setup/setup-node-appliance.sh -i ovirt-node*.iso -p ovirt
   cat *nodectl-check*.log
-  status=$(grep -Po "(?<=Status: ).*" *nodectl-check*.log)
-  [[ "$status" == *OK* ]] || {
+
+  status1=$(grep -Po "(?<=Status: ).*" *nodectl-check*.log)
+  status2=$(grep Status network-check.log |cut -d' ' -f2)
+
+  [[ "$status1" == *OK* || "$status2" == *OK* ]] || {
     echo "Invalid node status"
     exit 1
   }
@@ -142,9 +127,21 @@ EOF
   popd
 }
 
+cleanup() {
+  # Remove device-mapper files that were created by kpartx in LMC
+  dmsetup ls | \
+    grep ^loop | \
+    awk '{print $1}' | \
+    xargs -r -I {} dmsetup remove -f --retry /dev/mapper/{} ||:
+
+  # umount and detach
+  losetup -O BACK-FILE | grep -v BACK-FILE | xargs -r umount -vdf ||:
+  losetup -v -D ||:
+}
+
 prepare
 build
-# DISABLE checks until they are fixed
-#check
 check_iso
-checksum
+[[ $STD_CI_STAGE = "build-artifacts" ]] && checksum || :
+
+echo "Done."

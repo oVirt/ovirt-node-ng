@@ -1,7 +1,8 @@
 #!/usr/bin/bash
 
 BRANCH=${BRANCH:-master}
-NEWISO=${1:-$(realpath .)/ovirt-node-ng-installer-${BRANCH}-$(date +%Y%m%d%H).iso}
+DISTRO=$(rpm --eval '%{dist}'|cut -d. -f2)
+NEWISO=${1:-$(realpath .)/ovirt-node-ng-installer-${BRANCH}-${DISTRO}-$(date +%Y%m%d%H).iso}
 BOOTISO=${BOOTISO:-boot.iso}
 SQUASHFS=${SQUASHFS:-ovirt-node-ng-image.squashfs.img}
 PRODUCTIMG=${PRODUCTIMG:-product.img}
@@ -15,7 +16,7 @@ cond_curl() {
 }
 
 echo "Building an oVirt Node Next boot.iso"
-echo "from CentOS 7 boot.iso and a nightly squashfs"
+echo "from boot.iso and a nightly squashfs"
 echo "This can take a while ..."
 cond_curl "$BOOTISO" "http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso"
 cond_curl "$SQUASHFS" "http://jenkins.ovirt.org/job/ovirt-node-ng_${BRANCH}_build-artifacts-fc22-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-node-ng-image.squashfs.img"

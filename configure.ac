@@ -31,6 +31,11 @@ AC_SUBST([PACKAGE_RPM_RELEASE])
 IMAGENAME="ovirt-node-ng-image"
 AC_SUBST([IMAGENAME])
 
+AC_ARG_WITH([distro],
+    [AS_HELP_STRING([--with-distro=distro], [Base node-ng on distro (default: centos)])],
+    [],
+    [with_distro=centos])
+
 AC_ARG_WITH([bootisourl],
     [AS_HELP_STRING([--with-bootisourl=URL],
         [boot ISO url (default: http://mirror.centos.org/centos/7/os/x86_64/images/boot.iso)])],
@@ -124,3 +129,14 @@ AC_CONFIG_FILES([
 AM_PATH_PYTHON
 
 AC_OUTPUT
+
+# ksflatten doesn't work well in el7, so lets make our distro specific changes
+# manually here
+distro_ks=centos
+case "${with_distro}" in (fc*)
+        distro_ks=fedora
+        fcrel="${with_distro##fc}"
+        bootisourl=http://download.fedoraproject.org/pub/fedora/linux/releases/${fcrel}/Server/x86_64/os/images/boot.iso
+        sed -i s#^BOOTISOURL.*#BOOTISOURL=${bootisourl}# Makefile
+;; esac
+cat data/${distro_ks}.ks >> data/ovirt-node-ng-image.ks

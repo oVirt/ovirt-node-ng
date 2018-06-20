@@ -17,7 +17,8 @@ RELEASE_RPM=
 ####################
 
 
-die() { echo "ERROR: $@" && exit 1; }
+die() { echo "ERROR: $@" >&2 && exit 1; }
+dbg() { echo "DEBUG: $@" >&2; }
 
 download_rpm_and_extract() {
     local url=$1
@@ -41,25 +42,71 @@ do_ssh() {
 
     for i in {1..10}
     do
-        ssh -q -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $ssh_key root@$ip $cmd && break ||:
+        dbg "Executing [$cmd] on [$ip]"
+        ssh -q -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $ssh_key root@$ip "$cmd" && break ||:
         sleep 5
     done
 }
 
 get_vm_ip() {
-    name=$1
+    local name=$1
 
-    for i in {1..10}
+    local brdev=$(virsh net-info default | grep ^Bridge | awk '{print $2}')
+
+    for i in {1..30}
     do
-        ip=$(virsh -q domifaddr $name | awk '{sub(/\/.*/,""); print $4}') ||:
-        [[ -n "$ip" ]] && {
-            echo $ip
-            return
-        }
-        sleep 5
+        local mac=$(virsh -q domiflist "$name" | awk '{print $5}' | grep [0-9]) ||:
+
+        dbg "Searching ips for mac [$mac] on bridge device [$brdev]"
+        local arp_ips=$(ip n show dev "$brdev" | grep "$mac" | awk '{print $1}') ||:
+        local v_ips=$(virsh -q domifaddr "$name" | awk '{sub(/\/.*/,""); print $4}') ||:
+
+        dbg "Found arp_ips=$arp_ips, v_ips=$v_ips"
+        local ips=$(echo -e "$arp_ips\n$v_ips" | sort -ur)
+
+        for ip in $ips
+        do
+            dbg "Trying to ping $ip"
+            ping -c5 -i 3 $ip >&2 && {
+                dbg "Using ip $ip"
+                echo $ip
+                return
+            }
+        done
+        sleep 10
     done
 
-    die "get_vm_ip failed"
+    # Fallback - just use the ip in case ping is blocked for some reason, this
+    # is the previous behavior
+    [[ -n "$ips" ]] && echo $ips || die "get_vm_ip failed"
+}
+
+run_network_check() {
+    local name=$1
+    local vmpasswd=$2
+
+    local expect_script="./net-check.exp"
+
+cat << EOF > $expect_script
+#!/usr/bin/expect
+
+set timeout 300
+
+spawn virsh console $name --force
+
+expect "Escape character is"
+send "\r"
+
+expect "login: " { send "root\r" }
+expect "Password: " { send "$vmpasswd\r" }
+expect "~]# " { send "imgbase check\r" }
+expect "~]# " { send "ip a\r" }
+expect "~]# " { send "ip r\r" }
+expect "~]# " { send "journalctl -a --no-pager\r" }
+expect "~]# " { send "exit\r" }
+EOF
+    chmod +x $expect_script
+    $expect_script > network-check.log 2>&1 ||:
 }
 
 run_nodectl_check() {
@@ -72,7 +119,7 @@ run_nodectl_check() {
     while [[ -z "$check" ]]
     do
         [[ $timeout -eq 0 ]] && break
-        check=$(do_ssh $ssh_key $ip "nodectl check" 2>&1)
+        check=$(do_ssh "$ssh_key" "$ip" "imgbase check")
         sleep 10
         timeout=$((timeout - 10))
     done
@@ -157,6 +204,7 @@ setup_appliance() {
         --boot hd \
         --cdrom $cidata \
         --os-type linux \
+        --rng /dev/urandom \
         --noautoconsole > $logfile || die "virt-install failed"
 
     local ip=$(get_vm_ip $name)
@@ -164,13 +212,13 @@ setup_appliance() {
 
     echo "$name: Setting up repos and hostname ($fqdn)"
 
-    do_ssh $ssh_key $ip "hostnamectl set-hostname $fqdn; echo \"$ip $fqdn $name\" >> /etc/hosts"
-    [[ -n "$RELEASE_RPM" ]] && do_ssh $ssh_key $ip "rpm -U --quiet $RELEASE_RPM"
-    do_ssh $ssh_key $ip "systemctl -q enable sshd; systemctl -q mask --now cloud-init"
+    do_ssh "$ssh_key" "$ip" "hostnamectl set-hostname $fqdn; echo \"$ip $fqdn $name\" >> /etc/hosts"
+    [[ -n "$RELEASE_RPM" ]] && do_ssh "$ssh_key" "$ip" "rpm -U --quiet $RELEASE_RPM"
+    do_ssh "$ssh_key" "$ip" "systemctl -q enable sshd; systemctl -q mask --now cloud-init"
 
-    do_ssh $ssh_key $ip "echo SSO_ALTERNATE_ENGINE_FQDNS=\"$ip\" > /etc/ovirt-engine/engine.conf.d/99-alt-fqdn.conf"
-    do_ssh $ssh_key $ip "sed -i 's/^PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config"
-    do_ssh $ssh_key $ip "systemctl restart sshd"
+    do_ssh "$ssh_key" "$ip" "echo SSO_ALTERNATE_ENGINE_FQDNS=\"$ip\" > /etc/ovirt-engine/engine.conf.d/99-alt-fqdn.conf"
+    do_ssh "$ssh_key" "$ip" "sed -i 's/^PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config"
+    do_ssh "$ssh_key" "$ip" "systemctl restart sshd"
 
     echo "$name: appliance is available at $ip"
 
@@ -225,6 +273,7 @@ EOF
         --wait -1 \
         --os-variant rhel7 \
         --noautoconsole \
+        --rng /dev/urandom \
         --disk path=$diskimg,size=60 > "$logfile" || die "virt-install failed"
 
     if [[ -z $shutdown ]]
@@ -234,9 +283,8 @@ EOF
         virsh -q start $name || die "virsh start failed"
         local ip=$(get_vm_ip $name)
 
-        # waiting for ssh to be up...
-        do_ssh $ssh_key $ip "ls" > /dev/null
         run_nodectl_check $name $ssh_key $ip
+        run_network_check $name $vmpasswd
 
         echo "$name: node is available at $ip"
     else
@@ -295,6 +343,7 @@ setup_node() {
         --wait -1 \
         --os-variant rhel7 \
         --noautoconsole \
+        --rng /dev/urandom \
         --disk path=$diskimg,bus=virtio,cache=unsafe,discard=unmap,format=qcow2 \
         --disk path=$squashfs,readonly=on,device=disk,bus=virtio,serial=livesrc \
         > $logfile || die "virt-install failed"
@@ -307,9 +356,8 @@ setup_node() {
         virsh -q start $name || die "virsh start failed"
         local ip=$(get_vm_ip $name)
 
-        # waiting for ssh to be up...
-        do_ssh $ssh_key $ip "ls" > /dev/null
         run_nodectl_check $name $ssh_key $ip
+        run_network_check $name $vmpasswd
 
         echo "$name: node is available at $ip"
     else

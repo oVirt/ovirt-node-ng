@@ -3,8 +3,6 @@ automake
 coreutils
 createrepo
 git
-gluster
-glusterfs
 grubby
 kernel-modules
 kpartx
@@ -43,3 +41,4 @@ util-linux
 pigz
 glade-devel
 libxklavier-devel
+expect

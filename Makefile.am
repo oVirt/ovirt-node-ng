@@ -27,7 +27,9 @@ nodetoolsdir = $(prefix)/share/@PACKAGE_NAME@/tools
 EXTRA_DIST = \
 	docs/man/nodectl.8 \
 	scripts/nodectl-motd.sh \
-	scripts/nodectl-run-banner.sh
+	scripts/nodectl-run-banner.sh \
+	data/centos.ks \
+	data/fedora.ks
 
 SUBDIRS = \
 	src \
@@ -85,7 +87,7 @@ debug-ks: data/@IMAGENAME@.ks
 	sed -i 's/^poweroff/#poweroff/' $<
 
 # Building a "LiveOS" vm for debugging ks issues
-debug-squashfs: LMCOPTS=--vnc vnc
+debug-squashfs: LMCOPTS=--vnc vnc=127.0.0.1:5
 debug-squashfs: | debug-ks $(SQUASHFSFILENAME)
 	@echo debug-squashfs $(SQUASHFSFILENAME)
 
@@ -128,7 +130,7 @@ offline-installation-iso: product.img
 	PRODUCTIMG=$(PWD)/product.img BOOTISO=$(BOOTISO) SQUASHFS=$(SQUASHFSFILENAME) DERVICEBOOTISOSCRIPT=scripts/derive-boot-iso.sh bash scripts/create-nightly-boot-iso.sh
 
 @BOOTISO@:
-	curl $(CURLOPTS) -O @BOOTISOURL@
+	curl $(CURLOPTS) -LO $(BOOTISOURL)
 
 LMC ?= livemedia-creator
 %.squashfs.img: data/%.ks @BOOTISO@

@@ -8,11 +8,6 @@
 
 %global with_image @WITH_IMAGE@
 
-# Hardcode the dist to el7, because this is what the image contains
-# This is also hardcoded, because currently the el7 rpms are built
-# on F22 builders. Thus the dist would be wrong.
-%global dist .el7
-
 %global with_docs @DOCS@
 %global with_tools @TOOLS@
 
