@@ -13,7 +13,7 @@ TMPDIR=$(realpath bootiso.d)
 
 die() { echo "ERROR: $@" >&2 ; exit 2 ; }
 cond_out() { "$@" > .tmp.log 2>&1 || { cat .tmp.log >&2 ; die "Failed to run $@" ; } && rm .tmp.log || : ; return $? ; }
-in_squashfs() { export TMPDIR=/var/tmp ; guestfish --ro -a ${SQUASHFS} run : mount /dev/sda / : mount-loop /LiveOS/rootfs.img / : sh "$1" ; }
+in_squashfs() { TMPDIR=/var/tmp guestfish --ro -a ${SQUASHFS} run : mount /dev/sda / : mount-loop /LiveOS/rootfs.img / : sh "$1" ; }
 
 extract_iso() {
   echo "[1/4] Extracting ISO"
@@ -46,23 +46,29 @@ imgbase layout --init
 %end
 EOK
   # Add branding
-  local IMGMNT=$(mktemp -d)
-  local SQMNT=$(mktemp -d)
-  mount $DST $IMGMNT
-  mount $IMGMNT/LiveOS/rootfs.img $IMGMNT
+  local os_release=$(mktemp -p /var/tmp)
+  in_squashfs "cat /etc/os-release" > ${os_release}
+
+  # Which install image should we use as stage2
   local install_img="LiveOS/squashfs.img"
   if [[ ! -f ${install_img} ]]; then
       install_img="images/install.img" # Fedora-based isos
   fi
-  unsquashfs ${install_img}
-  mount squashfs-root/LiveOS/rootfs.img $SQMNT
-  cp -f $IMGMNT/etc/os-release $SQMNT/etc
-  umount -dvf $IMGMNT
-  umount -dvf $IMGMNT
-  umount -dvf $SQMNT
-  rm -rvf $SQMNT $IMGMNT
-  mksquashfs squashfs-root ${install_img} -noappend -comp xz
-  rm -rf squashfs-root
+  install_img=$(realpath ${install_img})
+
+  # Process stage2 image in a different dir
+  local stage2_dir=$(mktemp -dp /var/tmp)
+  pushd ${stage2_dir}
+    mkdir mntroot
+    unsquashfs ${install_img} && rm -f ${install_img}
+    mount squashfs-root/LiveOS/rootfs.img mntroot
+    mv -vf ${os_release} mntroot/etc/os-release
+    umount -dvf mntroot
+    mksquashfs squashfs-root install.squashfs.img -noappend -comp xz
+  popd
+  mv -vf ${stage2_dir}/install.squashfs.img ${install_img}
+  rm -rf ${stage2_dir}
+
   # and the kickstart
   if [[ -e "$PRODUCTIMG" ]]; then
     cp "$PRODUCTIMG" images/product.img
