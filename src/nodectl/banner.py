@@ -48,7 +48,7 @@ class Banner(object):
             self.gen_motd()
 
     def _get_ips(self):
-        output = subprocess.check_output(["ip", "addr"])
+        output = subprocess.check_output(["ip", "addr"]).decode("utf-8")
         relevant = [l for l in output.splitlines() if "global" in l and
                     "virbr" not in l]
 

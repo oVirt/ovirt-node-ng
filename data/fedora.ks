@@ -8,6 +8,7 @@ updates https://bugzilla.redhat.com/attachment.cgi?id=1454675
 dracut-live
 dracut-config-generic
 -dracut-config-rescue
+grub2-efi-x64
 %end
 
 %post

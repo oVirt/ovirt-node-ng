@@ -28,6 +28,7 @@ import re
 import subprocess
 
 from imgbased.utils import bcolors
+from .utils import string_types
 
 try:
     from subprocess import DEVNULL
@@ -54,7 +55,7 @@ class Status(object):
         services = {"vdsmd": VdsmStatus}
         statuses = {}
 
-        for service, checker in services.iteritems():
+        for service, checker in services.items():
             srv_status = checker(service)
             srv_machine = StatusParser(srv_status).parse()
             vals = {"human": srv_status,
@@ -99,11 +100,11 @@ class Status(object):
         if self.oneline:
             self.write_motd()
         else:
-            print self.output
+            print(self.output)
 
     def write_motd(self):
-        print "\n  Node {0}\n".format(
-                re.sub(r'\033\[1m', '', self.output.split('\n')[0]))
+        print("\n  Node {0}\n".format(
+                re.sub(r'\033\[1m', '', self.output.split('\n')[0])))
 
 
 class StatusParser(object):
@@ -122,7 +123,7 @@ class StatusParser(object):
         self.status = status
 
     def parse(self):
-        if isinstance(self.status, basestring):
+        if isinstance(self.status, string_types):
             cat, result = self.parse_line(self.status)
             return {cat: result}
         else:
@@ -195,7 +196,7 @@ class VdsmStatus(object):
 
             has_run = False
             for line in log.splitlines():
-                if "Started" in line:
+                if "Started" in str(line):
                     has_run = True
 
             if has_run:

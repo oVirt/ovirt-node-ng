@@ -25,7 +25,12 @@ import functools
 import logging
 import re
 
-from StringIO import StringIO
+from io import StringIO
+
+try:
+    string_types = (str, unicode, bytes)
+except NameError:
+    string_types = (str, bytes)
 
 log = logging.getLogger()
 

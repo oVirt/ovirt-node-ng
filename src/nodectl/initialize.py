@@ -63,17 +63,17 @@ class Initialize(object):
 
     def write(self):
         if self.machine:
-            print json.dumps(self.results)
+            print(json.dumps(self.results))
         else:
             # Neither JSON nor YAML gives a very nice output here, so use
             # our own formatter, since pprint includes sigils
             status = bcolors.ok("Success") if self.results["success"] else \
                 bcolors.fail("Failure")
-            print "Status: %s" % status
+            print("Status: %s" % status)
 
             if self.results["success"]:
-                print "  Please reboot to use the initialized system"
+                print("  Please reboot to use the initialized system")
             else:
-                print "  Reason:"
+                print("  Reason:")
                 for line in self.results["reason"].splitlines():
-                    print "    %s" % line
+                    print("    %s" % line)

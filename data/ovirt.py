@@ -34,7 +34,7 @@ class OvirtBaseInstallClass(BaseInstallClass):
     sortPriority = 21000
     hidden = not productName.startswith("oVirt")
 
-    wfi_dir = "fedora"
+    efi_dir = "fedora"
     default_autopart_type = AUTOPART_TYPE_LVM_THINP
 
     # there is a RHV branded help content variant

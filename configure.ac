@@ -139,4 +139,4 @@ case "${with_distro}" in (fc*)
         bootisourl=http://download.fedoraproject.org/pub/fedora/linux/releases/${fcrel}/Server/x86_64/os/images/boot.iso
         sed -i s#^BOOTISOURL.*#BOOTISOURL=${bootisourl}# Makefile
 ;; esac
-cat data/${distro_ks}.ks >> data/ovirt-node-ng-image.ks
+cat $(dirname $(realpath $0))/data/${distro_ks}.ks >> data/ovirt-node-ng-image.ks

@@ -7,9 +7,22 @@
 %global	_node_tools_dir /usr/share/%{name}/tools/
 
 %global with_image @WITH_IMAGE@
-
 %global with_docs @DOCS@
 %global with_tools @TOOLS@
+
+%if 0%{?fedora} || 0%{?rhel} >= 8
+%global with_python3 1
+%else
+%global with_python3 0
+%endif
+
+%if 0%{?rhel} >= 8
+%global with_python2 0
+%else
+%global with_python2 1
+%endif
+
+%global _configure ../configure
 
 # Disable compression, because the image is already compressed
 %define _source_payload w0.gzdio
@@ -31,6 +44,11 @@ BuildArch:  noarch
 
 BuildRequires: autoconf
 BuildRequires: automake
+
+%if 0%{?with_python3}
+BuildRequires: python3-devel
+%endif # with_python3
+
 
 %description
 This package provides some tooling around building %{_product_name}.
@@ -75,21 +93,64 @@ Subpackage for tools related to %{_product_name}
 %package nodectl
 Summary:     nodectl for %{name}
 Requires:    imgbased
+%if 0%{?with_python3}
+Requires:   python%{python3_pkgversion}-%{name}-nodectl
+%else
+Requires:   python2-%{name}-nodectl
+%endif # with_python3
 
 %description nodectl
 Subpackage for nodectl for %{name}
+
+
+%if 0%{?with_python2}
+%package -n python2-%{name}-nodectl
+Summary: A python 2 module for nodectl
+Requires:   %{name}-nodectl = %{version}
+
+%description -n python2-%{name}-nodectl
+python2-%{name}-nodectl is a python 2 library for nodectl
+%endif # with_python2
+
+%if 0%{?with_python3}
+%package -n python%{python3_pkgversion}-%{name}-nodectl
+Summary: A python 3 module for nodectl
+Requires:   %{name}-nodectl = %{version}
+
+%description -n python%{python3_pkgversion}-%{name}-nodectl
+python%{python3_pkgversion}-%{name}-nodectl is a python 3 library for nodectl
+%endif # with_python2
 
 %prep
 %setup -q -n %{name}-@PACKAGE_VERSION@
 
 %build
-%configure
+%if 0%{?with_python2}
+mkdir py2 && pushd py2
+%configure PYTHON="%{__python2}"
 make %{?_smp_mflags}
+popd
+%endif # with_python2
+
+%if 0%{?with_python3}
+mkdir py3 && pushd py3
+%configure PYTHON="%{__python3}"
+make %{?_smp_mflags}
+%endif # with_python3
+
 
 %install
 install -Dm 0755 scripts/nodectl-motd.sh %{buildroot}%{_sysconfdir}/profile.d/nodectl-motd.sh
 install -Dm 0755 scripts/nodectl-run-banner.sh %{buildroot}%{_sysconfdir}/profile.d/nodectl-run-banner.sh
-%make_install
+
+%if 0%{?with_python2}
+make -C py2 install DESTDIR="%{buildroot}"
+%endif # with_python2
+
+%if 0%{?with_python3}
+make -C py3 install DESTDIR="%{buildroot}"
+%endif # with_python3
+
 
 %if 0%{?with_image}
 # Install the image
@@ -151,7 +212,16 @@ rmdir "${MNTDIR}"
 %{_sysconfdir}/profile.d/nodectl-motd.sh
 %{_sysconfdir}/profile.d/nodectl-run-banner.sh
 %{_sbindir}/nodectl
-%{python_sitelib}/nodectl
+
+%if 0%{?with_python2}
+%files -n python2-%{name}-nodectl
+%{python2_sitelib}/nodectl
+%endif
+
+%if 0%{?with_python3}
+%files -n python%{python3_pkgversion}-%{name}-nodectl
+%{python3_sitelib}/nodectl
+%endif
 
 %if 0%{?with_docs}
 %files docs

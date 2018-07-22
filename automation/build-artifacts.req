@@ -34,6 +34,7 @@ gettext-devel
 libtool
 intltool
 python-devel
+python3-devel
 gobject-introspection
 gobject-introspection-devel
 libguestfs

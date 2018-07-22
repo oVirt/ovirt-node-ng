@@ -26,6 +26,7 @@ import logging
 import re
 import sys
 from imgbased.bootloader import BootConfiguration
+from .utils import string_types
 
 log = logging.getLogger()
 
@@ -71,12 +72,12 @@ class Info(object):
     def write(self):
         def pretty_print(k, indent=0):
             sys.stdout.write('{0}{1}: '.format(' ' * indent, k[0]))
-            if isinstance(k[1], basestring):
+            if isinstance(k[1], string_types):
                 sys.stdout.write('{0}\n'.format(k[1]))
 
             elif isinstance(k[1], dict):
                 sys.stdout.write('\n')
-                for item in k[1].iteritems():
+                for item in k[1].items():
                     pretty_print(item, indent+2)
 
             elif isinstance(k[1], list):
@@ -87,11 +88,11 @@ class Info(object):
             sys.stdout.flush()
 
         if self.machine:
-            print json.dumps(self.results)
+            print(json.dumps(self.results))
         else:
             # Neither JSON nor YAML gives a very nice output here, so use
             # our own formatter, since pprint includes sigils
-            for k in self.results.iteritems():
+            for k in self.results.items():
                 pretty_print(k)
 
 
