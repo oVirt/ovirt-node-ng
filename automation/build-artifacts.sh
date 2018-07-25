@@ -56,14 +56,10 @@ build() {
 
   if [[ ${dist} = fc* ]]; then
     export SHIP_OVIRT_INSTALLCLASS=1
-    ./autogen.sh --with-tmpdir=/var/tmp --with-distro=${dist} --disable-image
+    ./autogen.sh --with-tmpdir=/var/tmp --with-distro=${dist}
   else
-    ./autogen.sh --with-tmpdir=/var/tmp --disable-image
+    ./autogen.sh --with-tmpdir=/var/tmp
   fi
-
-  make rpm
-  ln -fv tmp.repos/SRPMS/*.rpm tmp.repos/RPMS/noarch/*.rpm "$ARTIFACTSDIR/"
-  exit 0
 
   sudo -E make squashfs &
   sudo -E tail -f virt-install.log --pid=$! --retry ||:
