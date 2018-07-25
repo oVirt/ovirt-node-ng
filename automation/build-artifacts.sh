@@ -56,9 +56,9 @@ build() {
 
   if [[ ${dist} = fc* ]]; then
     export SHIP_OVIRT_INSTALLCLASS=1
-    ./autogen.sh --with-tmpdir=/var/tmp --with-distro=${dist}
+    ./autogen.sh --with-tmpdir=/var/tmp --with-distro=${dist} --disable-image
   else
-    ./autogen.sh --with-tmpdir=/var/tmp
+    ./autogen.sh --with-tmpdir=/var/tmp --disable-image
   fi
 
   sudo -E make squashfs &
