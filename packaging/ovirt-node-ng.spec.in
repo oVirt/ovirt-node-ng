@@ -46,7 +46,7 @@ BuildRequires: autoconf
 BuildRequires: automake
 
 %if 0%{?with_python3}
-BuildRequires: python3-devel
+BuildRequires: python%{python3_pkgversion}-devel
 %endif # with_python3
 
 
@@ -106,7 +106,7 @@ Subpackage for nodectl for %{name}
 %if 0%{?with_python2}
 %package -n python2-%{name}-nodectl
 Summary: A python 2 module for nodectl
-Requires:   %{name}-nodectl = %{version}
+Requires:   %{name}-nodectl = @PACKAGE_RPM_VERSION@
 
 %description -n python2-%{name}-nodectl
 python2-%{name}-nodectl is a python 2 library for nodectl
@@ -115,7 +115,7 @@ python2-%{name}-nodectl is a python 2 library for nodectl
 %if 0%{?with_python3}
 %package -n python%{python3_pkgversion}-%{name}-nodectl
 Summary: A python 3 module for nodectl
-Requires:   %{name}-nodectl = %{version}
+Requires:   %{name}-nodectl = @PACKAGE_RPM_VERSION@
 
 %description -n python%{python3_pkgversion}-%{name}-nodectl
 python%{python3_pkgversion}-%{name}-nodectl is a python 3 library for nodectl
