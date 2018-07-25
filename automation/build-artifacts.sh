@@ -61,6 +61,10 @@ build() {
     ./autogen.sh --with-tmpdir=/var/tmp --disable-image
   fi
 
+  make rpm
+  ln -fv tmp.repos/SRPMS/*.rpm tmp.repos/RPMS/noarch/*.rpm "$ARTIFACTSDIR/"
+  exit 0
+
   sudo -E make squashfs &
   sudo -E tail -f virt-install.log --pid=$! --retry ||:
 
