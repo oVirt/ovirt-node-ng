@@ -1,4 +1,4 @@
-dnl Copyright (C) 2016 Red Hat, Inc.
+dnl Copyright (C) 2016-2018 Red Hat, Inc.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@ dnl Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 dnl MA  02110-1301, USA.  A copy of the GNU General Public License is
 dnl also available at http://www.gnu.org/copyleft/gpl.html.
 
-define([VERSION_NUMBER], [4.2.0])
+define([VERSION_NUMBER], [4.3.0])
 define([DISTRO], [centos])
-define([RELEASEVER], [0.999])
+define([RELEASEVER], [0.0])
 
 AC_INIT([ovirt-node-ng], VERSION_NUMBER, [devel@ovirt.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dependencies])
