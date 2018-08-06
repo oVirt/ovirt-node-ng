@@ -1,7 +1,8 @@
 #!/usr/bin/bash
 
 BRANCH=${BRANCH:-master}
-NEWISO=${1:-$(realpath .)/ovirt-node-ng-installer-${BRANCH}-$(date +%Y%m%d%H).iso}
+DISTRO=$(rpm --eval '%{dist}'|cut -d. -f2)
+NEWISO=${1:-$(realpath .)/ovirt-node-ng-installer-${VERSION}-$(date +%Y%m%d%H).${DISTRO}.iso}
 BOOTISO=${BOOTISO:-boot.iso}
 SQUASHFS=${SQUASHFS:-ovirt-node-ng-image.squashfs.img}
 PRODUCTIMG=${PRODUCTIMG:-product.img}
