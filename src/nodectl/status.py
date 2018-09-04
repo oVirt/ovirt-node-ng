@@ -104,7 +104,7 @@ class Status(object):
 
     def write_motd(self):
         print("\n  Node {0}\n".format(
-                re.sub(r'\033\[1m', '', self.output.split('\n')[0])))
+              re.sub(r'\033\[1m', '', self.output.split('\n')[0])))
 
 
 class StatusParser(object):

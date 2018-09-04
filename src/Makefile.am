@@ -27,3 +27,7 @@ pynodectl_PYTHON = \
 	nodectl/utils.py \
 	nodectl/config.py \
 	$(NULL)
+
+check-code:
+	pyflakes $(wildcard nodectl/*.py)
+	pep8 $(wildcard nodectl/*.py)

@@ -1,8 +1,8 @@
 ---
 stage:
-  - check-patch:
-      runtime-requirements:
-        support-nesting-level: 2
+  - check-patch
+  - check-merged
+  - build-artifacts
 distro: [el7, fc28]
 release_branches:
     master: ovirt-master
