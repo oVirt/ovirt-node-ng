@@ -141,5 +141,5 @@ prepare
 build
 # DISABLE checks until they are fixed
 #check
-check_iso
+#check_iso
 checksum
