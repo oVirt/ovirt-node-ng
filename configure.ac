@@ -31,6 +31,8 @@ AC_SUBST([PACKAGE_RPM_RELEASE])
 IMAGENAME="ovirt-node-ng-image"
 AC_SUBST([IMAGENAME])
 
+AC_SUBST([am__tar], ['find "$$tardir" -print -perm /g=w -exec chmod g-w {} \; | sort | tar --no-recursion --mtime="1970-01-01 00:00Z" --owner=root --group=root -chpf - -T -'])
+
 AC_ARG_WITH([distro],
     [AS_HELP_STRING([--with-distro=distro], [Base node-ng on distro (default: centos)])],
     [],
@@ -85,7 +87,7 @@ AC_ARG_ENABLE(
         [include image package @<:@default=yes@:>@]
     )],
     ,
-    [enable_image="yes"]
+    [enable_image="no"]
 )
 AM_CONDITIONAL([WITH_IMAGE], [test "${enable_image}" = "yes"])
 AM_CONDITIONAL([PACKAGE_IMAGE], [test "${enable_image}" = "yes"])
@@ -100,7 +102,7 @@ AC_ARG_ENABLE(
         [build docs subpackage @<:@default=yes@:>@]
     )],
     ,
-    [enable_docs="yes"]
+    [enable_docs="no"]
 )
 AS_IF([test "${enable_docs}" = "yes"],
       AC_SUBST([DOCS], ['1']),
@@ -113,7 +115,7 @@ AC_ARG_ENABLE(
         [build tools subpackage @<:@default=yes@:>@]
     )],
     ,
-    [enable_tools="yes"]
+    [enable_tools="no"]
 )
 AS_IF([test "${enable_tools}" = "yes"],
       AC_SUBST([TOOLS], ['1']),
