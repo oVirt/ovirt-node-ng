@@ -49,6 +49,9 @@ BuildRequires: automake
 BuildRequires: python%{python3_pkgversion}-devel
 %endif # with_python3
 
+%if 0%{?with_python2}
+BuildRequires: python-devel
+%endif # with_python2
 
 %description
 This package provides some tooling around building %{_product_name}.
