@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Red Hat, Inc.
+# Copyright (C) 2016-2019 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ if __name__ == "__main__":
     rpm = []
     key_pkgs = ['cockpit-ovirt-dashboard', 'kernel',
                 'redhat-release-virtualization-host', 'vdsm',
-                'ovirt-hosted-engine-setup', 'ovirt-release-master',
-                'ovirt-release40', 'imgbased']
+                'ovirt-hosted-engine-setup', 'ovirt-release43-pre',
+                'imgbased']
 
     if len(sys.argv) != 3:
         print("Generates the manifest file from different squashfs images\n")

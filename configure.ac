@@ -1,4 +1,4 @@
-dnl Copyright (C) 2016-2018 Red Hat, Inc.
+dnl Copyright (C) 2016-2019 Red Hat, Inc.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -61,9 +61,9 @@ AC_SUBST([TMPDIR])
 
 AC_ARG_WITH([ovirt-release-rpm-url],
     [AS_HELP_STRING([--with-ovirt-release-rpm-url=URL],
-        [URL to the ovirt-release rpm (default: http://resources.ovirt.org/pub/yum-repo/ovirt-release-master.rpm)])],
+        [URL to the ovirt-release rpm (default: https://resources.ovirt.org/pub/yum-repo/ovirt-release43-pre.rpm)])],
     [OVIRTRELEASERPMURL="$withval"],
-    [OVIRTRELEASERPMURL="http://resources.ovirt.org/pub/yum-repo/ovirt-release-master.rpm"])
+    [OVIRTRELEASERPMURL="https://resources.ovirt.org/pub/yum-repo/ovirt-release43-pre.rpm"])
 AC_SUBST([OVIRTRELEASERPMURL])
 
 AC_ARG_WITH([anaconda-url],
