@@ -28,4 +28,4 @@ check-integration: #check-sanity ovirt-engine-appliance.qcow2
 	$(PYTEST) testIntegration.py
 
 ovirt-engine-appliance.qcow2:
-	curl -O http://jenkins.ovirt.org/job/ovirt-appliance_master_build-artifacts-el7-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-engine-appliance.qcow2
+	curl -O http://jenkins.ovirt.org/job/ovirt-appliance_4.3_build-artifacts-el7-x86_64/lastStableBuild/artifact/exported-artifacts/ovirt-engine-appliance.qcow2
