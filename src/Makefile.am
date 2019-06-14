@@ -30,4 +30,4 @@ pynodectl_PYTHON = \
 
 check-code:
 	pyflakes $(wildcard nodectl/*.py)
-	pep8 $(wildcard nodectl/*.py)
+	$(PEP8) $(wildcard nodectl/*.py)

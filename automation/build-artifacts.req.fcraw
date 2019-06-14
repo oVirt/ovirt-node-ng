@@ -1,0 +1,7 @@
+autoconf
+automake
+createrepo
+make
+python3-devel
+python3-pyflakes
+python3-pycodestyle

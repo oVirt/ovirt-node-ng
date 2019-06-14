@@ -121,6 +121,11 @@ AS_IF([test "${enable_tools}" = "yes"],
       AC_SUBST([TOOLS], ['1']),
       AC_SUBST([TOOLS], ['0']))
 
+
+AC_ARG_VAR([PEP8], [path to pep8 utility])
+AC_CHECK_PROGS([PEP8], [pep8 pycodestyle-3])
+
+
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile

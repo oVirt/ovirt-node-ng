@@ -12,13 +12,9 @@
 
 %if 0%{?fedora} || 0%{?rhel} >= 8
 %global with_python3 1
-%else
-%global with_python3 0
-%endif
-
-%if 0%{?rhel} >= 8
 %global with_python2 0
 %else
+%global with_python3 0
 %global with_python2 1
 %endif
 

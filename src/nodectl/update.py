@@ -44,14 +44,14 @@ class Rollback(object):
         self._do(nvr)
 
     def _do(self, nvr):
-        with LogCapture() as l:
+        with LogCapture() as logs:
             try:
                 dst_layer = rollback(self.app, nvr)
                 self.results["success"] = True
                 self.results["next_layer"] = str(dst_layer)
-            except:
+            except Exception:
                 self.results["success"] = False
-                self.results["reason"] = l.getOutput()
+                self.results["reason"] = logs.getOutput()
 
     def write(self):
         if self.machine:

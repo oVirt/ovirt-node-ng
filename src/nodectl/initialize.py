@@ -44,7 +44,7 @@ class Initialize(object):
         self._do(source, nvr)
 
     def _do(self, source, nvr):
-        with LogCapture() as l:
+        with LogCapture() as log:
             try:
                 layout = Layout(self.app)
                 layout.initialize(source, nvr)
@@ -53,11 +53,11 @@ class Initialize(object):
                     Layout.InitializationFailedError) as e:
                 success = False
                 self.results["reason"] = str(e)
-            except:
+            except Exception:
                 # Failure -- an exceptionw was thrown from somewhere inside the
                 # imgbased hook emitting
                 success = False
-                self.results["reason"] = l.getOutput()
+                self.results["reason"] = log.getOutput()
 
             self.results["success"] = success
 
