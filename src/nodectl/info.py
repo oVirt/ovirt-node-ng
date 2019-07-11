@@ -59,7 +59,8 @@ class Info(object):
             # FIXME: this isn't very nice. GrubbyEntry should present
             # a clean way for a dict which can be JSON serializable.
             # json chokes with __repr__, so maybe a custom decoder?
-            bootinfo["entries"][k] = v.__dict__
+            for entry in v:
+                bootinfo["entries"][entry.title] = entry.__dict__
 
         self.results["bootloader"] = bootinfo
 
