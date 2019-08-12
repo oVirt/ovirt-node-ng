@@ -25,7 +25,9 @@ import json
 import logging
 import re
 import sys
+
 from imgbased.bootloader import BootConfiguration
+
 from .utils import string_types
 
 log = logging.getLogger()
@@ -78,7 +80,10 @@ class Info(object):
 
             elif isinstance(k[1], dict):
                 sys.stdout.write('\n')
-                for item in k[1].items():
+                items = k[1].items()
+                if k[0] == "entries":  # bootloader entries
+                    items.sort(key=lambda x: x[1]["index"])
+                for item in items:
                     pretty_print(item, indent+2)
 
             elif isinstance(k[1], list):
