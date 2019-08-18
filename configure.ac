@@ -20,7 +20,7 @@ define([DISTRO], [centos])
 define([RELEASEVER], [0.0])
 
 AC_INIT([ovirt-node-ng], VERSION_NUMBER, [devel@ovirt.org])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dependencies])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dist-gzip dist-xz no-dependencies])
 
 PACKAGE_RPM_VERSION="VERSION_NUMBER"
 AC_SUBST([PACKAGE_RPM_VERSION])

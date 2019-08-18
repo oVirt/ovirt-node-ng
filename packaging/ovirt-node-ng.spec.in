@@ -25,8 +25,8 @@
 %global _configure ../configure
 
 # Disable compression, because the image is already compressed
-%define _source_payload w0.gzdio
-%define _binary_payload w0.gzdio
+%define _source_payload w0.xzdio
+%define _binary_payload w0.xzdio
 
 Name:       %{_product_id}
 Version:    @PACKAGE_RPM_VERSION@
@@ -35,7 +35,7 @@ License:    GPLv2
 Summary:    %{_product_name}
 
 URL:        http://www.ovirt.org/node/
-Source0:    %{name}-@PACKAGE_VERSION@.tar.gz
+Source0:    %{name}-@PACKAGE_VERSION@.tar.xz
 %if 0%{?with_image}
 Source1:    @IMAGENAME@.squashfs.img
 Source2:    product.img
