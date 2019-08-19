@@ -3,6 +3,6 @@ stage:
   - check-patch
   - check-merged
   - build-artifacts
-distro: [el7, fc29, fc30, fcraw]
+distro: [el7, fc29, fc30]
 release_branches:
   master: ovirt-master
