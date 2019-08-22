@@ -80,7 +80,7 @@ class Info(object):
 
             elif isinstance(k[1], dict):
                 sys.stdout.write('\n')
-                items = k[1].items()
+                items = list(k[1].items())
                 if k[0] == "entries":  # bootloader entries
                     items.sort(key=lambda x: x[1]["index"])
                 for item in items:
