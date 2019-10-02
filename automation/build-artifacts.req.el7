@@ -2,6 +2,8 @@ autoconf
 automake
 createrepo
 make
+pyflakes
+python-pep8
+python-devel
 python3-devel
 python3-pyflakes
-python3-pycodestyle
