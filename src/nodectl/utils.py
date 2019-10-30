@@ -25,7 +25,7 @@ import functools
 import logging
 import re
 
-from io import StringIO
+from six import StringIO
 
 try:
     string_types = (str, unicode, bytes)
