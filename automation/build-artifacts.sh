@@ -2,16 +2,18 @@
 
 export ARTIFACTSDIR=$PWD/exported-artifacts
 
-main() {
-    rm -rf $ARTIFACTSDIR
-    mkdir -p $ARTIFACTSDIR
+# mock runner is not setting up the system correctly
+# https://issues.redhat.com/browse/CPDEVOPS-242
+dnf install -y $(cat automation/build-artifacts.req)
 
-    ./autogen.sh --disable-image --disable-docs --disable-tools
 
-    make -C src check-code
-    make rpm
+rm -rf "$ARTIFACTSDIR"
+mkdir -p "$ARTIFACTSDIR"
 
-    find tmp.repos -name "*.rpm" -exec mv {} $ARTIFACTSDIR \;
-}
+./autogen.sh --disable-image --disable-docs --disable-tools
 
-main
+make -C src check-code
+make rpm
+
+find tmp.repos -name "*.rpm" -exec mv {} "$ARTIFACTSDIR" \;
+

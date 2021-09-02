@@ -1,8 +1,8 @@
 ---
-stage:
-  - check-patch
-  - check-merged
-  - build-artifacts
-distro: [el8]
+distro:
+  - el8
+  - el9stream:
+      runtime-requirements:
+        host_distro: newer
 release_branches:
   master: ovirt-master
