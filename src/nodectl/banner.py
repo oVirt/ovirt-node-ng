@@ -49,8 +49,9 @@ class Banner(object):
 
     def _get_ips(self):
         output = subprocess.check_output(["ip", "addr"]).decode("utf-8")
-        relevant = [l for l in output.splitlines() if "global" in l and
-                    "virbr" not in l]
+        relevant = [line
+                    for line in output.splitlines() if "global" in line and
+                    "virbr" not in line]
 
         addresses = []
         for r in relevant:

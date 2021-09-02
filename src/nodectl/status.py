@@ -132,13 +132,14 @@ class StatusParser(object):
             for s in self.status:
                 if s.is_failed():
                     results["status"] = "bad"
-                d = [self.strip_ansi(l) for l in s.details().splitlines()]
-                cat, result = self.parse_line(d.pop(0))
+                details = [self.strip_ansi(line)
+                           for line in s.details().splitlines()]
+                cat, result = self.parse_line(details.pop(0))
 
                 results[cat] = result
 
-                for l in d:
-                    v, r = self.parse_line(l)
+                for current_detail in details:
+                    v, r = self.parse_line(current_detail)
                     results[cat][v] = r
 
         return results

@@ -117,8 +117,8 @@ class LayoutParser(object):
         result = dict()
         layouts = re.split(r'\n(?=\w)', self.layout, re.M)
 
-        for l in layouts:
-            lines = l.splitlines()
+        for current_layout in layouts:
+            lines = current_layout.splitlines()
             parent = lines.pop(0)
             result[parent] = []
             for line in lines:
