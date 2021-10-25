@@ -154,7 +154,8 @@ rmdir "${MNTDIR}"
 %dir %{_node_image_dir}
 %{_node_image_file}
 %{_node_image_dir}/product.img
-%endif # with_image
+%endif
+# ^ with_image
 
 %files nodectl
 %{_mandir}/man8/nodectl.8.gz
