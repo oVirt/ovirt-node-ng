@@ -40,7 +40,7 @@ man_MANS = \
 	$(NULL)
 
 dist_doc_DATA = \
-	README \
+	README.md \
 	$(NULL)
 
 dist_docbook_DATA = \
