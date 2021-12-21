@@ -158,10 +158,5 @@ endif
 clean-local:
 	-rm -vrf $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(RPMUNSIGNEDNAME) $(INSTALLEDIMAGEFILE) packaging/ovirt-node-ng.spec build
 
-# If you wonder, check does not depend on installed-squashfs, because we do not
-# # want to enforce a rebuild if check is called
-check:
-	$(MAKE) -C tests check
-
 clean-build-and-check: | clean squashfs installed-squashfs check
 	echo Done
