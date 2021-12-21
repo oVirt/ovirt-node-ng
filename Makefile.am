@@ -20,8 +20,6 @@ RPMMANIFESTNAME = @IMAGENAME@.manifest-rpm
 RPMUNSIGNEDNAME = @IMAGENAME@.unsigned-rpms
 INSTALLEDIMAGEFILE = @IMAGENAME@.installed.qcow2
 
-docbookdir = $(prefix)/share/doc/@PACKAGE_NAME@/book
-docbookimgsdir = $(prefix)/share/doc/@PACKAGE_NAME@/book/imgs
 nodetoolsdir = $(prefix)/share/@PACKAGE_NAME@/tools
 
 EXTRA_DIST = \
@@ -40,31 +38,6 @@ man_MANS = \
 
 dist_doc_DATA = \
 	README.md \
-	$(NULL)
-
-dist_docbook_DATA = \
-	docs/book/administration.md \
-	docs/book/book.json \
-	docs/book/build.md \
-	docs/book/cover.jpg \
-	docs/book/customization.md \
-	docs/book/design.md \
-	docs/book/engine.md \
-	docs/book/fsh.md \
-	docs/book/getting-started.md \
-	docs/book/install.md \
-	docs/book/testing.md \
-	docs/book/upgrade.md \
-	docs/book/imgs/build-flow.dot \
-	$(NULL)
-
-dist_docbookimgs_DATA = \
-	docs/book/imgs/build-flow.dot \
-	docs/book/imgs/build-flow.dot.png \
-	docs/book/imgs/ngn-flow-components.dot \
-	docs/book/imgs/ngn-flow-components.dot.png \
-	docs/book/imgs/ngn-flow.dot \
-	docs/book/imgs/ngn-flow.dot.png \
 	$(NULL)
 
 dist_nodetools_DATA = \
