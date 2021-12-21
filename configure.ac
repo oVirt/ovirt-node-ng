@@ -129,21 +129,9 @@ AC_CHECK_PROGS([PEP8], [pep8 pycodestyle-3])
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
-	data/ovirt-node-ng-image.ks
 	src/nodectl/config.py
 ])
 
 AM_PATH_PYTHON
 
 AC_OUTPUT
-
-# ksflatten doesn't work well in el7, so lets make our distro specific changes
-# manually here
-distro_ks=centos
-case "${with_distro}" in (fc*)
-        distro_ks=fedora
-        fcrel="${with_distro##fc}"
-        bootisourl=http://download.fedoraproject.org/pub/fedora/linux/releases/${fcrel}/Server/x86_64/os/images/boot.iso
-        sed -i s#^BOOTISOURL.*#BOOTISOURL=${bootisourl}# Makefile
-;; esac
-cat $(dirname $(realpath $0))/data/${distro_ks}.ks >> data/ovirt-node-ng-image.ks

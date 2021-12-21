@@ -28,8 +28,7 @@ EXTRA_DIST = \
 	docs/man/nodectl.8 \
 	scripts/nodectl-motd.sh \
 	scripts/nodectl-run-banner.sh \
-	data/centos.ks \
-	data/fedora.ks
+	$(NULL)
 
 SUBDIRS = \
 	src \
@@ -83,8 +82,6 @@ dist_sbin_SCRIPTS = \
 	scripts/nodectl \
 	$(NULL)
 
-debug-ks: data/@IMAGENAME@.ks
-	sed -i 's/^poweroff/#poweroff/' $<
 
 # Building a "LiveOS" vm for debugging ks issues
 debug-squashfs: LMCOPTS=--vnc vnc=127.0.0.1:5
@@ -95,30 +92,6 @@ squashfs: $(SQUASHFSFILENAME) $(RPMMANIFESTNAME) $(RPMUNSIGNEDNAME)
 	@echo squashfs: $(SQUASHFSFILENAME)
 	@echo squashfs rpm-manifest: $(RPMMANIFESTNAME)
 	@echo squashfs rpm-unsigned: $(RPMUNSIGNEDNAME)
-
-installed-squashfs: DOMNAME=node-$(shell date +%F-%H%M)
-installed-squashfs: data/ci-image-install.ks $(SQUASHFSFILENAME) @BOOTISO@
-	qemu-img create -f qcow2 $(INSTALLEDIMAGEFILE) 63G
-	virt-install \
-		--name $(DOMNAME) \
-		--boot menu=off \
-		--network none \
-		--memory 4096 \
-		--vcpus 4 \
-		--os-variant rhel7 \
-		--rng random \
-		--noreboot \
-		--location @BOOTISO@ \
-		--extra-args "inst.ks=file:///ci-image-install.ks console=ttyS0" \
-		--initrd-inject data/ci-image-install.ks \
-		--check disk_size=off,path_in_use=off \
-		--graphics none \
-		--wait 60 \
-		--disk path=$(INSTALLEDIMAGEFILE),bus=virtio,cache=unsafe,discard=unmap,format=qcow2 \
-		--disk path=$(SQUASHFSFILENAME),readonly=on,device=disk,bus=virtio,serial=livesrc
-	virsh dumpxml $(DOMNAME) > installed-squashfs-domain.xml
-	virsh undefine $(DOMNAME)
-	@echo "The squashfs '$(SQUASHFSFILENAME)' got installed into the file '$(INSTALLEDIMAGEFILE)'"
 
 debug-installed: installed-squashfs
 	virsh define installed-squashfs-domain.xml
@@ -137,10 +110,6 @@ offline-installation-iso: product.img
 @BOOTISO@:
 	curl $(CURLOPTS) -LO $(BOOTISOURL)
 
-LMC ?= livemedia-creator
-%.squashfs.img: data/%.ks @BOOTISO@
-	$(LMC) $(LMCOPTS) --make-pxe-live --iso @BOOTISO@ --ks $< --resultdir build --tmp @TMPDIR@
-	mv -v build/*squash* "$@"
 
 # Short TMPDIR otherwise we run into trouble with guestfish < 1.33.27-1.fc24
 # # -x -v to be more verbose
