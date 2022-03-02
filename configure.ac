@@ -17,7 +17,7 @@ dnl also available at http://www.gnu.org/copyleft/gpl.html.
 
 define([VERSION_NUMBER], [4.4.1])
 define([DISTRO], [centos])
-define([RELEASEVER], [0.0])
+define([RELEASEVER], [1])
 
 AC_INIT([ovirt-node-ng], VERSION_NUMBER, [devel@ovirt.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dist-gzip dist-xz no-dependencies])
@@ -25,7 +25,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax no-dist-gzip di
 PACKAGE_RPM_VERSION="VERSION_NUMBER"
 AC_SUBST([PACKAGE_RPM_VERSION])
 
-PACKAGE_RPM_RELEASE="0.$(date +%Y%m%d).0"
+PACKAGE_RPM_RELEASE="1"
 AC_SUBST([PACKAGE_RPM_RELEASE])
 
 IMAGENAME="ovirt-node-ng-image"

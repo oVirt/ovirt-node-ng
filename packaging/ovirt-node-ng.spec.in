@@ -2,9 +2,9 @@
 %global _product_name oVirt Node Next
 %global _product_id ovirt-node-ng
 
-%global	_node_image_dir /usr/share/%{name}/image/
-%global	_node_image_file %{_node_image_dir}/%{name}-@PLACEHOLDER_RPM_VERSION@-@PLACEHOLDER_RPM_RELEASE@.squashfs.img
-%global	_node_tools_dir /usr/share/%{name}/tools/
+%global _node_image_dir /usr/share/%{name}/image/
+%global _node_image_file %{_node_image_dir}/%{name}-@PLACEHOLDER_RPM_VERSION@-@PLACEHOLDER_RPM_RELEASE@.squashfs.img
+%global _node_tools_dir /usr/share/%{name}/tools/
 
 %global with_image @WITH_IMAGE@
 %global with_docs @DOCS@
@@ -20,8 +20,8 @@ Release:    @PACKAGE_RPM_RELEASE@%{?dist}%{?extra_release}
 License:    GPLv2
 Summary:    %{_product_name}
 
-URL:        http://www.ovirt.org/node/
-Source0:    %{name}-@PACKAGE_VERSION@.tar.xz
+URL:        https://www.ovirt.org/download/node.html
+Source0:    https://github.com/oVirt/%{name}/releases/download/%{name}-%{version}/%{name}-@PACKAGE_VERSION@.tar.xz
 %if 0%{?with_image}
 Source1:    @IMAGENAME@.squashfs.img
 Source2:    product.img
@@ -184,6 +184,9 @@ rmdir "${MNTDIR}"
 %endif
 
 %changelog
+* Wed Mar 02 2022 Sandro Bonazzola <sbonazzo@redhat.com> - 4.4.1-1
+- Rebase on upstream 4.4.1
+
 * Fri Nov 22 2019 Sandro Bonazzola <sbonazzo@redhat.com> - 4.4.0-1
 - Rebase on upstream 4.4.0
 - Initial el8 import
