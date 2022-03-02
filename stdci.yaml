@@ -1,8 +1,0 @@
----
-distro:
-  - el8
-  - el9stream:
-      runtime-requirements:
-        host_distro: newer
-release_branches:
-  master: ovirt-master
