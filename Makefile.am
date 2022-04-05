@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2019 Red Hat, Inc.
+# Copyright (C) 2016-2022 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -98,8 +98,6 @@ packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_VERSION=$(shell $(IN_ROOTFS) "rpm 
 packaging/ovirt-node-ng.spec: PLACEHOLDER_RPM_RELEASE=$(shell $(IN_ROOTFS) "rpm -q --qf %{release} $(PLACEHOLDER_RPM)")
 packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in
 	sed \
-		-e "s/\@WITH_IMAGE\@/$(WITH_IMAGE)/" \
-		-e "s/\@IMAGENAME\@/$(IMAGENAME)/" \
 		-e "s/\@PACKAGE_VERSION\@/$(PACKAGE_VERSION)/" \
 		-e "s/\@PACKAGE_RPM_VERSION\@/$(PACKAGE_RPM_VERSION)/" \
 		-e "s/\@PACKAGE_RPM_RELEASE\@/$(PACKAGE_RPM_RELEASE)/" \
@@ -112,11 +110,7 @@ packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in
 RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
 
-if WITH_IMAGE
-rpm srpm: packaging/ovirt-node-ng.spec $(RPMMANIFESTNAME) $(RPMUNSIGNEDNAME) $(SQUASHFSFILENAME) product.img
-else
 rpm srpm: packaging/ovirt-node-ng.spec
-endif
 	rm -fr "$(TMPREPOS)"
 	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
 	make dist
