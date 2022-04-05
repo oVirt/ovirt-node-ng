@@ -1,20 +1,12 @@
 
 %global _product_name oVirt Node Next
-%global _product_id ovirt-node-ng
 
-%global _node_image_dir /usr/share/%{name}/image/
-%global _node_image_file %{_node_image_dir}/%{name}-@PLACEHOLDER_RPM_VERSION@-@PLACEHOLDER_RPM_RELEASE@.squashfs.img
 %global _node_tools_dir /usr/share/%{name}/tools/
 
-%global with_image @WITH_IMAGE@
 %global with_docs @DOCS@
 %global with_tools @TOOLS@
 
-# Disable compression, because the image is already compressed
-%define _source_payload w0.xzdio
-%define _binary_payload w0.xzdio
-
-Name:       %{_product_id}
+Name:       ovirt-node-ng
 Version:    @PACKAGE_RPM_VERSION@
 Release:    @PACKAGE_RPM_RELEASE@%{?dist}%{?extra_release}
 License:    GPLv2
@@ -22,10 +14,6 @@ Summary:    %{_product_name}
 
 URL:        https://www.ovirt.org/download/node.html
 Source0:    https://github.com/oVirt/%{name}/releases/download/%{name}-%{version}/%{name}-@PACKAGE_VERSION@.tar.xz
-%if 0%{?with_image}
-Source1:    @IMAGENAME@.squashfs.img
-Source2:    product.img
-%endif
 BuildArch:  noarch
 
 BuildRequires: autoconf
@@ -36,26 +24,6 @@ BuildRequires: python%{python3_pkgversion}-devel
 %description
 This package provides some tooling around building %{_product_name}.
 Currently the main package is empty.
-
-%if 0%{?with_image}
-# IMPORTANT
-# The image and image-updat version and release are inherited
-# from the ovirt-node-ng-image-update-placeholder package
-# There is a lot of fu to support this.
-%package image-update
-Summary:    %{_product_name} Image Update
-Version:    @PLACEHOLDER_RPM_VERSION@
-Release:    @PLACEHOLDER_RPM_RELEASE@
-Requires:   imgbased >= 0.7.2
-
-Obsoletes:  %{_product_id}-image-update-placeholder < %{version}-%{release}
-Provides:  %{_product_id}-image-update-placeholder = %{version}-%{release}
-Obsoletes:  %{_product_id}-image < %{version}-%{release}
-Provides:   %{_product_id}-image = %{version}-%{release}
-
-%description image-update
-This package will update an %{_product_name} host with the new image.
-%endif
 
 %if 0%{?with_docs}
 %package docs
@@ -101,62 +69,6 @@ install -Dm 0755 scripts/nodectl-motd.sh %{buildroot}%{_sysconfdir}/profile.d/no
 install -Dm 0755 scripts/nodectl-run-banner.sh %{buildroot}%{_sysconfdir}/profile.d/nodectl-run-banner.sh
 make install DESTDIR="%{buildroot}"
 
-%if 0%{?with_image}
-# Install the image
-/usr/bin/install -d %{buildroot}/%{_node_image_dir}
-/usr/bin/install -m 644 %{SOURCE1} %{buildroot}/%{_node_image_file}
-/usr/bin/install -m 644 %{SOURCE2} %{buildroot}/%{_node_image_dir}/product.img
-
-%pre image-update
-local_sds=($(find / -xdev -name "__DIRECT_IO_TEST__"))
-
-if [ "$local_sds" ]; then
-    echo "Local storage domains were found on the same filesystem as / ! Please migrate the data to a new LV before upgrading, or you will lose the VMs"
-    echo "See: https://bugzilla.redhat.com/show_bug.cgi?id=1550205#c3"
-    echo "Storage domains were found in:"
-    for sd in "${local_sds[@]}"; do
-        echo -e "\t$(dirname $sd)"
-    done
-    exit 1
-fi
-
-%post image-update
-set -e
-# Some magic to ensure that imgbase from
-# the new image is used for updates
-export MNTDIR="$(mktemp -d)"
-mount "%{_node_image_file}" "$MNTDIR"
-mount "$MNTDIR"/LiveOS/rootfs.img "$MNTDIR"
-export PYTHONPATH="$MNTDIR"/usr/lib/python2.7/site-packages/:$PYTHONPATH
-imgbase --debug update --format liveimg %{_node_image_file} >> /tmp/imgbased.log 2>&1
-VOL=$(imgbase layer --volume-path $(imgbase layer --latest))
-umount "$MNTDIR"
-umount "$MNTDIR"
-
-UPDATERPM="/tmp/updaterpm.path"
-lsof | grep image-update | awk '{print $9}' > $UPDATERPM
-
-UPDATELOG="/tmp/image-update.log"
-echo "List of open files:" > $UPDATELOG
-lsof > $UPDATELOG
-
-mount "$VOL" "$MNTDIR"
-rpm -Uvh --quiet --justdb --root "${MNTDIR}" $(cat ${UPDATERPM}) > /dev/null 2>&1
-RC=$?
-umount "${MNTDIR}"
-
-rm "${UPDATERPM}"
-[ $RC = 0 ] && rm "${UPDATELOG}"
-rmdir "${MNTDIR}"
-
-
-%files image-update
-%dir %{_node_image_dir}
-%{_node_image_file}
-%{_node_image_dir}/product.img
-%endif
-# ^ with_image
-
 %files nodectl
 %{_mandir}/man8/nodectl.8.gz
 %{_sysconfdir}/profile.d/nodectl-motd.sh
@@ -184,6 +96,9 @@ rmdir "${MNTDIR}"
 %endif
 
 %changelog
+* Tue Apr 05 2022 Sandro Bonazzola <sbonazzo@redhat.com> - 4.4.2-1
+- Rebase on upstream 4.4.2
+
 * Wed Mar 02 2022 Sandro Bonazzola <sbonazzo@redhat.com> - 4.4.1-1
 - Rebase on upstream 4.4.1
 
