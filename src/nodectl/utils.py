@@ -24,13 +24,9 @@
 import functools
 import logging
 import re
+import io
 
-from six import StringIO
-
-try:
-    string_types = (str, unicode, bytes)
-except NameError:
-    string_types = (str, bytes)
+string_types = (str, bytes)
 
 log = logging.getLogger()
 
@@ -46,7 +42,7 @@ class ContextDecorator(object):
 
 class LogCapture(ContextDecorator):
     def __enter__(self):
-        self.buf = StringIO()
+        self.buf = io.StringIO()
 
         self.oldLogLevel = log.getEffectiveLevel()
         log.setLevel(logging.INFO)

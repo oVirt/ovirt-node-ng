@@ -15,11 +15,7 @@
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
 
-PYTHON=python
-
-if [[ -n "$(which python3 2>&-)" ]]; then
-  PYTHON=python3
-fi
+PYTHON=python3
 
 if [[ $EUID -ne 0 ]]; then
     echo "nodectl must be run as root!"
