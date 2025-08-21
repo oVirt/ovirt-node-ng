@@ -18,6 +18,7 @@ BuildArch:  noarch
 
 BuildRequires: autoconf
 BuildRequires: automake
+BuildRequires: make
 
 BuildRequires: python%{python3_pkgversion}-devel
 
