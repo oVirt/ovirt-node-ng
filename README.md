@@ -1,5 +1,4 @@
 # oVirt Node NG - nodectl
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-node-ng/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-node-ng/)
 
 This repository contains the code of the `nodectl` tool used within oVirt Node NG.
 The repository which contains the code for building oVirt Node NG is at <https://github.com/oVirt/ovirt-node-ng-image>.
