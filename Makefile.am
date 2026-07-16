@@ -109,14 +109,15 @@ packaging/ovirt-node-ng.spec: packaging/ovirt-node-ng.spec.in
 
 RPMBUILD = rpmbuild
 TMPREPOS = tmp.repos
+RPMBUILD_ARGS := --define="_topdir `pwd`/$(TMPREPOS)" --define "_sourcedir `pwd`"
+RPMBUILD_ARGS += $(if $(RELEASE_SUFFIX),--define="release_suffix $(RELEASE_SUFFIX)")
 
 rpm srpm: packaging/ovirt-node-ng.spec
 	rm -fr "$(TMPREPOS)"
 	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
 	make dist
 	$(RPMBUILD) \
-		--define="_topdir `pwd`/$(TMPREPOS)" \
-		--define "_sourcedir `pwd`" \
+		$(RPMBUILD_ARGS) \
 		-ba packaging/ovirt-node-ng.spec
 	@echo
 	@echo "srpm and rpm(s) available at '$(TMPREPOS)'"
