@@ -42,7 +42,7 @@ AC_ARG_ENABLE(
     [docs],
     [AS_HELP_STRING(
         [--enable-docs],
-        [build docs subpackage @<:@default=yes@:>@]
+        [build docs subpackage @<:@default=no@:>@]
     )],
     ,
     [enable_docs="no"]
@@ -55,7 +55,7 @@ AC_ARG_ENABLE(
     [tools],
     [AS_HELP_STRING(
         [--enable-tools],
-        [build tools subpackage @<:@default=yes@:>@]
+        [build tools subpackage @<:@default=no@:>@]
     )],
     ,
     [enable_tools="no"]
